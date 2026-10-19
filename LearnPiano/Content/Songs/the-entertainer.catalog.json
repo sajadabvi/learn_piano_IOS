@@ -18,10 +18,10 @@
       "timeSignature": "2/4",
       "measures": 20,
       "hands": "both",
-      "notes": "Intro and the complete first strain at a relaxed tempo; the octave intro is thinned to a single line that passes from right hand to left hand, and the bass uses single notes with close E-G-C triads instead of octaves.",
+      "notes": "Intro and the complete first strain at a relaxed tempo; the octave intro is thinned to a single line played by the right hand in bars 1-2 and handed to the left hand in bar 3, and the bass uses single notes with close E-G-C triads instead of octaves.",
       "teachingPoints": [
         "Left hand first: bass note on the beat, triad off the beat, no accents on the triads. Loop bars 5-8 with a metronome until it is automatic.",
-        "Right hand: the D-D#-E-C pickup lands on E4 with the thumb and C5 with the fifth finger; keep that 1-5 frame for E C E C.",
+        "Right hand: the D-D#-E pickup (after a 16th rest) lands on C5 with the fifth finger on the downbeat; keep the 1-5 frame for the syncopated C E C E C, where the C5s fall every three 16ths.",
         "Bars 13-14 (A G F# A C E, E D C A D) shift the hand up: thumb on F#4, then 3-4-5 on A-C-E.",
         "Hold the long D5 in bars 14-15 for its full value while the left hand keeps moving through D7 to G7."
       ]

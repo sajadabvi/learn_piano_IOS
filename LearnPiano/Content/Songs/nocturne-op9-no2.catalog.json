@@ -1,0 +1,31 @@
+{
+  "id": "nocturne-op9-no2",
+  "title": "Nocturne in E-flat major, Op. 9 No. 2 (opening)",
+  "composer": "Frédéric Chopin",
+  "genre": "Classical",
+  "categories": ["Classical", "Famous Melodies"],
+  "year": 1832,
+  "description": "Chopin's most famous nocturne: a bel canto melody in 12/8 over a rocking waltz-like bass, decorated more lavishly each time it returns. Learning the opening teaches cantabile voicing, left-hand leaps, and how to fit ornamental runs freely over a steady accompaniment.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "nocturne-op9-no2-pro",
+      "label": "Pro",
+      "difficulty": "pro",
+      "file": "nocturne-op9-no2__pro.musicxml",
+      "tempoBPM": 66,
+      "keySignature": "E-flat major",
+      "timeSignature": "12/8",
+      "measures": 17,
+      "hands": "both",
+      "notes": "Chopin's text for the pickup and bars 1-16 (theme, ornamented theme, the B section and the return of the theme), with the grace notes written out as 32nds (bar 8 acciaccatura, bar 13 grace triplet, trill terminations in bars 7 and 15) and the Schirmer fingerings.",
+      "teachingPoints": [
+        "Left hand: each beat is bass note then two chords; the bass alternates registers (Eb2, Eb3, Eb2, D2 in bar 1), so practise the leaps slowly with the eyes on the bass note.",
+        "Bars 1-4 are the plain theme: finger 5-4 substitution on the opening G5, and the Bb4 upbeats with the thumb; keep the melody singing above the pp chords.",
+        "Bar 6 and 14 (the chromatic ascent B-C, Db-C, F-E, Ab-G, Db-C) and the 32nd runs in bar 16 are played freely over a left hand that does not slow down; practise hands separately, then fit the run into the two accompaniment chords.",
+        "Bars 11-12: the right hand plays dyads and triads; the chromatic bass in bar 12 (Bb-A-G#-G-F-Bb) drives into the Tempo I return at bar 13.",
+        "Bars 7, 10 and 15: the trill on F (finger 2-3) ends with E-F before the staccato G; bar 10's four staccato Ebs are a poco ritardando into the dominant."
+      ]
+    }
+  ]
+}

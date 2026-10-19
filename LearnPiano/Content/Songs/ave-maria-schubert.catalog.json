@@ -1,0 +1,31 @@
+{
+  "id": "ave-maria-schubert",
+  "title": "Ave Maria (Ellens Gesang III)",
+  "composer": "Franz Schubert",
+  "genre": "Classical",
+  "categories": ["Classical", "Famous Melodies"],
+  "year": 1825,
+  "description": "Schubert's 1825 song from his Walter Scott settings (D. 839), later sung with the Latin Ave Maria text and one of the most famous melodies ever written. Learning it teaches singing-tone legato over a rolling triplet accompaniment and the ornamental turns of a Romantic vocal line.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "ave-maria-schubert-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "ave-maria-schubert__intermediate.musicxml",
+      "tempoBPM": 44,
+      "keySignature": "B-flat major",
+      "timeSignature": "4/4",
+      "measures": 17,
+      "hands": "both",
+      "notes": "The complete first verse in the original B-flat major: two-bar piano prelude, the vocal line in the right hand with Schubert's written-out turns (grace notes realised as 32nds), the sextuplet accompaniment reduced to left-hand triplets of bass plus two chord tones, and the original three-bar postlude.",
+      "teachingPoints": [
+        "Left hand: every beat is one triplet, bass note (finger 5) then two chord tones; practise it alone with a metronome until the triplets are perfectly even and quiet.",
+        "Right hand: the melody lies between G4 and F5 around Bb4-D5; keep the long notes singing and shape each ornamental turn (bars 5, 6, 9, 11) as a decoration, not a rhythm exercise.",
+        "Bar 5 has a 32nd-note pair (C-Bb) and bar 8 a sextuplet after a tie; count these bars slowly in 16ths before playing them in tempo.",
+        "Watch the accidentals: E natural in the bass of bars 3 and 7, C-sharp in bar 6, B natural in bars 7, 9 and 10, D-flat in bar 12.",
+        "Prelude and postlude (bars 1-2, 14-17): right hand plays rising dyads in triplets over left-hand octaves; keep them pp so the melody entrance in bar 3 can be the first real sound."
+      ]
+    }
+  ]
+}

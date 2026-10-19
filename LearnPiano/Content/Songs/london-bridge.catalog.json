@@ -1,0 +1,30 @@
+{
+  "id": "london-bridge",
+  "title": "London Bridge Is Falling Down",
+  "composer": "Traditional (English)",
+  "genre": "Children & Folk",
+  "categories": ["Children & Folk", "Famous Melodies"],
+  "year": null,
+  "description": "The English nursery rhyme everyone can hum, in C major: a stepwise tune that sits in one five-finger position with a single thumb shift at the end. A first piece for playing hands together with a steady left-hand accompaniment.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "london-bridge-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "london-bridge__beginner.musicxml",
+      "tempoBPM": 100,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 8,
+      "hands": "both",
+      "notes": "The whole tune once through in C major with the right hand in D position (thumb on D) and the left hand playing only two fifths, C-G and B-G, as half and whole notes.",
+      "teachingPoints": [
+        "Right hand sits with the thumb on D (D-E-F-G-A under fingers 1-5); the only shift is the final la-dy, where finger 2 plays E and the thumb slides down to C.",
+        "Bars 1 and 5 open with a dotted quarter plus eighth (Lon-don): count 1-2-and so the A lands on the and of beat 2.",
+        "Left hand holds a C-G fifth (fingers 5-1) and moves finger 5 down to B for the G-chord bars 3 and 7; practise the B-G change alone until it is silent.",
+        "Play hands separately first, then together at a slow tempo; the left hand changes only on beats 1 and 3."
+      ]
+    }
+  ]
+}
