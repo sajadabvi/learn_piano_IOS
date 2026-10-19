@@ -22,12 +22,12 @@
       "timeSignature": "6/8",
       "measures": 16,
       "hands": "both",
-      "notes": "Grieg's opening phrase (sol-mi-re-do-re-mi) and its octave-lower oboe answer, with the bar-2 turn simplified to a repeat of bar 1, over a left hand of single dotted-quarter notes (E3, B3, C#3).",
+      "notes": "Grieg's opening flute phrase (sol-mi-re-do-re-mi) and its octave-lower oboe answer, with the bar-2 turn simplified to a repeat of bar 1, over a left hand of single dotted-quarter notes (E3, B3, C#3). Bar 8 cadence adapted to stay in E: Grieg's oboe ends on D#-B#-A#-G# over G#7, leading into a G#-major restatement; here it closes B-G#-F#-E. Bars 9-16 repeat bars 1-8 in E (instead of Grieg's move to G# major) so the piece stays self-contained.",
       "teachingPoints": [
-        "Right hand position: thumb on E5, 2 on F#5, 3 on G#5, 4 on B5, 5 on C#6 (and the same fingers an octave lower in bars 5-8 and 13-15).",
+        "Right hand position: thumb on E5, 2 on F#5, 3 on G#5, 4 on B5, 5 on C#6 (and the same fingers an octave lower in bars 5-8 and 13-16).",
         "Bars 1-2 are the motif B-G#-F#-E-F#-G#; bar 3 rocks up to C#6 with the 5th finger (B-G#-B-C#-G#-C#); bar 4 closes B-G#-F# then a dotted-quarter E.",
-        "Count the 6/8 as two big beats per bar (1-2-3 4-5-6); every left-hand note is one big beat, and the dotted-quarter E that ends bars 4 and 8 lasts the whole second beat.",
-        "Left hand alternates E3 and B3 as dotted quarters; in bars 3, 7, 11 and 15 the second note is C#3 under the C#6 (C#5) of the melody. Practice it alone with a metronome before adding the melody."
+        "Count the 6/8 as two big beats per bar (1-2-3 4-5-6); every left-hand note is one big beat, and the dotted-quarter E that ends bars 4, 8, 12 and 16 lasts the whole second beat.",
+        "Left hand alternates E3 and B3 as dotted quarters; in bars 3, 7, 11 and 15 the second note is C#3 under the C#6 (C#5) of the melody, so play E3 with finger 3 there and C#3 with 5. Practice it alone with a metronome before adding the melody."
       ]
     }
   ]

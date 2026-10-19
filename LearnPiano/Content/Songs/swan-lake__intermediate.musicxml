@@ -681,30 +681,21 @@
           <octave>4</octave>
         </pitch>
         <duration>8</duration>
-        <tie type="start"/>
         <voice>1</voice>
         <type>half</type>
         <staff>1</staff>
         <notations>
-          <tied type="start"/>
           <technical>
             <fingering>1</fingering>
           </technical>
         </notations>
       </note>
       <note>
-        <pitch>
-          <step>B</step>
-          <octave>4</octave>
-        </pitch>
+        <rest/>
         <duration>2</duration>
-        <tie type="stop"/>
         <voice>1</voice>
         <type>eighth</type>
         <staff>1</staff>
-        <notations>
-          <tied type="stop"/>
-        </notations>
       </note>
       <note>
         <pitch>
@@ -2369,55 +2360,27 @@
           <alter>1</alter>
           <octave>5</octave>
         </pitch>
-        <duration>2</duration>
+        <duration>8</duration>
         <voice>1</voice>
-        <type>eighth</type>
+        <type>half</type>
         <staff>1</staff>
         <notations>
           <technical>
-            <fingering>5</fingering>
+            <fingering>4</fingering>
           </technical>
         </notations>
       </note>
       <note>
+        <chord/>
         <pitch>
-          <step>D</step>
-          <octave>5</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>eighth</type>
-        <staff>1</staff>
-        <notations>
-          <technical>
-            <fingering>3</fingering>
-          </technical>
-        </notations>
-      </note>
-      <note>
-        <pitch>
-          <step>C</step>
+          <step>A</step>
           <alter>1</alter>
-          <octave>5</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>eighth</type>
-        <staff>1</staff>
-        <notations>
-          <technical>
-            <fingering>2</fingering>
-          </technical>
-        </notations>
-      </note>
-      <note>
-        <pitch>
-          <step>B</step>
           <octave>4</octave>
         </pitch>
-        <duration>2</duration>
+        <duration>8</duration>
         <voice>1</voice>
-        <type>eighth</type>
+        <type>half</type>
+        <accidental>sharp</accidental>
         <staff>1</staff>
         <notations>
           <technical>
@@ -2495,7 +2458,8 @@
       </note>
       <note>
         <pitch>
-          <step>B</step>
+          <step>F</step>
+          <alter>1</alter>
           <octave>2</octave>
         </pitch>
         <duration>2</duration>
@@ -2510,7 +2474,7 @@
       </note>
       <note>
         <pitch>
-          <step>F</step>
+          <step>C</step>
           <alter>1</alter>
           <octave>3</octave>
         </pitch>
@@ -2526,7 +2490,8 @@
       </note>
       <note>
         <pitch>
-          <step>B</step>
+          <step>F</step>
+          <alter>1</alter>
           <octave>3</octave>
         </pitch>
         <duration>2</duration>
@@ -2541,8 +2506,9 @@
       </note>
       <note>
         <pitch>
-          <step>D</step>
-          <octave>4</octave>
+          <step>A</step>
+          <alter>1</alter>
+          <octave>3</octave>
         </pitch>
         <duration>2</duration>
         <voice>5</voice>
@@ -3223,10 +3189,12 @@
           <octave>5</octave>
         </pitch>
         <duration>2</duration>
+        <tie type="start"/>
         <voice>1</voice>
         <type>eighth</type>
         <staff>1</staff>
         <notations>
+          <tied type="start"/>
           <technical>
             <fingering>4</fingering>
           </technical>
@@ -3234,64 +3202,16 @@
       </note>
       <note>
         <pitch>
-          <step>F</step>
-          <alter>1</alter>
-          <octave>5</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>eighth</type>
-        <staff>1</staff>
-        <notations>
-          <technical>
-            <fingering>5</fingering>
-          </technical>
-        </notations>
-      </note>
-      <note>
-        <pitch>
-          <step>D</step>
-          <octave>5</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>eighth</type>
-        <staff>1</staff>
-        <notations>
-          <technical>
-            <fingering>3</fingering>
-          </technical>
-        </notations>
-      </note>
-      <note>
-        <pitch>
-          <step>C</step>
-          <alter>1</alter>
-          <octave>5</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>eighth</type>
-        <staff>1</staff>
-        <notations>
-          <technical>
-            <fingering>2</fingering>
-          </technical>
-        </notations>
-      </note>
-      <note>
-        <pitch>
           <step>B</step>
-          <octave>4</octave>
+          <octave>5</octave>
         </pitch>
-        <duration>2</duration>
+        <duration>8</duration>
+        <tie type="stop"/>
         <voice>1</voice>
-        <type>eighth</type>
+        <type>half</type>
         <staff>1</staff>
         <notations>
-          <technical>
-            <fingering>1</fingering>
-          </technical>
+          <tied type="stop"/>
         </notations>
       </note>
       <backup>

@@ -433,7 +433,7 @@
         <staff>2</staff>
         <notations>
           <technical>
-            <fingering>5</fingering>
+            <fingering>3</fingering>
           </technical>
         </notations>
       </note>
@@ -927,7 +927,7 @@
         <staff>2</staff>
         <notations>
           <technical>
-            <fingering>5</fingering>
+            <fingering>3</fingering>
           </technical>
         </notations>
       </note>
@@ -1421,7 +1421,7 @@
         <staff>2</staff>
         <notations>
           <technical>
-            <fingering>5</fingering>
+            <fingering>3</fingering>
           </technical>
         </notations>
       </note>
@@ -1915,7 +1915,7 @@
         <staff>2</staff>
         <notations>
           <technical>
-            <fingering>5</fingering>
+            <fingering>3</fingering>
           </technical>
         </notations>
       </note>
@@ -1940,12 +1940,59 @@
     <measure number="16">
       <note>
         <pitch>
-          <step>E</step>
-          <octave>5</octave>
+          <step>B</step>
+          <octave>4</octave>
         </pitch>
-        <duration>12</duration>
+        <duration>2</duration>
         <voice>1</voice>
-        <type>half</type>
+        <type>eighth</type>
+        <staff>1</staff>
+        <notations>
+          <technical>
+            <fingering>4</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>G</step>
+          <alter>1</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>eighth</type>
+        <staff>1</staff>
+        <notations>
+          <technical>
+            <fingering>3</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>eighth</type>
+        <staff>1</staff>
+        <notations>
+          <technical>
+            <fingering>2</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>E</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>quarter</type>
         <dot/>
         <staff>1</staff>
         <notations>

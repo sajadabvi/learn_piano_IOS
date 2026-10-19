@@ -18,12 +18,12 @@
       "timeSignature": "9/8",
       "measures": 14,
       "hands": "both",
-      "notes": "Debussy's text for the opening fourteen bars up to Tempo rubato, with all four voices (melody in thirds, inner right-hand voice, the two left-hand voices), the duplets written as 2:3 tuplets, and the inner F of bar 13 shortened to a dotted quarter so it does not collide with the melody octaves.",
+      "notes": "Debussy's text for the opening fourteen bars up to Tempo rubato, with all four voices (melody in thirds, inner right-hand voice, the two left-hand voices), the duplets written as 2:3 tuplets, the inner F of bar 13 and the inner F-Bb of bar 14 shortened to dotted quarters so they do not collide with the melody, and the left-hand bass notes in bars 10, 12 and 14 sustained by pedal as Debussy writes them; the metronome mark is editorial.",
       "teachingPoints": [
         "Bar 1: the left hand enters alone on the second eighth with F-Ab, then the right hand answers on the third eighth with F-Ab an octave higher; the left hand holds its third for the rest of the bar while the right hand moves on to Db-F.",
         "Bars 3, 13 and 14 have duplets (two notes in the time of three eighths); practise them against a steady eighth count until the 2-against-3 feel is automatic.",
         "Bars 5-8 the melody descends while the left hand walks down chromatically (Db-C, Bb-A, Ab-Gb, F-Eb-Ab); keep the inner voices (Gb, Eb, Db) softer than the top line.",
-        "Bar 9 restarts the theme as a climbing ladder of thirds on successive eighths: left hand Db-Ab in the bass, right hand F-Ab low (fingers 1-2), left hand F-Ab in the treble, then right hand F-Ab high before settling onto Db-F; bars 10-12 need the left hand to find the four-note Db-Gb-Bb-Db chord (5-3-2-1) right after the bass octave.",
+        "Bar 9 restarts the theme as a climbing ladder of thirds on successive eighths: left hand Db-Ab in the bass, right hand F-Ab low (fingers 1-2), left hand F-Ab in the treble, then right hand F-Ab high before settling onto Db-F; bars 10-12 need the left hand to find the four-note Db-Gb-Bb-Db chord (5-3-2-1) right after the bass fifth Gb-Db.",
         "Bars 13-14 are the first swell: octaves in the right hand with 1-5, left-hand Cb-Db-F chord in bar 13, then settle onto Bb minor and back to pp before the Tempo rubato."
       ]
     }
