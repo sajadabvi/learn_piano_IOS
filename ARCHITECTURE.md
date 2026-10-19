@@ -27,7 +27,7 @@ says otherwise. `App/` depends on everything and wires the modules together.
 | `Import/` (wave 2) | Import screen: file picker / URL / share-in, PDF+image page rendering, `SheetTranscriptionProvider` via the Claude API, validation + repair loop, review screen, save to user library. | Core, Parsers, Content, Notation (preview) | `ImportHomeView`, `ImportClaudeTranscriptionProvider`, `ImportReviewView` |
 | `PracticeUI/` (wave 2) | The practice screen: composes Notation + Keyboard + Practice + Audio + Input with the control bar (play/pause, mode, speed, loop, hands, metronome). | Core, Notation, Keyboard, Practice, Audio, Input | `PracticeScreen`, `PracticeControlBar` |
 | `Settings/` (wave 2) | Input source choice, mic sensitivity and A4, Bluetooth MIDI pairing entry, Claude API key (Keychain), model choice, display options, reset progress. | Core, Input | `SettingsView`, `SettingsKeychain` |
-| `App/` | Entry point, `AppModel` navigation, `Theme` tokens, wiring. | all | `LearnPianoApp`, `RootView`, `AppModel`, `Theme` |
+| `App/` | `AppModel` navigation + `PracticeRequest`, `ProfileStore` (profile.json), `Theme` tokens. `App/Shell/` holds `LearnPianoApp` (creates and injects the stores) and `RootView` (tabs + practice `fullScreenCover`); only the integrator type-checks Shell. | all | `AppModel`, `PracticeRequest`, `ProfileStore`, `Theme`, `LearnPianoApp`, `RootView` |
 
 Rules that apply to every module:
 
