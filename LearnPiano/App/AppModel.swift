@@ -32,4 +32,12 @@ final class AppModel {
     }
 
     var selectedTab: Tab = .songs
+
+    /// The practice screen currently presented full-screen, if any.
+    var activePractice: PracticeRequest?
+
+    /// Opens the practice screen for a request (replacing any open one).
+    func presentPractice(_ request: PracticeRequest) { activePractice = request }
+
+    func dismissPractice() { activePractice = nil }
 }
