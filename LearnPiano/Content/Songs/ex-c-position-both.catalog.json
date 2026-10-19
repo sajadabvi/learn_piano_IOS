@@ -1,0 +1,32 @@
+{
+  "id": "ex-c-position-both",
+  "title": "C Position: Both Hands Together",
+  "composer": "LearnPiano exercise",
+  "genre": "Exercise",
+  "categories": [
+    "Exercises"
+  ],
+  "year": null,
+  "description": "Both hands in C position at once, moving in contrary motion so the same finger numbers play in both hands at the same time - the easiest way to start playing hands together.",
+  "isExercise": true,
+  "arrangements": [
+    {
+      "id": "ex-c-position-both-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "ex-c-position-both__beginner.musicxml",
+      "tempoBPM": 72,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 8,
+      "hands": "both",
+      "notes": "Mirror-motion quarter notes: when the right hand plays finger 5-4-3-2 the left plays 5-4-3-2 too, so you only have to think of one finger number at a time.",
+      "teachingPoints": [
+        "Both thumbs sit on either side of middle C: RH on C-G above it, LH on F-C below it. The thumbs share middle C, so they never play together here.",
+        "Bars 1, 3 and 6: both hands use fingers 5-4-3-2 together; say the finger numbers aloud while you play.",
+        "Bars 5 and 7: RH goes up 1-2-3-4 while LH goes down 2-3-4-5 - the hands still move in mirror directions.",
+        "Practise each bar hands separately once, then together very slowly, before moving on."
+      ]
+    }
+  ]
+}

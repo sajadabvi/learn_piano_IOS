@@ -1,0 +1,32 @@
+{
+  "id": "ex-middle-c",
+  "title": "Finding Middle C",
+  "composer": "LearnPiano exercise",
+  "genre": "Exercise",
+  "categories": [
+    "Exercises"
+  ],
+  "year": null,
+  "description": "Your very first exercise: locate middle C (the C nearest the keyhole) and play it with the right thumb, then the left thumb, holding each note for a full count of four.",
+  "isExercise": true,
+  "arrangements": [
+    {
+      "id": "ex-middle-c-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "ex-middle-c__beginner.musicxml",
+      "tempoBPM": 70,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 8,
+      "hands": "both",
+      "notes": "Only middle C is used: whole notes in each hand, then halves and alternating quarters so you learn to count rests as carefully as notes.",
+      "teachingPoints": [
+        "Find middle C by its place just left of the two black keys in the middle of the keyboard.",
+        "Bars 1-2: right thumb, count 1-2-3-4 and hold the key down the whole bar; bars 3-4: left thumb does the same.",
+        "Bars 5-7: the hands take turns - lift exactly when the rest begins so the other hand can take over.",
+        "Keep the wrist level and the thumb curved; play from the side of the thumb, not flat."
+      ]
+    }
+  ]
+}

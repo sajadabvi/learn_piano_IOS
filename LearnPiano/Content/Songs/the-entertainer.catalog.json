@@ -1,0 +1,48 @@
+{
+  "id": "the-entertainer",
+  "title": "The Entertainer",
+  "composer": "Scott Joplin",
+  "genre": "Ragtime & Jazz",
+  "categories": ["Ragtime & Jazz", "Famous Melodies", "Film & TV"],
+  "year": 1902,
+  "description": "Joplin's most famous rag, revived by the 1973 film The Sting: a syncopated right-hand tune over a steady left-hand oom-pah. It is the classic introduction to ragtime rhythm and to the independent, metronomic left hand every rag demands.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "the-entertainer-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "the-entertainer__intermediate.musicxml",
+      "tempoBPM": 68,
+      "keySignature": "C major",
+      "timeSignature": "2/4",
+      "measures": 20,
+      "hands": "both",
+      "notes": "Intro and the complete first strain at a relaxed tempo; the octave intro is thinned to a single line that passes from right hand to left hand, and the bass uses single notes with close E-G-C triads instead of octaves.",
+      "teachingPoints": [
+        "Left hand first: bass note on the beat, triad off the beat, no accents on the triads. Loop bars 5-8 with a metronome until it is automatic.",
+        "Right hand: the D-D#-E-C pickup lands on E4 with the thumb and C5 with the fifth finger; keep that 1-5 frame for E C E C.",
+        "Bars 13-14 (A G F# A C E, E D C A D) shift the hand up: thumb on F#4, then 3-4-5 on A-C-E.",
+        "Hold the long D5 in bars 14-15 for its full value while the left hand keeps moving through D7 to G7."
+      ]
+    },
+    {
+      "id": "the-entertainer-advanced",
+      "label": "Advanced",
+      "difficulty": "advanced",
+      "file": "the-entertainer__advanced.musicxml",
+      "tempoBPM": 80,
+      "keySignature": "C major",
+      "timeSignature": "2/4",
+      "measures": 20,
+      "hands": "both",
+      "notes": "Intro and first strain in Joplin's own texture: both hands in octaves for the three-octave descending introduction, and an octave-bass stride left hand (C2-C3 / G2-G3) under the single-line melody.",
+      "teachingPoints": [
+        "Intro octaves: play each D-E-C / A-B-G group as one wrist gesture; practise the hand shift down an octave between bars without looking.",
+        "Stride bass: octaves on the beat with 5-1, triads off the beat with 3-2-1; the jump from C2-C3 to the E3-G3-C4 chord must be silent and even.",
+        "Keep Joplin's marking in mind: not fast. The syncopated C5 tied across the barline (bars 5-6, 7-8) must not rush.",
+        "Bars 13-16: the melody climbs to E5 then hangs on D5 over D7 to G7; let the left hand carry the pulse through the held note."
+      ]
+    }
+  ]
+}

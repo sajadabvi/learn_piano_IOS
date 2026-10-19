@@ -1,0 +1,33 @@
+{
+  "id": "scarborough-fair",
+  "title": "Scarborough Fair",
+  "composer": "Traditional (English)",
+  "genre": "Children & Folk",
+  "categories": [
+    "Children & Folk",
+    "Famous Melodies"
+  ],
+  "year": null,
+  "description": "A haunting English ballad in the Dorian mode, made world-famous by Simon & Garfunkel. It teaches the modal sound and smooth 3/4 phrasing using only white keys.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "scarborough-fair-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "scarborough-fair__beginner.musicxml",
+      "tempoBPM": 96,
+      "keySignature": "D Dorian",
+      "timeSignature": "3/4",
+      "measures": 16,
+      "hands": "both",
+      "notes": "Full verse melody on white keys only, with one sustained left-hand dyad per bar.",
+      "teachingPoints": [
+        "Phrase 1 and 4 sit in D position (thumb on D4); phrase 2-3 shift up with 2 on A4 and 5 on D5",
+        "Bar 11: finger 3 crosses over the thumb on F4 to bring the hand back down for the last line",
+        "The B natural in bar 7 is the Dorian colour note: do not flatten it",
+        "Shape each four-bar phrase in one breath, lifting slightly at the dotted half notes"
+      ]
+    }
+  ]
+}

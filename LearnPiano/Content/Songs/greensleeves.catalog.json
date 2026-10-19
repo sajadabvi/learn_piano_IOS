@@ -1,0 +1,51 @@
+{
+  "id": "greensleeves",
+  "title": "Greensleeves",
+  "composer": "Traditional (English, 16th c.)",
+  "genre": "Children & Folk",
+  "categories": [
+    "Children & Folk",
+    "Famous Melodies"
+  ],
+  "year": 1580,
+  "description": "The famous Elizabethan tune (also sung at Christmas as 'What Child Is This'), a lilting minor-key waltz with a long-short-long rhythm. A perfect introduction to 3/4 time, dotted rhythms and raised leading tones.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "greensleeves-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "greensleeves__beginner.musicxml",
+      "tempoBPM": 84,
+      "keySignature": "A minor",
+      "timeSignature": "3/4",
+      "measures": 16,
+      "hands": "both",
+      "notes": "The verse only (pickup plus 15 bars), single-note melody over one held two-note left-hand chord per bar.",
+      "teachingPoints": [
+        "Right hand starts with thumb on A4; the hand shifts down to G4 in bar 4 and up again on the pickup to the second half.",
+        "Practice the dotted-quarter/eighth rhythm (long-short) by clapping it before playing bars 2, 4 and 6.",
+        "Watch the accidentals: G# in bars 6, 7 and 14, F# in bar 14 — they are not in the key signature.",
+        "Left hand holds each two-note chord for the whole bar; change chords exactly on beat 1."
+      ]
+    },
+    {
+      "id": "greensleeves-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "greensleeves__intermediate.musicxml",
+      "tempoBPM": 100,
+      "keySignature": "A minor",
+      "timeSignature": "3/4",
+      "measures": 29,
+      "hands": "both",
+      "notes": "The complete tune (verse and chorus) with a waltz-style left hand (bass note then triad) and a few right-hand thirds under the held melody notes.",
+      "teachingPoints": [
+        "Left hand pattern: root on beat 1, three-note chord on beats 2-3; learn the five chord shapes (Am, C, G, Em, E) before adding the melody.",
+        "The chorus (bar 16) jumps up to G5 — prepare the hand with finger 5 during the held A4 of bar 15.",
+        "Bars 17, 19, 21 and 24 add a third below the melody; keep the top note louder than the harmony.",
+        "Hands separately at slow tempo, then together with the metronome at 72 before moving up to 100."
+      ]
+    }
+  ]
+}

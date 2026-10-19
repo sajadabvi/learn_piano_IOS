@@ -1,0 +1,32 @@
+{
+  "id": "ex-rhythm-eighths",
+  "title": "Rhythm: Eighth Notes",
+  "composer": "LearnPiano exercise",
+  "genre": "Exercise",
+  "categories": [
+    "Exercises"
+  ],
+  "year": null,
+  "description": "Introduces the eighth note - two to a beat - by alternating C and D under the thumb and second finger, first alone and then against steady left-hand quarters.",
+  "isExercise": true,
+  "arrangements": [
+    {
+      "id": "ex-rhythm-eighths-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "ex-rhythm-eighths__beginner.musicxml",
+      "tempoBPM": 76,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 8,
+      "hands": "both",
+      "notes": "Right hand alternates C4 and D4 (fingers 1-2) in eighths mixed with quarters and a half; from bar 5 the left hand keeps quarter notes on C3 as a metronome.",
+      "teachingPoints": [
+        "Count '1 and 2 and 3 and 4 and'; each eighth note falls on a number or on an 'and'.",
+        "Bar 2: eight even eighths C-D-C-D - keep them level in volume and exactly two per count.",
+        "Bars 3-4 mix eighths and quarters: the quarter note is the moment you STOP moving for a whole count.",
+        "Bars 5-7: the left hand plays steady quarters on C; the right hand must fit exactly two eighths into each left-hand note."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "ex-c-position-rh",
+  "title": "C Position: Right Hand (C D E F G)",
+  "composer": "LearnPiano exercise",
+  "genre": "Exercise",
+  "categories": [
+    "Exercises"
+  ],
+  "year": null,
+  "description": "The five-finger C position for the right hand: thumb on middle C, one finger per key up to G, so that every note has its own finger and the hand never moves.",
+  "isExercise": true,
+  "arrangements": [
+    {
+      "id": "ex-c-position-rh-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "ex-c-position-rh__beginner.musicxml",
+      "tempoBPM": 80,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 8,
+      "hands": "both",
+      "notes": "Stepwise and small-skip patterns within C4-G4, every note fingered 1-5 so the hand stays fixed over the five keys; the left hand rests.",
+      "teachingPoints": [
+        "Place the right thumb on middle C and let fingers 2-5 fall naturally on D, E, F and G; do not look down once they are placed.",
+        "Bars 1-2 walk up and back down; bars 3-4 introduce skips (C-E, D-F) - keep the unused fingers resting lightly on their keys.",
+        "Bar 6 repeats G three times with finger 5: play from the knuckle, not by flopping the hand.",
+        "Hold the half notes in bars 4 and 6 and the final whole note for their full value."
+      ]
+    }
+  ]
+}

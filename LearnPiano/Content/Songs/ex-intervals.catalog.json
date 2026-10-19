@@ -1,0 +1,32 @@
+{
+  "id": "ex-intervals",
+  "title": "Intervals: Seconds to Fifths",
+  "composer": "LearnPiano exercise",
+  "genre": "Exercise",
+  "categories": [
+    "Exercises"
+  ],
+  "year": null,
+  "description": "Learn to see and hear the distance between two notes: a second, third, fourth and fifth from middle C, each played one note at a time (melodic) and then together (harmonic).",
+  "isExercise": true,
+  "arrangements": [
+    {
+      "id": "ex-intervals-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "ex-intervals__beginner.musicxml",
+      "tempoBPM": 72,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 8,
+      "hands": "both",
+      "notes": "Right hand measures intervals upward from C4 (C-D, C-E, C-F, C-G) and the left hand downward from C4 (C-B, C-A, C-G, C-F); each bar is two single notes then the dyad.",
+      "teachingPoints": [
+        "An interval is counted by letter names including both ends: C to E is a third (C-D-E), C to G is a fifth.",
+        "Bars 1-4: thumb stays on middle C; the finger number equals the interval number (2nd = finger 2, 3rd = finger 3...).",
+        "Bars 5-8: the same intervals downward in the left hand, thumb on middle C, finger number again equals the interval.",
+        "Listen: seconds clash, thirds are sweet, fourths and fifths sound open and hollow - try to name them with your eyes closed."
+      ]
+    }
+  ]
+}

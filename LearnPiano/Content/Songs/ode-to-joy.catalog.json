@@ -1,0 +1,49 @@
+{
+  "id": "ode-to-joy",
+  "title": "Ode to Joy",
+  "composer": "Ludwig van Beethoven",
+  "genre": "Classical",
+  "categories": ["Classical", "Famous Melodies", "Easy Classics"],
+  "year": 1824,
+  "description": "The choral theme from the finale of Beethoven's Ninth Symphony, one of the most recognised melodies ever written. Its stepwise tune sits under five fingers, which makes it the classic first piece for learning hand position and phrasing.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "ode-to-joy-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "ode-to-joy__beginner.musicxml",
+      "tempoBPM": 100,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 16,
+      "hands": "both",
+      "notes": "Transposed to C major so the whole melody stays in a five-finger C position; the left hand plays whole- and half-note roots (C and G) with a single closing dyad.",
+      "teachingPoints": [
+        "RH in C position (thumb on C4) for the entire piece; LH 5th finger on C3, thumb on G3.",
+        "Bars 4 and 8: the dotted-quarter/eighth rhythm (long-short) is the only rhythmic trap - count '1-2-and, 3' out loud.",
+        "Bar 12: the melody drops to the low G, which the LH thumb plays while the RH rests.",
+        "Practise bars 9-12 (the B phrase) separately: the eighth-note pair E-F is the fastest motion in the piece."
+      ]
+    },
+    {
+      "id": "ode-to-joy-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "ode-to-joy__intermediate.musicxml",
+      "tempoBPM": 108,
+      "keySignature": "D major",
+      "timeSignature": "4/4",
+      "measures": 24,
+      "hands": "both",
+      "notes": "In Beethoven's original D major; the full 16-bar theme over a bass-and-chord accompaniment, then the B and A phrases return with broken-chord eighths and the melody in octaves.",
+      "teachingPoints": [
+        "Keep the two sharps (F#, C#) automatic: RH stays in D position (thumb on D4) for bars 1-16.",
+        "LH oom-pah pattern: bass note on beats 1 and 3, dyad (or triad from bar 21) on beats 2 and 4 - practise it as block chords first.",
+        "Bar 12 and 20: the melody drops to A3 under the thumb; prepare the hand shift during the preceding E.",
+        "Bars 17-20: LH broken-chord eighths must stay even and quiet under the melody.",
+        "Bars 21-24: RH octaves (1-5); keep the wrist loose and let the 5th finger carry the tune."
+      ]
+    }
+  ]
+}

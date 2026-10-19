@@ -1,0 +1,32 @@
+{
+  "id": "ex-g-major-scale",
+  "title": "G Major Scale (F-sharp)",
+  "composer": "LearnPiano exercise",
+  "genre": "Exercise",
+  "categories": [
+    "Exercises"
+  ],
+  "year": null,
+  "description": "The G major scale introduces the first key signature: one sharp, F-sharp. Same fingering as C major, hands separately, in quarters and then eighths.",
+  "isExercise": true,
+  "arrangements": [
+    {
+      "id": "ex-g-major-scale-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "ex-g-major-scale__intermediate.musicxml",
+      "tempoBPM": 80,
+      "keySignature": "G major",
+      "timeSignature": "4/4",
+      "measures": 12,
+      "hands": "both",
+      "notes": "RH G4-G5 and LH G2-G3, fingering identical to C major (RH 1-2-3-1-2-3-4-5, LH 5-4-3-2-1-3-2-1); the sharp in the key signature means every F is F-sharp.",
+      "teachingPoints": [
+        "The key signature has one sharp on the F line: play F-sharp (the black key) every time, even though no sharp sign appears in the bar.",
+        "RH fingering is the same as C major; finger 4 lands on the black key F-sharp - keep the hand slightly forward so the 4th finger reaches it comfortably.",
+        "LH: finger 2 plays F-sharp going up and down; the crossing (thumb on D, 3 on E) is on white keys.",
+        "Bars 9-12 in eighths: listen for the leading-tone F-sharp pulling up to G at the top of the scale."
+      ]
+    }
+  ]
+}

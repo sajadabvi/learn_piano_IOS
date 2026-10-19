@@ -1,0 +1,33 @@
+{
+  "id": "happy-birthday",
+  "title": "Happy Birthday to You",
+  "composer": "Patty & Mildred Hill",
+  "genre": "Celebrations",
+  "categories": [
+    "Celebrations",
+    "Famous Melodies"
+  ],
+  "year": 1893,
+  "description": "The most-sung song in the English language, from the Hill sisters' 'Good Morning to All'. Learn it and you can play for every birthday in the room.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "happy-birthday-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "happy-birthday__beginner.musicxml",
+      "tempoBPM": 100,
+      "keySignature": "C major",
+      "timeSignature": "3/4",
+      "measures": 9,
+      "hands": "both",
+      "notes": "The whole tune in C major with the dotted pickups simplified to even eighths and the left hand reduced to one sustained fifth (C-G, G-D or F-C) per bar.",
+      "teachingPoints": [
+        "Right hand starts with thumb on G4; every 'Hap-py' is two eighths on the same G.",
+        "Left hand only plays fifths with fingers 5 and 1: C3-G3, G2-D3 and F2-C3. Practice the three shifts alone.",
+        "Bar 6 leaps up to G5 with finger 5, then comes down 5-3-1 and crosses 3 over to B4.",
+        "Bar 8 is the only bar where the left hand changes chord mid-bar (C then G on beat 3) - count it out loud."
+      ]
+    }
+  ]
+}

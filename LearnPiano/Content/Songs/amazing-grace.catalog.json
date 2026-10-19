@@ -1,0 +1,52 @@
+{
+  "id": "amazing-grace",
+  "title": "Amazing Grace",
+  "composer": "Traditional (John Newton / \"New Britain\")",
+  "genre": "Hymns & Spirituals",
+  "categories": [
+    "Hymns & Spirituals",
+    "Famous Melodies",
+    "Easy Classics"
+  ],
+  "year": 1779,
+  "description": "The best-loved English-language hymn, sung to the pentatonic folk tune \"New Britain\". Its slow 3/4 sway and one-note-per-syllable melody make it an ideal first piece for lyrical, singing legato.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "amazing-grace-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "amazing-grace__beginner.musicxml",
+      "tempoBPM": 72,
+      "keySignature": "G major",
+      "timeSignature": "3/4",
+      "measures": 17,
+      "hands": "both",
+      "notes": "Single-note melody in an extended G position with the left hand holding one root-fifth dyad per bar.",
+      "teachingPoints": [
+        "RH stays in G position (thumb on G4) and reaches down to D4/E4 with the thumb for the low notes",
+        "The tune starts on a pickup D4: count 1-2 before you play, then land G4 on the downbeat",
+        "Practise the B4-G4 eighth-note pairs (bars 2, 6, 10, 14) slowly so they do not rush",
+        "Hold every LH dyad for the full three beats; keep the fifth light under the melody"
+      ]
+    },
+    {
+      "id": "amazing-grace-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "amazing-grace__intermediate.musicxml",
+      "tempoBPM": 76,
+      "keySignature": "G major",
+      "timeSignature": "3/4",
+      "measures": 17,
+      "hands": "both",
+      "notes": "Adds harmony notes under the melody (thirds and sixths) and a root-then-chord waltz bass with E minor and D7 colour chords.",
+      "teachingPoints": [
+        "LH pattern is root on beat 1, two-note chord on beats 2-3: practise the hand alone until the leap is automatic",
+        "Watch the walking bass D3 at the end of bars 5, 7, 11 and 13 that pulls the harmony back to G",
+        "RH dyads in bars 7-9 (D5 over F#4) need a relaxed hand; keep the melody note on top louder",
+        "Final cadence: balance the three-note RH chord so G4 still sings above the fifth in the bass"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "id": "canon-in-d",
+  "title": "Canon in D",
+  "composer": "Johann Pachelbel",
+  "genre": "Classical",
+  "categories": [
+    "Classical",
+    "Famous Melodies",
+    "Easy Classics"
+  ],
+  "year": 1680,
+  "description": "Pachelbel's Baroque canon over an eight-note ground bass, now the most-played piece at weddings. Learn it to feel how a melody is built in layers over a bass that never changes.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "canon-in-d-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "canon-in-d__beginner.musicxml",
+      "tempoBPM": 60,
+      "keySignature": "D major",
+      "timeSignature": "4/4",
+      "measures": 12,
+      "hands": "both",
+      "notes": "The famous D-A-B-F#-G-D-G-A ground bass in quarter notes under the first four violin entries (two in quarters, two in eighths), closing with a short cadence; no sixteenth notes.",
+      "teachingPoints": [
+        "Learn the left-hand ground alone first: D3-A2-B2-F#2 / G2-D2-G2-A2 repeats every two bars with the same fingering 1-3-2-5 / 4-5-4-3.",
+        "Right hand sits in a D5 position for bars 3-6 and drops to a D4 position for the eighth-note entries in bars 7-10.",
+        "Bar 10 has the octave leap D4 to D5: practice the last four eighths slowly with 1-5-5-4.",
+        "Count the eighth notes against the steady quarter-note bass before putting hands together."
+      ]
+    },
+    {
+      "id": "canon-in-d-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "canon-in-d__intermediate.musicxml",
+      "tempoBPM": 60,
+      "keySignature": "D major",
+      "timeSignature": "4/4",
+      "measures": 16,
+      "hands": "both",
+      "notes": "The first six violin entries over the ground bass, with the canon's second voice added in thirds in bars 5-6 and 15, and the two famous sixteenth-note entries (bars 11-14) kept intact.",
+      "teachingPoints": [
+        "Bars 5-6 and 15 play the canon texture as right-hand thirds: keep both notes exactly together.",
+        "Isolate the sixteenth-note bars 11-14; the hand shifts at D4 (bar 11), D5 (bar 12 start) and B4 (bar 14) are marked.",
+        "Left hand stays on the eight-note ground throughout; play it from memory so your eyes can stay on the right hand.",
+        "Keep the pulse at 60 until the sixteenths are even, then raise the tempo gradually."
+      ]
+    }
+  ]
+}

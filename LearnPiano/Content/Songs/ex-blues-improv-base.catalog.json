@@ -1,0 +1,32 @@
+{
+  "id": "ex-blues-improv-base",
+  "title": "Improvisation Base: 12-bar Blues in C (left hand)",
+  "composer": "LearnPiano exercise",
+  "genre": "Exercise",
+  "categories": [
+    "Exercises"
+  ],
+  "year": null,
+  "description": "The left-hand foundation for improvising: a 12-bar blues in C with a walking 1-3-5-6 bass line on each chord. Learn the loop, then make up right-hand melodies over it.",
+  "isExercise": true,
+  "arrangements": [
+    {
+      "id": "ex-blues-improv-base-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "ex-blues-improv-base__intermediate.musicxml",
+      "tempoBPM": 100,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 12,
+      "hands": "both",
+      "notes": "Left hand only: the classic boogie walking line (root, 3rd, 5th, 6th) in quarters over the 12-bar form C-C-C-C / F-F-C-C / G-F-C-C; the right-hand staff is all rests for your improvisation.",
+      "teachingPoints": [
+        "The 12-bar form: four bars of C, two of F, two of C, then G, F, C, C. Memorise the bar numbers where the chord changes (5, 7, 9, 10, 11).",
+        "Every chord uses the same LH shape 5-3-2-1 on root-3rd-5th-6th: C-E-G-A, F-A-C-D, G-B-D-E.",
+        "Loop it with a steady swing feel until you can play it without looking; then improvise RH using the C blues scale (C-Eb-F-F#-G-Bb-C).",
+        "Start the improvisation with just two or three notes (C, Eb, G) and long rests - the LH keeps time, the RH tells the story."
+      ]
+    }
+  ]
+}

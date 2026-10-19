@@ -1,0 +1,32 @@
+{
+  "id": "ex-rhythm-quarters-halves",
+  "title": "Rhythm: Quarters and Halves",
+  "composer": "LearnPiano exercise",
+  "genre": "Exercise",
+  "categories": [
+    "Exercises"
+  ],
+  "year": null,
+  "description": "A pure rhythm drill on one note per hand: quarter notes get one count, half notes get two, and you learn to keep a steady pulse while the pattern changes.",
+  "isExercise": true,
+  "arrangements": [
+    {
+      "id": "ex-rhythm-quarters-halves-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "ex-rhythm-quarters-halves__beginner.musicxml",
+      "tempoBPM": 80,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 8,
+      "hands": "both",
+      "notes": "Single pitches only (E4 in the right hand, C3 in the left) so all attention goes to counting quarters and halves in 4/4.",
+      "teachingPoints": [
+        "Count '1 2 3 4' aloud in every bar; a quarter note is one count, a half note is held for two.",
+        "Bars 3 and 4 put the half note at the end and then at the start of the bar - the hardest part is NOT playing on counts 4 and 2.",
+        "Bars 5-6 move the same patterns to the left hand on C with finger 5.",
+        "Bars 7-8: both hands play the identical rhythm together - they must sound as one note."
+      ]
+    }
+  ]
+}

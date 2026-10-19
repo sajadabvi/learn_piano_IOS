@@ -1,0 +1,30 @@
+{
+  "id": "minuet-in-g",
+  "title": "Minuet in G major (BWV Anh. 114)",
+  "composer": "Christian Petzold (attr. J. S. Bach)",
+  "genre": "Classical",
+  "categories": ["Classical", "Famous Melodies", "Easy Classics"],
+  "year": 1725,
+  "description": "The best-known minuet from the Notebook for Anna Magdalena Bach, long attributed to Bach but written by Christian Petzold. A graceful 3/4 dance that teaches scale passages, independent hands and Baroque phrasing.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "minuet-in-g-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "minuet-in-g__intermediate.musicxml",
+      "tempoBPM": 112,
+      "keySignature": "G major",
+      "timeSignature": "3/4",
+      "measures": 32,
+      "hands": "both",
+      "notes": "The complete minuet with both sections written out (16 + 16 bars), keeping the original melody and a two-voice left hand of half and quarter notes.",
+      "teachingPoints": [
+        "Right hand sits in a G position (thumb on G4) for most of the first section; bars 3-4 and 17-19 reach up to G5 with the 5th finger.",
+        "Second section (bars 17-24) moves to D major: watch the C-sharps in bars 20-23 and the thumb shifts marked in bar 21.",
+        "Practice the left hand alone: half note plus quarter in each bar, with the three-quarter-note walk in bar 7 and the descending B-A-G in bar 27.",
+        "Keep the dance feel: light on beats 2 and 3, a gentle lift before each new phrase (bars 8, 16, 24, 32)."
+      ]
+    }
+  ]
+}

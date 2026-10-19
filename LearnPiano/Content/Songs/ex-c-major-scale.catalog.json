@@ -1,0 +1,32 @@
+{
+  "id": "ex-c-major-scale",
+  "title": "C Major Scale, One Octave, Hands Separately",
+  "composer": "LearnPiano exercise",
+  "genre": "Exercise",
+  "categories": [
+    "Exercises"
+  ],
+  "year": null,
+  "description": "The C major scale up and down one octave with the standard fingering, right hand then left hand, first in quarter notes and then in eighths.",
+  "isExercise": true,
+  "arrangements": [
+    {
+      "id": "ex-c-major-scale-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "ex-c-major-scale__intermediate.musicxml",
+      "tempoBPM": 80,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 12,
+      "hands": "both",
+      "notes": "Each hand plays alone: RH 1-2-3-1-2-3-4-5 ascending (reverse descending), LH 5-4-3-2-1-3-2-1; bars 1-8 in quarters, bars 9-12 the same in eighths.",
+      "teachingPoints": [
+        "RH: the thumb crosses UNDER after finger 3 (E to F going up); descending, finger 3 crosses OVER the thumb (F to E).",
+        "LH: fingers 5-4-3-2 then thumb on G; finger 3 crosses OVER the thumb to A. Descending, after 3 on A the thumb tucks UNDER to G, then 2-3-4-5.",
+        "Prepare the crossing finger early: start moving it toward its key while the previous note is still sounding.",
+        "Bars 9-12 double the speed; keep the eighths even - the crossings are where scales lurch, so slow down until they disappear."
+      ]
+    }
+  ]
+}

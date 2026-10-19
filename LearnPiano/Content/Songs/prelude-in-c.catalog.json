@@ -1,0 +1,30 @@
+{
+  "id": "prelude-in-c",
+  "title": "Prelude in C major (BWV 846)",
+  "composer": "Johann Sebastian Bach",
+  "genre": "Classical",
+  "categories": ["Classical", "Famous Melodies", "Easy Classics"],
+  "year": 1722,
+  "description": "The opening prelude of The Well-Tempered Clavier, Book I: one broken-chord pattern repeated through a chain of rich harmonies. A perfect study in even sixteenths, quiet hands and listening to harmony change under your fingers.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "prelude-in-c-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "prelude-in-c__intermediate.musicxml",
+      "tempoBPM": 66,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 35,
+      "hands": "both",
+      "notes": "The complete 35-bar prelude as Bach wrote it; the only editorial choice is notating the held tenor note as a sixteenth tied to a dotted quarter so every voice fills the bar.",
+      "teachingPoints": [
+        "Learn the chord of each bar as a block first (bass, tenor, three right-hand notes), then unfold it into the sixteenth pattern.",
+        "Left hand: bass on the beat, tenor on the second sixteenth, both held while the right hand arpeggiates; keep the wrist loose and the dynamics even.",
+        "Hand-position shifts are marked at bars 1, 2, 5, 10, 16 and 19; the accidentals in bars 12, 14, 20, 22, 23 and 28 define the colour of each harmony.",
+        "Bars 33-34 break the pattern with a long right-hand arpeggio over the held low C; practice them slowly and let the final chord in bar 35 ring."
+      ]
+    }
+  ]
+}

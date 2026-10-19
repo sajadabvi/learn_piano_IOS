@@ -1,0 +1,32 @@
+{
+  "id": "ex-triads-c-f-g",
+  "title": "Chords: C, F and G Triads",
+  "composer": "LearnPiano exercise",
+  "genre": "Exercise",
+  "categories": [
+    "Exercises"
+  ],
+  "year": null,
+  "description": "The three primary chords of C major as root-position triads in both hands - the chords behind most beginner songs - held as whole notes, then halves, then quarters.",
+  "isExercise": true,
+  "arrangements": [
+    {
+      "id": "ex-triads-c-f-g-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "ex-triads-c-f-g__beginner.musicxml",
+      "tempoBPM": 72,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 8,
+      "hands": "both",
+      "notes": "Root-position triads only (RH 1-3-5, LH 5-3-1), the same shape moved to C, F and G; speed increases from whole notes to quarter notes.",
+      "teachingPoints": [
+        "Every triad is the same hand shape - thumb, middle finger, little finger on alternate white keys. Learn the shape on C, then slide it to F and G.",
+        "RH: C-E-G, F-A-C, G-B-D with 1-3-5; LH: C-E-G and F-A-C with 5-3-1, and the G chord drops to G2-B2-D3.",
+        "Play all three notes of a chord at exactly the same instant - listen for one sound, not a roll.",
+        "Bar 7 changes chord every beat: prepare the next shape in the air while the current chord sounds."
+      ]
+    }
+  ]
+}

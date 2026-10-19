@@ -1,0 +1,32 @@
+{
+  "id": "ex-chord-progression-i-iv-v",
+  "title": "Chord Progression: I–IV–V–I in C",
+  "composer": "LearnPiano exercise",
+  "genre": "Exercise",
+  "categories": [
+    "Exercises"
+  ],
+  "year": null,
+  "description": "The most common progression in Western music: C (I), F (IV), G (V) and back to C, first in root position and then with smooth close-position inversions over a left-hand bass.",
+  "isExercise": true,
+  "arrangements": [
+    {
+      "id": "ex-chord-progression-i-iv-v-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "ex-chord-progression-i-iv-v__intermediate.musicxml",
+      "tempoBPM": 84,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 8,
+      "hands": "both",
+      "notes": "Bars 1-4 use root-position triads over single bass notes; bars 5-8 keep the thumb on or near C and change only the upper fingers (C-E-G, C-F-A, B-D-G), then speed up to quarter notes.",
+      "teachingPoints": [
+        "Bars 1-4: name each chord aloud (I, IV, V, I) as you play it; LH plays the roots C3, F3 and G3 with fingers 5, 2 and 1.",
+        "Bars 5-6: the IV chord becomes C-F-A (second inversion) and V becomes B-D-G (first inversion) so the hand barely moves - practise the RH alone until the changes are silent.",
+        "Bar 7: one chord per beat - the bass note and the chord must change together.",
+        "Final bar: LH open fifth C3-G3 (5-1) under the C triad; let it ring."
+      ]
+    }
+  ]
+}

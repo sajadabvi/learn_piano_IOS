@@ -1,0 +1,66 @@
+{
+  "id": "fur-elise",
+  "title": "Für Elise",
+  "composer": "Ludwig van Beethoven",
+  "genre": "Classical",
+  "categories": ["Classical", "Famous Melodies", "Easy Classics"],
+  "year": 1810,
+  "description": "Beethoven's Bagatelle in A minor (WoO 59), the most recognised piano piece ever written. Its opening section teaches the hand-off between a left-hand broken chord and a right-hand melody, and it is the piece every learner wants to play first.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "fur-elise-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "fur-elise__beginner.musicxml",
+      "tempoBPM": 92,
+      "keySignature": "A minor",
+      "timeSignature": "3/4",
+      "measures": 9,
+      "hands": "both",
+      "notes": "The famous first phrase only (pickup plus eight bars), written at double note values in 3/4 so nothing is shorter than an eighth; the left hand plays the original A-E-A broken chord as three single eighths and the right hand is single notes with every finger marked.",
+      "teachingPoints": [
+        "Right hand starts with finger 4 on E5 and 3 on D#5; the rocking E-D# figure uses only those two fingers.",
+        "In bars 2, 3 and 4 the thumb lands on the melody note (A4, B4, C5), then the hand drops to play the rising C-E-A, E-G#-B and E-E-D# with fingers 1-2-5, 1-3-5 and 1-4-3 (an octave jump for E4 to E5).",
+        "Left hand: 5-2-1 on A2-E3-A3 and E2-E3-G#3; practise placing the hand on the bass note during the right hand's trill bar so it is ready on the downbeat.",
+        "Count the eighth rest in bars 2-4 and 6-8 out loud; the right hand's rising group must wait for it."
+      ]
+    },
+    {
+      "id": "fur-elise-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "fur-elise__intermediate.musicxml",
+      "tempoBPM": 66,
+      "keySignature": "A minor",
+      "timeSignature": "3/8",
+      "measures": 22,
+      "hands": "both",
+      "notes": "The whole opening A section (pickup through the return of the theme) with the original right hand, while the left hand plays the bass note as an eighth followed by the two upper notes together as a dyad instead of the three-sixteenth broken chord.",
+      "teachingPoints": [
+        "Bars 8-13 are the new material: A . B-C-D, E . G-F-E, D . F-E-D, C . E-D-C, B . E-E-E; the left hand changes to C major (C3, G3-C4) and G major (G2, G3-B3) under the E and D bars.",
+        "Bar 13 leaps to the high E6 with finger 5 and then alternates D#-E with 3-4 for six sixteenths before the theme returns; practise the leap slowly as its own exercise.",
+        "In bars 9-12 the right hand drops a seventh to the lower note (G4, F4, E4) and comes straight back up with 1-5-4; keep the wrist loose.",
+        "Keep the sixteenth rest after each melody eighth silent; the dyad in the left hand lands on the second eighth and must not be rushed."
+      ]
+    },
+    {
+      "id": "fur-elise-advanced",
+      "label": "Advanced",
+      "difficulty": "advanced",
+      "file": "fur-elise__advanced.musicxml",
+      "tempoBPM": 80,
+      "keySignature": "A minor",
+      "timeSignature": "3/8",
+      "measures": 22,
+      "hands": "both",
+      "notes": "Faithful to Beethoven's text for the full opening A section: the pickup E-D#, the a-b-a form through bar 21, the original left-hand sixteenth broken chords (A2-E3-A3, E2-E3-G#3, C3-G3-C4, G2-G3-B3) and the high E6 before the retransition trill.",
+      "teachingPoints": [
+        "The core coordination is the hand-off: left hand plays three sixteenths (A2-E3-A3), then the right hand continues the arpeggio upward (C4-E4-A4) after a sixteenth rest; practise bars 2-4 hands together very slowly until the six sixteenths sound like one line.",
+        "Bars 13-14 contain the long D#-E alternation after the E6; use 3-4 throughout and let the thumb find B4 on the fourth sixteenth of bar 14 without accenting.",
+        "Dynamics: pp throughout, with a slight swell in the B phrase (bars 9-12) and a return to pp for the final A.",
+        "Finger the melody eighths with the thumb in bars 2-4, 6-8 and 15-20 so the following rising group fits under the hand."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "gymnopedie-1",
+  "title": "Gymnopédie No. 1",
+  "composer": "Erik Satie",
+  "genre": "Classical",
+  "categories": [
+    "Classical",
+    "Famous Melodies",
+    "Easy Classics"
+  ],
+  "year": 1888,
+  "description": "Satie's slow, dreamlike waltz: a two-chord left-hand sway under a floating melody that hangs on long held notes. A favourite first 'real' classical piece because it sounds far harder than it is.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "gymnopedie-1-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "gymnopedie-1__intermediate.musicxml",
+      "tempoBPM": 60,
+      "keySignature": "D major",
+      "timeSignature": "3/4",
+      "measures": 20,
+      "hands": "both",
+      "notes": "The original opening section (introduction and the first two statements of the theme) with the authentic Gmaj7/Dmaj7 left-hand sway, closing on a D major chord instead of continuing into the development.",
+      "teachingPoints": [
+        "Left hand alone first: low bass note on beat 1, then leap up to the three-note chord on beat 2 and hold it through beat 3.",
+        "Keep the chord leap quiet and even; the whole piece is one dynamic (soft) with a gentle lean on beat 1.",
+        "Right hand enters in bar 5: F#-A-G, F#-C#-B, C#-D-A, then a long F# held for five bars while the left hand keeps swaying.",
+        "Count the long held notes out loud (1-2-3 per bar) so the left hand stays strictly in time underneath."
+      ]
+    }
+  ]
+}

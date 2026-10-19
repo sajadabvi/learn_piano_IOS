@@ -1,0 +1,49 @@
+{
+  "id": "twinkle-twinkle",
+  "title": "Twinkle, Twinkle, Little Star",
+  "composer": "Traditional (French melody, 1761)",
+  "genre": "Children & Folk",
+  "categories": ["Children & Folk", "Famous Melodies", "Easy Classics"],
+  "year": 1761,
+  "description": "The French tune 'Ah! vous dirai-je, maman', later set to Jane Taylor's poem and varied by Mozart. Its repeated notes and simple A-B-B-A form make it the ideal first piece for coordinating both hands.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "twinkle-twinkle-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "twinkle-twinkle__beginner.musicxml",
+      "tempoBPM": 92,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 12,
+      "hands": "both",
+      "notes": "The complete tune in C major with single-note melody in a five-finger position and a left hand of whole and half notes on C, F and G.",
+      "teachingPoints": [
+        "RH C position throughout; the only stretch is the 5th finger reaching up to A in bars 2 and 10.",
+        "Every bar has only quarter and half notes - count steadily and hold the half notes for their full two beats.",
+        "LH: 5th finger on C3, thumb on G3, 2nd finger on F3; change notes exactly on beats 1 and 3.",
+        "Learn bars 1-4 hands separately, then bars 5-8 (the 'up above the world' phrase repeats), then join."
+      ]
+    },
+    {
+      "id": "twinkle-twinkle-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "twinkle-twinkle__intermediate.musicxml",
+      "tempoBPM": 96,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 24,
+      "hands": "both",
+      "notes": "Two statements of the tune: the first over an Alberti-bass left hand in eighths, the second an octave higher with the melody harmonised in thirds and sixths over half-note triads.",
+      "teachingPoints": [
+        "Bars 1-12: LH Alberti bass (root-fifth-third-fifth) - practise it slowly as a loop until it is even, then add the RH.",
+        "The bass changes chord every two beats from bar 2 on (C, F, G); name the chord before each change.",
+        "Bars 13-24: RH plays the melody on top of thirds and sixths - the top note is the tune, so weight the 5th finger.",
+        "Bars 15-16 and 23-24: the lower voice walks down A-G-F-E while the melody descends F-E-D-C; listen for both lines.",
+        "LH half-note triads in bars 13-24 use 5-3-1; keep them light so the melody dyads sing."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "ex-c-position-lh",
+  "title": "C Position: Left Hand (C B A G F)",
+  "composer": "LearnPiano exercise",
+  "genre": "Exercise",
+  "categories": [
+    "Exercises"
+  ],
+  "year": null,
+  "description": "The mirror image of the right-hand position: left thumb on middle C, fingers 2-5 on B, A, G and F below it, reading the notes in the bass clef.",
+  "isExercise": true,
+  "arrangements": [
+    {
+      "id": "ex-c-position-lh-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "ex-c-position-lh__beginner.musicxml",
+      "tempoBPM": 80,
+      "keySignature": "C major",
+      "timeSignature": "4/4",
+      "measures": 8,
+      "hands": "both",
+      "notes": "Stepwise and small-skip patterns within F3-C4 with fingers 1-5 on every note; the right hand rests so you can watch the left hand alone.",
+      "teachingPoints": [
+        "Left thumb on middle C, little finger on F: the pattern C-B-A-G-F goes DOWN the keyboard as the fingers go 1-2-3-4-5.",
+        "Middle C sits on the line just above the bass staff - learn that one note first and read the others by step from it.",
+        "Bar 3 has skips (C-A, B-G): feel the gap with the hand still, do not reach.",
+        "Bar 6: three Fs with finger 5 - the weakest finger, so keep the wrist relaxed and let arm weight help."
+      ]
+    }
+  ]
+}
