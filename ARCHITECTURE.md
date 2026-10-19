@@ -80,7 +80,7 @@ chord. Views render only that; they never compute musical logic.
 
 **Persistence.** `UserProfile` (favorites, `SongProgress` per arrangement, `LessonProgress`,
 `UserSettings`) is one JSON file: `Documents/profile.json`. Imported songs live in
-`Documents/Library/<song-id>/` as `score.musicxml` (exported by Parsers) plus `song.json`
+`Documents/Library/<song-id>/` as `score.json` (Codable `Score`), an optional `score.musicxml` export, plus `song.json`
 (`SongEntry` with `.user` storage). Bundled songs are the `Content/Songs/*.musicxml` files and their
 `*.catalog.json` fragments (`CatalogFragment` → `SongEntry`).
 
