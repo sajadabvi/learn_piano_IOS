@@ -1,0 +1,123 @@
+name: LearnPiano
+options:
+  bundleIdPrefix: com.sajadabvi
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_USER_SCRIPT_SANDBOXING: "NO"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  LearnPiano:
+    type: application
+    platform: iOS
+    sources:
+      - path: LearnPiano
+        excludes:
+          - "**/*.md"
+    info:
+      path: LearnPiano/Info.plist
+      properties:
+        CFBundleDisplayName: LearnPiano
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+          - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+        UIRequiresFullScreen: false
+        UIBackgroundModes:
+          - audio
+        UIAppFonts:
+          - Bravura.otf
+        NSMicrophoneUsageDescription: LearnPiano listens to your piano so the sheet music can follow what you play.
+        NSBluetoothAlwaysUsageDescription: LearnPiano connects to Bluetooth MIDI keyboards so it can read the keys you press.
+        NSBluetoothPeripheralUsageDescription: LearnPiano connects to Bluetooth MIDI keyboards so it can read the keys you press.
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: MusicXML Score
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes:
+              - com.sajadabvi.learnpiano.musicxml
+              - com.sajadabvi.learnpiano.mxl
+          - CFBundleTypeName: MIDI File
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes:
+              - public.midi-audio
+          - CFBundleTypeName: Sheet Music PDF
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes:
+              - com.adobe.pdf
+          - CFBundleTypeName: Sheet Music Image
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes:
+              - public.image
+        UTImportedTypeDeclarations:
+          - UTTypeIdentifier: com.sajadabvi.learnpiano.musicxml
+            UTTypeDescription: MusicXML Score
+            UTTypeConformsTo:
+              - public.xml
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - musicxml
+                - xml
+              public.mime-type:
+                - application/vnd.recordare.musicxml+xml
+          - UTTypeIdentifier: com.sajadabvi.learnpiano.mxl
+            UTTypeDescription: Compressed MusicXML Score
+            UTTypeConformsTo:
+              - public.data
+              - public.archive
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - mxl
+              public.mime-type:
+                - application/vnd.recordare.musicxml
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.sajadabvi.LearnPiano
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: "YES"
+        INFOPLIST_KEY_UISupportsDocumentBrowser: "NO"
+  LearnPianoTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: LearnPianoTests
+    dependencies:
+      - target: LearnPiano
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.sajadabvi.LearnPianoTests
+schemes:
+  LearnPiano:
+    build:
+      targets:
+        LearnPiano: all
+        LearnPianoTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - LearnPianoTests

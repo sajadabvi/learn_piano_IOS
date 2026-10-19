@@ -1,0 +1,18 @@
+# Xcode
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+DerivedData/
+build/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+.DS_Store
+# Swift PM
+.build/
+.swiftpm/
+# Local
+.claude/launch.json
+scripts/.sim-udid
