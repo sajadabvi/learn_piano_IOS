@@ -7,4 +7,4 @@ FILES=(LearnPiano/Core/*.swift)
 for m in "$@"; do FILES+=(LearnPiano/"$m"/*.swift); done
 xcrun swiftc -typecheck -swift-version 5 -sdk "$(xcrun --sdk iphonesimulator --show-sdk-path)" \
   -target arm64-apple-ios18.0-simulator "${FILES[@]}"
-echo "typecheck OK: Core ${*}"
+echo "typecheck OK: Core ${*:-}"

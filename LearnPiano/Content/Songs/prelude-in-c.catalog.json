@@ -3,7 +3,11 @@
   "title": "Prelude in C major (BWV 846)",
   "composer": "Johann Sebastian Bach",
   "genre": "Classical",
-  "categories": ["Classical", "Famous Melodies", "Easy Classics"],
+  "categories": [
+    "Classical",
+    "Famous Melodies",
+    "Easy Classics"
+  ],
   "year": 1722,
   "description": "The opening prelude of The Well-Tempered Clavier, Book I: one broken-chord pattern repeated through a chain of rich harmonies. A perfect study in even sixteenths, quiet hands and listening to harmony change under your fingers.",
   "isExercise": false,
@@ -18,12 +22,12 @@
       "timeSignature": "4/4",
       "measures": 35,
       "hands": "both",
-      "notes": "The complete 35-bar prelude as Bach wrote it; the only editorial choice is notating the held tenor note as a sixteenth tied to a dotted quarter so every voice fills the bar.",
+      "notes": "The complete 35-bar prelude as Bach wrote it; the only editorial choices are notating the held tenor note in bars 1-32 as a sixteenth tied to a dotted quarter so every voice fills the bar, and switching the right-hand staff to bass clef for the low arpeggio of bar 33 (back to treble in bar 34); in bars 33-35 both left-hand notes are struck together as whole notes.",
       "teachingPoints": [
         "Learn the chord of each bar as a block first (bass, tenor, three right-hand notes), then unfold it into the sixteenth pattern.",
-        "Left hand: bass on the beat, tenor on the second sixteenth, both held while the right hand arpeggiates; keep the wrist loose and the dynamics even.",
-        "Hand-position shifts are marked at bars 1, 2, 5, 10, 16 and 19; the accidentals in bars 12, 14, 20, 22, 23 and 28 define the colour of each harmony.",
-        "Bars 33-34 break the pattern with a long right-hand arpeggio over the held low C; practice them slowly and let the final chord in bar 35 ring."
+        "Left hand: bass on the beat, tenor on the second sixteenth, both held while the right hand arpeggiates; where the tenor sits a 10th or more above the bass (bars 1, 4, 5, 9-15, 17, 20) release the bass early rather than stretching.",
+        "Hand-position shifts are marked at bars 1, 2, 5, 10, 16 and 19; the accidentals in bars 12, 14, 20, 22, 23, 28 and 32 define the colour of each harmony.",
+        "Bars 33-34 break the pattern with a long right-hand arpeggio over the low C and C/B struck together on the downbeat; practice them slowly and let the final chord in bar 35 ring."
       ]
     }
   ]

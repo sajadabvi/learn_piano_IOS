@@ -1,0 +1,30 @@
+{
+  "id": "moonlight-sonata",
+  "title": "Moonlight Sonata, 1st movement (opening)",
+  "composer": "Ludwig van Beethoven",
+  "genre": "Classical",
+  "categories": ["Classical", "Famous Melodies"],
+  "year": 1801,
+  "description": "The Adagio sostenuto from Beethoven's Piano Sonata No. 14 in C-sharp minor, Op. 27 No. 2: a hushed, unbroken stream of triplets under a bass of octaves and a melody that barely moves. Learning it builds control of a three-layer texture (bass, accompaniment and melody) in one quiet dynamic.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "moonlight-sonata-advanced",
+      "label": "Advanced",
+      "difficulty": "advanced",
+      "file": "moonlight-sonata__advanced.musicxml",
+      "tempoBPM": 56,
+      "keySignature": "C-sharp minor",
+      "timeSignature": "2/2",
+      "measures": 15,
+      "hands": "both",
+      "notes": "Beethoven's text for bars 1-15 (the four-bar introduction, the first theme and its move through E major to the arrival on B), with the right hand playing both the triplets and the melody and the left hand the octaves; only the second theme's pickup note at the very end of bar 15 is left out so the excerpt closes on the B.",
+      "teachingPoints": [
+        "Right hand holds two layers: triplets with fingers 1-2-3 (or 1-2-4) kept under the hand, and the melody G# on 5 (later 4-5) ringing above them; practise the triplets alone at pp first, then add the melody and let it sound a shade louder.",
+        "The melody rhythm is a dotted eighth plus sixteenth on the fourth beat (bars 5, 6, 10, 11): count the triplets and place the sixteenth exactly on the last triplet note, never swung.",
+        "Left hand octaves use 5-1 and change on the half note in bars 3, 4, 7, 8 and 12-14; bar 12 has three changes (C, B, A#) and bar 13 moves to single notes E and G, so practise bars 12-14 left hand alone.",
+        "Watch the accidentals that mark the harmony: B# in the bass of bar 6, B natural from bar 8, then G, F and C naturals in bars 10-12 as the music slides through E minor and C major before A# and F# bring it to B."
+      ]
+    }
+  ]
+}

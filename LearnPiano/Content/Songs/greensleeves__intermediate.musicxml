@@ -165,8 +165,8 @@
    <note><chord/><pitch><step>D</step><octave>4</octave></pitch><duration>8</duration><voice>5</voice><type>half</type><staff>2</staff></note>
   </measure>
   <measure number="17">
-   <note><pitch><step>B</step><octave>4</octave></pitch><duration>8</duration><voice>1</voice><type>half</type><staff>1</staff></note>
-   <note><chord/><pitch><step>D</step><octave>5</octave></pitch><duration>8</duration><voice>1</voice><type>half</type><staff>1</staff></note>
+   <note><pitch><step>B</step><octave>4</octave></pitch><duration>8</duration><voice>1</voice><type>half</type><staff>1</staff><notations><technical><fingering>1</fingering></technical></notations></note>
+   <note><chord/><pitch><step>D</step><octave>5</octave></pitch><duration>8</duration><voice>1</voice><type>half</type><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
    <note><pitch><step>B</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff></note>
    <backup><duration>12</duration></backup>
    <note><pitch><step>G</step><octave>2</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff></note>
@@ -218,9 +218,9 @@
    <note><pitch><step>E</step><octave>4</octave></pitch><duration>12</duration><voice>1</voice><type>half</type><dot/><staff>1</staff><notations><technical><fingering>1</fingering></technical></notations></note>
    <backup><duration>12</duration></backup>
    <note><pitch><step>E</step><octave>3</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff></note>
-   <note><pitch><step>G</step><alter>1</alter><octave>3</octave></pitch><duration>8</duration><voice>5</voice><type>half</type><accidental>sharp</accidental><staff>2</staff></note>
+   <note><pitch><step>E</step><octave>3</octave></pitch><duration>8</duration><voice>5</voice><type>half</type><staff>2</staff></note>
+   <note><chord/><pitch><step>G</step><alter>1</alter><octave>3</octave></pitch><duration>8</duration><voice>5</voice><type>half</type><accidental>sharp</accidental><staff>2</staff></note>
    <note><chord/><pitch><step>B</step><octave>3</octave></pitch><duration>8</duration><voice>5</voice><type>half</type><staff>2</staff></note>
-   <note><chord/><pitch><step>E</step><octave>4</octave></pitch><duration>8</duration><voice>5</voice><type>half</type><staff>2</staff></note>
   </measure>
   <measure number="23">
    <note><pitch><step>G</step><octave>5</octave></pitch><duration>6</duration><voice>1</voice><type>quarter</type><dot/><staff>1</staff><notations><technical><fingering>5</fingering></technical></notations></note>

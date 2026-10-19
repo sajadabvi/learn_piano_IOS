@@ -22,12 +22,13 @@
       "timeSignature": "3/4",
       "measures": 17,
       "hands": "both",
-      "notes": "Single-note melody in an extended G position with the left hand holding one root-fifth dyad per bar.",
+      "notes": "Single-note melody in an extended G position with the left hand holding one sustained dyad (mostly a root-fifth) per bar.",
       "teachingPoints": [
         "RH stays in G position (thumb on G4) and reaches down to D4/E4 with the thumb for the low notes",
         "The tune starts on a pickup D4: count 1-2 before you play, then land G4 on the downbeat",
         "Practise the B4-G4 eighth-note pairs (bars 2, 6, 10, 14) slowly so they do not rush",
-        "Hold every LH dyad for the full three beats; keep the fifth light under the melody"
+        "Hold every LH dyad for its full length; keep it light under the melody (bars 5 and 13 use G3+B3 so the thumb never shares D4 with the RH)",
+        "The long notes in bars 8-9 and 16-17 are tied: hold them, do not re-strike"
       ]
     },
     {
@@ -43,7 +44,7 @@
       "notes": "Adds harmony notes under the melody (thirds and sixths) and a root-then-chord waltz bass with E minor and D7 colour chords.",
       "teachingPoints": [
         "LH pattern is root on beat 1, two-note chord on beats 2-3: practise the hand alone until the leap is automatic",
-        "Watch the walking bass D3 at the end of bars 5, 7, 11 and 13 that pulls the harmony back to G",
+        "Watch the walking bass D3 at the end of bars 5, 7, 11, 13 and 15 that pulls the harmony back to G",
         "RH dyads in bars 7-9 (D5 over F#4) need a relaxed hand; keep the melody note on top louder",
         "Final cadence: balance the three-note RH chord so G4 still sings above the fifth in the bass"
       ]
