@@ -68,8 +68,9 @@
         <sound dynamics="36"/>
       </direction>
       <note><rest/><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff></note>
-      <note><pitch><step>F</step><octave>5</octave></pitch><duration>4</duration><tie type="start"/><voice>1</voice><type>quarter</type><staff>1</staff><notations><tied type="start"/><technical><fingering>3</fingering></technical></notations></note>
-      <note><chord/><pitch><step>A</step><alter>-1</alter><octave>5</octave></pitch><duration>4</duration><tie type="start"/><voice>1</voice><type>quarter</type><staff>1</staff><notations><tied type="start"/><technical><fingering>5</fingering></technical></notations></note>
+      <note><rest/><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff></note>
+      <note><pitch><step>F</step><octave>5</octave></pitch><duration>2</duration><tie type="start"/><voice>1</voice><type>eighth</type><staff>1</staff><notations><tied type="start"/><technical><fingering>3</fingering></technical></notations></note>
+      <note><chord/><pitch><step>A</step><alter>-1</alter><octave>5</octave></pitch><duration>2</duration><tie type="start"/><voice>1</voice><type>eighth</type><staff>1</staff><notations><tied type="start"/><technical><fingering>5</fingering></technical></notations></note>
       <note><pitch><step>F</step><octave>5</octave></pitch><duration>6</duration><tie type="stop"/><voice>1</voice><type>quarter</type><dot/><staff>1</staff><notations><tied type="stop"/></notations></note>
       <note><chord/><pitch><step>A</step><alter>-1</alter><octave>5</octave></pitch><duration>6</duration><tie type="stop"/><voice>1</voice><type>quarter</type><dot/><staff>1</staff><notations><tied type="stop"/></notations></note>
       <note><pitch><step>D</step><alter>-1</alter><octave>5</octave></pitch><duration>6</duration><tie type="start"/><voice>1</voice><type>quarter</type><dot/><staff>1</staff><notations><tied type="start"/><technical><fingering>1</fingering></technical></notations></note>
@@ -126,8 +127,9 @@
       <note><chord/><pitch><step>C</step><octave>5</octave></pitch><duration>12</duration><tie type="start"/><voice>1</voice><type>half</type><dot/><staff>1</staff><notations><tied type="start"/><technical><fingering>3</fingering></technical></notations></note>
       <backup><duration>18</duration></backup>
       <note><pitch><step>B</step><alter>-1</alter><octave>4</octave></pitch><duration>2</duration><tie type="stop"/><voice>2</voice><type>eighth</type><staff>1</staff><notations><tied type="stop"/></notations></note>
-      <note><rest/><duration>12</duration><voice>2</voice><type>half</type><dot/><staff>1</staff></note>
       <note><rest/><duration>4</duration><voice>2</voice><type>quarter</type><staff>1</staff></note>
+      <note><rest/><duration>6</duration><voice>2</voice><type>quarter</type><dot/><staff>1</staff></note>
+      <note><rest/><duration>6</duration><voice>2</voice><type>quarter</type><dot/><staff>1</staff></note>
       <backup><duration>18</duration></backup>
       <note><pitch><step>E</step><alter>-1</alter><octave>4</octave></pitch><duration>12</duration><tie type="start"/><voice>5</voice><type>half</type><dot/><staff>2</staff><notations><tied type="start"/><technical><fingering>3</fingering></technical></notations></note>
       <note><chord/><pitch><step>G</step><alter>-1</alter><octave>4</octave></pitch><duration>12</duration><tie type="start"/><voice>5</voice><type>half</type><dot/><staff>2</staff><notations><tied type="start"/><technical><fingering>1</fingering></technical></notations></note>
@@ -209,17 +211,18 @@
     </measure>
     <measure number="9">
       <note><rest/><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff></note>
-      <note><pitch><step>F</step><octave>5</octave></pitch><duration>4</duration><tie type="start"/><voice>1</voice><type>quarter</type><staff>1</staff><notations><tied type="start"/><technical><fingering>3</fingering></technical></notations></note>
-      <note><chord/><pitch><step>A</step><alter>-1</alter><octave>5</octave></pitch><duration>4</duration><tie type="start"/><voice>1</voice><type>quarter</type><staff>1</staff><notations><tied type="start"/><technical><fingering>5</fingering></technical></notations></note>
-      <note><pitch><step>F</step><octave>5</octave></pitch><duration>6</duration><tie type="stop"/><voice>1</voice><type>quarter</type><dot/><staff>1</staff><notations><tied type="stop"/></notations></note>
-      <note><chord/><pitch><step>A</step><alter>-1</alter><octave>5</octave></pitch><duration>6</duration><tie type="stop"/><voice>1</voice><type>quarter</type><dot/><staff>1</staff><notations><tied type="stop"/></notations></note>
+      <note><pitch><step>F</step><octave>3</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>1</fingering></technical></notations></note>
+      <note><chord/><pitch><step>A</step><alter>-1</alter><octave>3</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>2</fingering></technical></notations></note>
+      <note><pitch><step>F</step><octave>5</octave></pitch><duration>6</duration><voice>1</voice><type>quarter</type><dot/><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
+      <note><chord/><pitch><step>A</step><alter>-1</alter><octave>5</octave></pitch><duration>6</duration><voice>1</voice><type>quarter</type><dot/><staff>1</staff><notations><technical><fingering>5</fingering></technical></notations></note>
       <note><pitch><step>D</step><alter>-1</alter><octave>5</octave></pitch><duration>6</duration><tie type="start"/><voice>1</voice><type>quarter</type><dot/><staff>1</staff><notations><tied type="start"/><technical><fingering>1</fingering></technical></notations></note>
       <note><chord/><pitch><step>F</step><octave>5</octave></pitch><duration>6</duration><tie type="start"/><voice>1</voice><type>quarter</type><dot/><staff>1</staff><notations><tied type="start"/><technical><fingering>3</fingering></technical></notations></note>
       <backup><duration>18</duration></backup>
       <note><pitch><step>D</step><alter>-1</alter><octave>2</octave></pitch><duration>2</duration><voice>6</voice><type>eighth</type><staff>2</staff><notations><technical><fingering>5</fingering></technical></notations></note>
       <note><chord/><pitch><step>A</step><alter>-1</alter><octave>2</octave></pitch><duration>2</duration><tie type="stop"/><voice>6</voice><type>eighth</type><staff>2</staff><notations><tied type="stop"/></notations></note>
-      <note><pitch><step>F</step><octave>4</octave></pitch><duration>4</duration><tie type="start"/><voice>6</voice><type>quarter</type><staff>2</staff><notations><tied type="start"/><technical><fingering>3</fingering></technical></notations></note>
-      <note><chord/><pitch><step>A</step><alter>-1</alter><octave>4</octave></pitch><duration>4</duration><tie type="start"/><voice>6</voice><type>quarter</type><staff>2</staff><notations><tied type="start"/><technical><fingering>1</fingering></technical></notations></note>
+      <note><rest/><duration>2</duration><voice>6</voice><type>eighth</type><staff>2</staff></note>
+      <note><pitch><step>F</step><octave>4</octave></pitch><duration>2</duration><tie type="start"/><voice>6</voice><type>eighth</type><staff>2</staff><notations><tied type="start"/><technical><fingering>3</fingering></technical></notations></note>
+      <note><chord/><pitch><step>A</step><alter>-1</alter><octave>4</octave></pitch><duration>2</duration><tie type="start"/><voice>6</voice><type>eighth</type><staff>2</staff><notations><tied type="start"/><technical><fingering>1</fingering></technical></notations></note>
       <note><pitch><step>F</step><octave>4</octave></pitch><duration>12</duration><tie type="stop"/><voice>6</voice><type>half</type><dot/><staff>2</staff><notations><tied type="stop"/></notations></note>
       <note><chord/><pitch><step>A</step><alter>-1</alter><octave>4</octave></pitch><duration>12</duration><tie type="stop"/><voice>6</voice><type>half</type><dot/><staff>2</staff><notations><tied type="stop"/></notations></note>
     </measure>

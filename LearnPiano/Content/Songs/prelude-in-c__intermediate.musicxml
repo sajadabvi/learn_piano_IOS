@@ -763,7 +763,7 @@
       <note><pitch><step>G</step><octave>2</octave></pitch><duration>8</duration><voice>5</voice><type>half</type><staff>2</staff></note>
       <backup><duration>16</duration></backup>
       <note><rest/><duration>1</duration><voice>6</voice><type>16th</type><staff>2</staff></note>
-      <note><pitch><step>E</step><octave>3</octave></pitch><duration>1</duration><tie type="start"/><voice>6</voice><type>16th</type><staff>2</staff><notations><tied type="start"/></notations></note>
+      <note><pitch><step>E</step><alter>0</alter><octave>3</octave></pitch><duration>1</duration><tie type="start"/><voice>6</voice><type>16th</type><accidental>natural</accidental><staff>2</staff><notations><tied type="start"/></notations></note>
       <note><pitch><step>E</step><octave>3</octave></pitch><duration>6</duration><tie type="stop"/><voice>6</voice><type>quarter</type><dot/><staff>2</staff><notations><tied type="stop"/></notations></note>
       <note><rest/><duration>1</duration><voice>6</voice><type>16th</type><staff>2</staff></note>
       <note><pitch><step>E</step><octave>3</octave></pitch><duration>1</duration><tie type="start"/><voice>6</voice><type>16th</type><staff>2</staff><notations><tied type="start"/></notations></note>

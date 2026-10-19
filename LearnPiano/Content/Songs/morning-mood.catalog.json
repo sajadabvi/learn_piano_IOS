@@ -1,0 +1,34 @@
+{
+  "id": "morning-mood",
+  "title": "Morning Mood (Peer Gynt)",
+  "composer": "Edvard Grieg",
+  "genre": "Classical",
+  "categories": [
+    "Classical",
+    "Famous Melodies",
+    "Easy Classics"
+  ],
+  "year": 1875,
+  "description": "The sunrise that opens Grieg's Peer Gynt Suite No. 1, a pentatonic flute melody in E major and a gentle 6/8 sway. Ideal for learning a five-finger position with sharps and an even, unhurried eighth-note pulse.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "morning-mood-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "morning-mood__beginner.musicxml",
+      "tempoBPM": 88,
+      "keySignature": "E major",
+      "timeSignature": "6/8",
+      "measures": 16,
+      "hands": "both",
+      "notes": "Grieg's opening phrase (sol-mi-re-do-re-mi) and its octave-lower oboe answer, with the bar-2 turn simplified to a repeat of bar 1, over a left hand of single dotted-quarter notes (E3, B3, C#3).",
+      "teachingPoints": [
+        "Right hand position: thumb on E5, 2 on F#5, 3 on G#5, 4 on B5, 5 on C#6 (and the same fingers an octave lower in bars 5-8 and 13-15).",
+        "Bars 1-2 are the motif B-G#-F#-E-F#-G#; bar 3 rocks up to C#6 with the 5th finger (B-G#-B-C#-G#-C#); bar 4 closes B-G#-F# then a dotted-quarter E.",
+        "Count the 6/8 as two big beats per bar (1-2-3 4-5-6); every left-hand note is one big beat, and the dotted-quarter E that ends bars 4 and 8 lasts the whole second beat.",
+        "Left hand alternates E3 and B3 as dotted quarters; in bars 3, 7, 11 and 15 the second note is C#3 under the C#6 (C#5) of the melody. Practice it alone with a metronome before adding the melody."
+      ]
+    }
+  ]
+}

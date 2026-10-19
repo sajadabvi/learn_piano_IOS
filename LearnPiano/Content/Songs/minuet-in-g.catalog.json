@@ -22,11 +22,12 @@
       "timeSignature": "3/4",
       "measures": 32,
       "hands": "both",
-      "notes": "The complete minuet with both sections written out (16 + 16 bars), keeping the original melody and a two-voice left hand of half and quarter notes; bars 21-23 follow the Bach-Gesellschaft bass (A, B-D-C#, D-F#-A).",
+      "notes": "The complete minuet with both sections written out (16 + 16 bars), keeping the original melody; the left hand mostly uses half-plus-quarter patterns, with the published walking lines kept in bars 7-8, 22-23, 27 and 30-32 and bars 21-23 following the Bach-Gesellschaft bass (A, B-D-C#, D-F#-A).",
       "teachingPoints": [
         "Right hand sits in a G position (thumb on G4) for most of the first section; the second section opens with a leap to B5 (5th finger) in bar 17 and A5 in bar 18.",
         "Second section (bars 17-24) moves to D major: watch the C-sharps in bars 20-23, and finger the six-note scale in bar 21 as 1-2-3-1-2-3 so the 4th finger lands on G5 in bar 22.",
-        "Practice the left hand alone: half note plus quarter in each bar, the three-quarter-note walks in bars 7, 22, 23 and 27, and the held A in bar 21.",
+        "Bars 28-31 are the one place the second half differs from the first: a six-eighth run D4-B4 in bar 29 (1-2-1-2-3-4) leads to C5-B4-A4 (5-4-3) in bar 30 and the B4-D5 leap in bar 31.",
+        "Practice the left hand alone: half note plus quarter in most bars, the eighth-note walk in bar 8, the three-quarter-note bars 7, 22, 23, 27, 30, 31 and 32, and the held A in bar 21.",
         "Keep the dance feel: light on beats 2 and 3, a gentle lift before each new phrase (bars 8, 16, 24, 32)."
       ]
     }

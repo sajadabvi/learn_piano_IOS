@@ -1,0 +1,51 @@
+{
+  "id": "swan-lake",
+  "title": "Swan Lake (Scene theme)",
+  "composer": "Pyotr Ilyich Tchaikovsky",
+  "genre": "Classical",
+  "categories": [
+    "Classical",
+    "Famous Melodies"
+  ],
+  "year": 1876,
+  "description": "The haunting oboe theme that opens Act II of Tchaikovsky's ballet, in B minor. A singing long-note melody that rises from the opening F-sharp and sways in dotted rhythms; it teaches legato phrasing and a steady accompaniment under a sustained line.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "swan-lake-beginner",
+      "label": "Beginner",
+      "difficulty": "beginner",
+      "file": "swan-lake__beginner.musicxml",
+      "tempoBPM": 72,
+      "keySignature": "B minor",
+      "timeSignature": "4/4",
+      "measures": 16,
+      "hands": "both",
+      "notes": "The eight-bar Swan theme written out twice, single-note melody with its dotted-quarter/eighth sway, over a left hand of open-fifth dyads (B-F#, with E-B touches) in half notes.",
+      "teachingPoints": [
+        "Right hand sits with the thumb on B4 and the 5th finger on F#5 (1-2-3-4-5 = B C# D E F#); bar 1 holds F#5 for two beats, then the four eighths B-C#-D-E climb back up to it.",
+        "Bars 2-3 are the dotted sway: dotted-quarter F#5 then an eighth; in bar 3 the thumb drops to G4 for one note (fingers 5-2-4-2-1-4) and returns.",
+        "Bar 4: hold B4 through the tie into beat 3, then E-D-C# eighths lead back to the F#5 of bar 5; bar 8 is a whole-note B4 before the repeat.",
+        "Left hand plays only two open fifths, B2-F#3 and E3-B3 (5-1); the E-B dyad arrives on beat 3 of bars 1 and 4 only."
+      ]
+    },
+    {
+      "id": "swan-lake-intermediate",
+      "label": "Intermediate",
+      "difficulty": "intermediate",
+      "file": "swan-lake__intermediate.musicxml",
+      "tempoBPM": 76,
+      "keySignature": "B minor",
+      "timeSignature": "4/4",
+      "measures": 16,
+      "hands": "both",
+      "notes": "The Swan theme followed by its real second strain, over a flowing eighth-note broken-chord left hand (root-fifth-octave-third), with the long notes thickened into thirds in bars 5-7 and 10-11.",
+      "teachingPoints": [
+        "Left hand: one four-note arpeggio per half bar (5-3-2-1); learn the shapes Bm (B-F#-B-D), Em (E-B-E-G), D (D-A-D-F#) and F#7 (F#-C#-F#-A#) separately, then the changes in bars 10-12.",
+        "Right hand bars 5-7: hold the D5 under the long F#5 (fingers 3 and 5) while the eighths move; keep the dyad quieter than the melody note.",
+        "Bars 9-11 climb into a new position (C#5 D5 E5 = 1-2-3, then A5 and B5 with 5); bar 12 drops back to the opening position (F#5 D5 C#5 B4 = 5-3-2-1) after B5 with 4.",
+        "Keep the melody above the accompaniment: left hand pp and even, right hand singing; the A-sharp in the bar-12 and bar-16 left hand is the dominant leading back to B minor."
+      ]
+    }
+  ]
+}

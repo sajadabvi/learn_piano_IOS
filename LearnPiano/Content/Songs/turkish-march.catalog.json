@@ -1,0 +1,33 @@
+{
+  "id": "turkish-march",
+  "title": "Turkish March (Rondo alla Turca, opening)",
+  "composer": "Wolfgang Amadeus Mozart",
+  "genre": "Classical",
+  "categories": [
+    "Classical",
+    "Famous Melodies"
+  ],
+  "year": 1783,
+  "description": "The finale of Mozart's Piano Sonata No. 11, K. 331, imitating a Janissary band in A minor 2/4. The opening strain is the ultimate test of clean, light sixteenth-note turns and a crisp off-beat left hand.",
+  "isExercise": false,
+  "arrangements": [
+    {
+      "id": "turkish-march-advanced",
+      "label": "Advanced",
+      "difficulty": "advanced",
+      "file": "turkish-march__advanced.musicxml",
+      "tempoBPM": 120,
+      "keySignature": "A minor",
+      "timeSignature": "2/4",
+      "measures": 17,
+      "hands": "both",
+      "notes": "Mozart's own text for the opening strain and its return with the cadence: the four-sixteenth anacrusis B-A-G#-A, the double-note B / F#-A / E-G / F#-A bars, the eighth-note descent C-B-A-G# / A-E-F-D and the trill cadence on B, over Mozart's bass-plus-chord left hand (grace notes omitted).",
+      "teachingPoints": [
+        "The piece starts on a pickup: B4-A4-G#4-A4 sixteenths (4-3-2-1) land on the staccato C5 eighth of bar 1; the same turn returns at the end of bar 8 to launch the repeat.",
+        "Bar 3 is eight sixteenths an octave up (B5-A5-G#5-A5 twice, 4-3-2-1); practice the leap from E5 at the end of bar 2 so the 4th finger lands on B5 without a bump; bar 4 is a quarter C6 then A5-C6 eighths.",
+        "Bars 5-7: accented B5 eighth then three staccato double notes (F#-A, E-G, F#-A with 2-4, 1-3, 2-4); bar 7 ends on D#-F# and resolves to a tenuto E5 in bar 8.",
+        "Left hand: bass note on the beat then light staccato eighth chords (A3 + C4-E4 in bars 1-4, E3 + B3-E4 in bars 5-7); second time bar 12 is F3 + A3-D#4, bars 13-14 walk E-D / C-D under the eighth-note descent, bar 15 is the cadential E-A / E-G# under the trill on B4 (dotted-eighth, then A-B thirty-seconds), bar 16 lands on the A2-A3 octave."
+      ]
+    }
+  ]
+}

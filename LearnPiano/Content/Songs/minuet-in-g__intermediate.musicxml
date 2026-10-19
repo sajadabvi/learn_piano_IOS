@@ -89,7 +89,10 @@
       <note><pitch><step>A</step><octave>4</octave></pitch><duration>8</duration><voice>1</voice><type>half</type><staff>1</staff><notations><technical><fingering>4</fingering></technical></notations></note>
       <backup><duration>12</duration></backup>
       <note><pitch><step>D</step><octave>4</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>1</fingering></technical></notations></note>
-      <note><pitch><step>D</step><octave>3</octave></pitch><duration>8</duration><voice>5</voice><type>half</type><staff>2</staff><notations><technical><fingering>5</fingering></technical></notations></note>
+      <note><pitch><step>D</step><octave>3</octave></pitch><duration>2</duration><voice>5</voice><type>eighth</type><staff>2</staff><notations><technical><fingering>5</fingering></technical></notations></note>
+      <note><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration><voice>5</voice><type>eighth</type><staff>2</staff><notations><technical><fingering>2</fingering></technical></notations></note>
+      <note><pitch><step>B</step><octave>3</octave></pitch><duration>2</duration><voice>5</voice><type>eighth</type><staff>2</staff><notations><technical><fingering>3</fingering></technical></notations></note>
+      <note><pitch><step>A</step><octave>3</octave></pitch><duration>2</duration><voice>5</voice><type>eighth</type><staff>2</staff><notations><technical><fingering>4</fingering></technical></notations></note>
     </measure>
     <measure number="9">
       <note><pitch><step>D</step><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>5</fingering></technical></notations></note>
@@ -196,8 +199,9 @@
     </measure>
     <measure number="20">
       <note><pitch><step>C</step><alter>1</alter><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><accidental>sharp</accidental><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
-      <note><pitch><step>B</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>2</fingering></technical></notations></note>
-      <note><pitch><step>C</step><alter>1</alter><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
+      <note><pitch><step>B</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>2</fingering></technical></notations></note>
+      <note><pitch><step>C</step><alter>1</alter><octave>5</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
+      <note><pitch><step>A</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>1</fingering></technical></notations></note>
       <backup><duration>12</duration></backup>
       <note><pitch><step>A</step><octave>3</octave></pitch><duration>8</duration><voice>5</voice><type>half</type><staff>2</staff><notations><technical><fingering>2</fingering></technical></notations></note>
       <note><pitch><step>A</step><octave>2</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>5</fingering></technical></notations></note>
@@ -262,47 +266,53 @@
       <note><pitch><step>G</step><octave>3</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>4</fingering></technical></notations></note>
     </measure>
     <measure number="28">
-      <note><pitch><step>A</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
+      <note><pitch><step>A</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
       <note><pitch><step>G</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>2</fingering></technical></notations></note>
       <note><pitch><step>F</step><alter>1</alter><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>1</fingering></technical></notations></note>
       <note><pitch><step>G</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>2</fingering></technical></notations></note>
-      <note><pitch><step>A</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
+      <note><pitch><step>A</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
       <backup><duration>12</duration></backup>
       <note><pitch><step>D</step><octave>3</octave></pitch><duration>12</duration><voice>5</voice><type>half</type><dot/><staff>2</staff><notations><technical><fingering>5</fingering></technical></notations></note>
     </measure>
     <measure number="29">
-      <note><pitch><step>D</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>1</fingering></technical></notations></note>
+      <note><pitch><step>D</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>1</fingering></technical></notations></note>
       <note><pitch><step>E</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>2</fingering></technical></notations></note>
-      <note><pitch><step>F</step><alter>1</alter><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
-      <note><pitch><step>G</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>4</fingering></technical></notations></note>
-      <note><pitch><step>A</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>5</fingering></technical></notations></note>
+      <note><pitch><step>F</step><alter>1</alter><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>1</fingering></technical></notations></note>
+      <note><pitch><step>G</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>2</fingering></technical></notations></note>
+      <note><pitch><step>A</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
+      <note><pitch><step>B</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>4</fingering></technical></notations></note>
       <backup><duration>12</duration></backup>
-      <note><pitch><step>G</step><octave>3</octave></pitch><duration>12</duration><voice>5</voice><type>half</type><dot/><staff>2</staff><notations><technical><fingering>5</fingering></technical></notations></note>
+      <note><pitch><step>D</step><octave>3</octave></pitch><duration>12</duration><voice>5</voice><type>half</type><dot/><staff>2</staff><notations><technical><fingering>5</fingering></technical></notations></note>
+      <backup><duration>12</duration></backup>
+      <note><rest/><duration>4</duration><voice>6</voice><type>quarter</type><staff>2</staff></note>
+      <note><rest/><duration>4</duration><voice>6</voice><type>quarter</type><staff>2</staff></note>
+      <note><pitch><step>F</step><alter>1</alter><octave>3</octave></pitch><duration>4</duration><voice>6</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>2</fingering></technical></notations></note>
     </measure>
     <measure number="30">
-      <note><pitch><step>B</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
-      <note><pitch><step>C</step><octave>5</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>4</fingering></technical></notations></note>
-      <note><pitch><step>B</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
-      <note><pitch><step>A</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>2</fingering></technical></notations></note>
-      <note><pitch><step>G</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>1</fingering></technical></notations></note>
+      <note><pitch><step>C</step><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>5</fingering></technical></notations></note>
+      <note><pitch><step>B</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>4</fingering></technical></notations></note>
+      <note><pitch><step>A</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
       <backup><duration>12</duration></backup>
-      <note><pitch><step>G</step><octave>3</octave></pitch><duration>8</duration><voice>5</voice><type>half</type><staff>2</staff><notations><technical><fingering>5</fingering></technical></notations></note>
-      <note><pitch><step>B</step><octave>3</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>3</fingering></technical></notations></note>
+      <note><pitch><step>E</step><octave>3</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>5</fingering></technical></notations></note>
+      <note><pitch><step>G</step><octave>3</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>3</fingering></technical></notations></note>
+      <note><pitch><step>F</step><alter>1</alter><octave>3</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>4</fingering></technical></notations></note>
     </measure>
     <measure number="31">
-      <note><pitch><step>A</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
       <note><pitch><step>B</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>4</fingering></technical></notations></note>
-      <note><pitch><step>A</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>3</fingering></technical></notations></note>
-      <note><pitch><step>G</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>2</fingering></technical></notations></note>
-      <note><pitch><step>F</step><alter>1</alter><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>1</fingering></technical></notations></note>
+      <note><pitch><step>D</step><octave>5</octave></pitch><duration>2</duration><voice>1</voice><type>eighth</type><staff>1</staff><notations><technical><fingering>5</fingering></technical></notations></note>
+      <note><pitch><step>G</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>2</fingering></technical></notations></note>
+      <note><pitch><step>F</step><alter>1</alter><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>quarter</type><staff>1</staff><notations><technical><fingering>1</fingering></technical></notations></note>
       <backup><duration>12</duration></backup>
-      <note><pitch><step>C</step><octave>4</octave></pitch><duration>8</duration><voice>5</voice><type>half</type><staff>2</staff><notations><technical><fingering>2</fingering></technical></notations></note>
-      <note><pitch><step>D</step><octave>3</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>5</fingering></technical></notations></note>
+      <note><pitch><step>G</step><octave>3</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>1</fingering></technical></notations></note>
+      <note><pitch><step>B</step><octave>2</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>5</fingering></technical></notations></note>
+      <note><pitch><step>D</step><octave>3</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>3</fingering></technical></notations></note>
     </measure>
     <measure number="32">
       <note><pitch><step>G</step><octave>4</octave></pitch><duration>12</duration><voice>1</voice><type>half</type><dot/><staff>1</staff><notations><technical><fingering>2</fingering></technical></notations></note>
       <backup><duration>12</duration></backup>
-      <note><pitch><step>G</step><octave>3</octave></pitch><duration>12</duration><voice>5</voice><type>half</type><dot/><staff>2</staff><notations><technical><fingering>5</fingering></technical></notations></note>
+      <note><pitch><step>G</step><octave>3</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>1</fingering></technical></notations></note>
+      <note><pitch><step>D</step><octave>3</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>3</fingering></technical></notations></note>
+      <note><pitch><step>G</step><octave>2</octave></pitch><duration>4</duration><voice>5</voice><type>quarter</type><staff>2</staff><notations><technical><fingering>5</fingering></technical></notations></note>
     </measure>
   </part>
 </score-partwise>
