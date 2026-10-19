@@ -115,10 +115,9 @@ struct KeyboardTouchOverlay: UIViewRepresentable {
 
     private func apply(to view: KeyboardTouchUIView) {
         view.animatedViewport = animatedViewport
-        view.isUserInteractionEnabled = isEnabled
         view.onEvent = onEvent
         view.onHeldKeysChanged = onHeldKeysChanged
-        if !isEnabled { view.releaseAll() }
+        view.isTouchInputEnabled = isEnabled
     }
 }
 
@@ -129,6 +128,16 @@ final class KeyboardTouchUIView: UIView {
     var animatedViewport = KeyboardAnimatedViewport(range: KeyboardRangeFitter.defaultRange)
     var onEvent: ((NoteInputEvent) -> Void)?
     var onHeldKeysChanged: ((Set<Int>) -> Void)?
+    /// Whether touches are turned into notes. Turning it off releases every held key on the next main-queue
+    /// turn: the change arrives from `updateUIView`, and reporting held keys synchronously from there would
+    /// mutate SwiftUI state during a view update.
+    var isTouchInputEnabled = true {
+        didSet {
+            isUserInteractionEnabled = isTouchInputEnabled
+            guard oldValue, !isTouchInputEnabled else { return }
+            DispatchQueue.main.async { [weak self] in self?.releaseAll() }
+        }
+    }
 
     private var tracker = KeyboardTouchTracker<ObjectIdentifier>()
 

@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Sidebar-adaptable tab shell. On iPad this renders as a sidebar (or a floating
-/// tab bar in compact layouts); on iPhone it is a regular tab bar.
+/// Sidebar-adaptable tab shell. On iPad this renders as a floating tab bar that can expand into a sidebar.
+/// The practice screen is presented full-screen over everything when `AppModel.activePractice` is set.
 struct RootView: View {
     @Environment(AppModel.self) private var appModel
 
@@ -25,5 +25,8 @@ struct RootView: View {
             }
         }
         .tabViewStyle(.sidebarAdaptable)
+        .fullScreenCover(item: $appModel.activePractice) { request in
+            PracticeScreen(request: request)
+        }
     }
 }

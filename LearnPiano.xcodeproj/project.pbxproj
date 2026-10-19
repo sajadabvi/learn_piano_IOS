@@ -7,18 +7,167 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		004D58F0CE3BA97256DEA135 /* KeyboardStageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159383E4D38E954FE0A07810 /* KeyboardStageView.swift */; };
 		029E0A0C6C47EA71286328BA /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640AE2A11C76568F282135E4 /* Theme.swift */; };
+		02BAE7D74BED50A06A563891 /* NotationRenderPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = E208564984C48C4930053F75 /* NotationRenderPlan.swift */; };
+		06DE7E0DB0DCF4EB61094D24 /* ex-c-major-scale__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 1B7E63410D3E8969A39DB40A /* ex-c-major-scale__intermediate.musicxml */; };
+		0C4A740C65F8F25ADDC07673 /* InputClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E4E8A7AA8B2E848FF813F7 /* InputClock.swift */; };
+		0E70F7DF4226FD4BAD3584CC /* InputMicrophoneProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A847B7EEE6E9A4D93542DADD /* InputMicrophoneProcessor.swift */; };
+		0F5161E193E1382D8924A7BE /* KeyboardMiniMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 392B90CAB38319BD2446F64C /* KeyboardMiniMap.swift */; };
+		11F8CA94E458E4EF71352A51 /* ode-to-joy.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 2AD46E53C82A25453DB678D2 /* ode-to-joy.catalog.json */; };
+		12A0101AA0E1089D54548BD3 /* fur-elise.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = BED55BA48CC6BA2F2CD970D8 /* fur-elise.catalog.json */; };
+		131FFFC44E68F59178E5069D /* clair-de-lune__pro.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = B509EB6279132D2FAF382304 /* clair-de-lune__pro.musicxml */; };
+		13A61573202B877E0D77D3F8 /* clair-de-lune.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 5D83620A2D20F8F7EA5E0F24 /* clair-de-lune.catalog.json */; };
+		1485DC1069E5B62B56216CC6 /* amazing-grace__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 43BDF83EF5FFA7719909212A /* amazing-grace__intermediate.musicxml */; };
+		1584A33CC58AD3D7706428BF /* NotationGlyphs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFE50148012178FADF86B23 /* NotationGlyphs.swift */; };
+		15C24BEA7CE2863C93496649 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB52AEDA035A65A279A5A9F /* RootView.swift */; };
+		160C4A91095D279E7C9D4EBC /* twinkle-twinkle.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = B65583D5CCE92B92330CD18E /* twinkle-twinkle.catalog.json */; };
 		162E8A528C689359F1CF3D77 /* ImportHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0D65ABED6407DDE51E7E52 /* ImportHomeView.swift */; };
+		16B747CBA2BCE434070E7DCD /* Import.swift in Sources */ = {isa = PBXBuildFile; fileRef = A265A6624B8E533051D4C84B /* Import.swift */; };
+		17ED15414D5741714BCD5BF0 /* the-entertainer__advanced.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = BD561FA4D82B08F92D40DBAD /* the-entertainer__advanced.musicxml */; };
+		19991C575FD6C8D63FDE9152 /* jingle-bells.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 05E1E69E176A54732B803CCE /* jingle-bells.catalog.json */; };
 		1BE359F48C4423A82311F3FC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07F03B360C356D797748BF92 /* SettingsView.swift */; };
+		1C59C8EA1B769A1F34447906 /* PracticeTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D402AE6D19BA62B89A7D1EC /* PracticeTransport.swift */; };
+		1D79E6257FEF3BD65553EC9B /* PracticeMaterial.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB320A1CB3CE27C69506649 /* PracticeMaterial.swift */; };
+		1E3B65025C9BF41CCE71290C /* InputNoteTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE0D57DC3F5BC32EE9001305 /* InputNoteTracker.swift */; };
+		1E8C9FE19A37D801B33C078F /* AudioPianoSynth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56168A4E04AA449C56E414DF /* AudioPianoSynth.swift */; };
+		1EC8857B70444DEE7D1AD7BD /* the-entertainer__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = DEC7ADB43E93FDC0F1450A23 /* the-entertainer__intermediate.musicxml */; };
+		1F3CF8C13BFA3358F1262DBE /* AudioTransportMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFFB0238E30654D05EBC2 /* AudioTransportMapper.swift */; };
+		23654D551AABB28B0E5E1EFA /* happy-birthday__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 80017C662390325DD6609BAD /* happy-birthday__beginner.musicxml */; };
+		23F9C77D8F3C1D03D6313A40 /* ex-c-position-rh__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = BD232C96274728C8B2625CCA /* ex-c-position-rh__beginner.musicxml */; };
+		24B4D8CC4D793EDA1F107BB9 /* morning-mood__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 059E3CB056C825F16F2BE65B /* morning-mood__beginner.musicxml */; };
+		25DFA722E1B9201C6213B860 /* ex-c-major-scale.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = B27889B839608498723AEEDF /* ex-c-major-scale.catalog.json */; };
+		26EC216B33C785B64E5E8AF8 /* fur-elise__advanced.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 2D9D813846ECE420EF5BEF17 /* fur-elise__advanced.musicxml */; };
+		276527FD19AD6A21067C46CA /* InputVirtualKeyboardSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0917BE7CB1FFA93A20487DD6 /* InputVirtualKeyboardSource.swift */; };
+		28C44689641374912CD3AA7F /* swan-lake__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = CBFA29C828F509FBEDFAC745 /* swan-lake__intermediate.musicxml */; };
+		2AD6AA63F42815AFA6E2CF8F /* ex-g-major-scale__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 13152FFB1BA3FF6F5FBD8623 /* ex-g-major-scale__intermediate.musicxml */; };
+		2B30B9828421B77EB0D7660E /* ex-c-position-rh.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 4906FEAC3BC25CB4048B4A7A /* ex-c-position-rh.catalog.json */; };
+		311B24CE60FE6F68324D3A65 /* LearnPianoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA53D87DB43D76C14C7848A /* LearnPianoApp.swift */; };
+		34BD12DE620B8E0A94CA9482 /* london-bridge__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 4C2A1431B960F1815377A5F9 /* london-bridge__beginner.musicxml */; };
+		375E0650B94EF30B16C67AE5 /* turkish-march__advanced.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 345794F44314CEF6F0EB1724 /* turkish-march__advanced.musicxml */; };
+		39E8623BA1A35B8CFCB90A22 /* InputMIDIParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D9E43BB4B5B3FD4F556671F /* InputMIDIParser.swift */; };
+		3ADEC4D2987A7594C6260D47 /* swan-lake.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 42661C5150BFBDAB02D50A46 /* swan-lake.catalog.json */; };
+		3E46DC62780DC38116BC94EB /* NotationLayoutEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D97793929E4DF0F957F671D /* NotationLayoutEngine.swift */; };
+		3EF6ABBF9C5672402C10C131 /* InputHub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3596DDB1843014A009975A58 /* InputHub.swift */; };
+		3FD66FB1B0918009052A51EF /* ex-c-position-lh.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = D2F995D459DFCB85681388A8 /* ex-c-position-lh.catalog.json */; };
+		41FB42269111EA13C92D6E4D /* Pitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E046F707214EA2C0CB3CFBD5 /* Pitch.swift */; };
+		43ED8564A19752CB31AA9AB1 /* InputPitchPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80E42BC15D0C9FD9CD6CE4E9 /* InputPitchPipeline.swift */; };
+		45C8647DED2C808DF8908001 /* ParsersMusicXMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95954B0679FC474B0C35969 /* ParsersMusicXMLImporter.swift */; };
+		49486918B0D727D6CB1FCF36 /* KeyboardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5A6361E897B960B27D4793 /* KeyboardTests.swift */; };
+		4B17CFC3635B74345A0DBB87 /* happy-birthday.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 91FE9F48FDDE2D873C6A438E /* happy-birthday.catalog.json */; };
+		4B74ABE89FF780F0319753C7 /* PracticeJustPlayFollower.swift in Sources */ = {isa = PBXBuildFile; fileRef = D117BBB7CEF4FC1B71B719AE /* PracticeJustPlayFollower.swift */; };
+		4B9C267ACC8261D6BEC34DEA /* Courses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44601C3D6A672BB1FF23DEB7 /* Courses.swift */; };
+		4BD09B9EE73AFD735B68B763 /* ex-rhythm-quarters-halves.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = CA38428F58E72A2D941C866C /* ex-rhythm-quarters-halves.catalog.json */; };
+		4D1EC3E7054F5043F5ADF80D /* NotationHighlightModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9A2DB2FB3CA1DA1406BDBB /* NotationHighlightModel.swift */; };
+		4F514999C0A2C84980C734EC /* ParsersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F671416C00733B51E3637EE /* ParsersTests.swift */; };
+		534EF95853DC1ED2CA0DDC5F /* moonlight-sonata.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 15DFB098BB486A8E42DABB34 /* moonlight-sonata.catalog.json */; };
+		55B83ED2482E8510E69F1A92 /* AudioTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0853C0F118B9F2B686117765 /* AudioTests.swift */; };
 		5620187EC16F87BD4B5B5F39 /* SongsBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BB15869E7B354028B4A6A6 /* SongsBrowserView.swift */; };
-		6F29550B2C406164674C2153 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F8EC4246C24B790F13C39D /* RootView.swift */; };
+		57D9D3F88C8D64C3441D2398 /* AudioMetronome.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB27722FC9307298A2A8A2C5 /* AudioMetronome.swift */; };
+		590F3DC897778D8AFBE3A674 /* ave-maria-schubert.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 48E64185B496089C1DCDACF2 /* ave-maria-schubert.catalog.json */; };
+		5A95F3964922255328B299D5 /* Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78FF1197A798C517E70DA99E /* Validation.swift */; };
+		5AAF2FB4D73301BC21CDEA4A /* ex-g-major-scale.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 58C4E4C4093540342DAFAABB /* ex-g-major-scale.catalog.json */; };
+		5ACEAA965B45CCEC36FC8C54 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F4A4B953D0C4FDFF26064D /* Helpers.swift */; };
+		5B0B4F67E63287685785C214 /* amazing-grace.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 63B47266B8BD3FF6B1C0064E /* amazing-grace.catalog.json */; };
+		5C04E8A83342F2DDCD309977 /* twinkle-twinkle__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9E6B3E257941E95538554117 /* twinkle-twinkle__intermediate.musicxml */; };
+		5C3CF2E847221EF6A98111CC /* turkish-march.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = C9DDA3A899741D0C86C96453 /* turkish-march.catalog.json */; };
+		5C94C9391188AD41388D6F41 /* NotationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E87BAF275795F1963D65036 /* NotationTests.swift */; };
+		602617AF498A62EB27C8EBEC /* PracticeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EFB95FE7A6999434879276C /* PracticeScreen.swift */; };
+		61936127D0D219129C296EFF /* KeyboardGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F280EC7B2BE0D93330FCC028 /* KeyboardGeometry.swift */; };
+		63EC5EE57412A798382BB8D1 /* ParsersCompactScoreImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93FDFC18A80AE4066B744FD8 /* ParsersCompactScoreImporter.swift */; };
+		67CBBAB3F7C570BC5AF3C579 /* ParsersZipArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9E27B9D736CD801558AC67 /* ParsersZipArchive.swift */; };
+		69BF2366A67533D5B72EFECD /* PracticeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517076341CA75A65BC9A27E4 /* PracticeTests.swift */; };
+		6AB8EA2DDAC59B77E8E7C34D /* NotationStaffGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55DE5EA7129647AEC795B197 /* NotationStaffGeometry.swift */; };
+		6BDC75C33CD0619EC02991F9 /* fur-elise__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = AB699F2441DE0014384B5E62 /* fur-elise__beginner.musicxml */; };
+		6C602223BE350B4502C9B0A1 /* minuet-in-g__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 11D552CAC791ED3B540163A8 /* minuet-in-g__intermediate.musicxml */; };
+		6F3E75159D687E977872533D /* KeyboardLanes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE2BC5643DECF953D3E2D08 /* KeyboardLanes.swift */; };
+		70D52EEF89D1365356E10F64 /* PracticeRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53250716285A62A669884423 /* PracticeRecord.swift */; };
+		717DC81C8AD1801FE56EC401 /* scarborough-fair.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 9C4794A6A4E887A82770A45A /* scarborough-fair.catalog.json */; };
+		7202C5FB4CB24FD34E37C98C /* canon-in-d__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = E9BA4510AEC452D11B543316 /* canon-in-d__beginner.musicxml */; };
+		7303BDB2A5675485F8D8F59A /* ContentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C322BA76D3E6163492073066 /* ContentStore.swift */; };
 		7327773382234A21CA7D4C28 /* CoursesHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD6A929B2F7E960EC5A14E0 /* CoursesHomeView.swift */; };
+		738ABF0CC39F7B1059CD8130 /* ParsersMusicXMLExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36BF5034189009E613F8646A /* ParsersMusicXMLExporter.swift */; };
+		742BF8D7DFCD7FE4A6447199 /* gymnopedie-1__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 77A444B8C3C110236753EA6A /* gymnopedie-1__intermediate.musicxml */; };
 		7705B06B8C9E05347763E1C6 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFA6294344BCCDF59D4200EC /* SmokeTests.swift */; };
+		771489B32C9F2D1635E87CD2 /* PracticeSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A6CAD19E47AE9112709FD4A /* PracticeSession.swift */; };
+		792673FCF8FA821612721A11 /* fur-elise__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = DFF9B6F692CE96FAE6434A5A /* fur-elise__intermediate.musicxml */; };
+		7BB7D209CE2633E2DC306FE2 /* greensleeves.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = E1355237AF473C3B57E52221 /* greensleeves.catalog.json */; };
+		7C66D52557E6A640B83D1227 /* the-entertainer.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 0FFC1BF1975FDFDD76638C1A /* the-entertainer.catalog.json */; };
+		8194DB5A631A6FE5AA100721 /* AudioScorePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551D018C2662B5B04643B580 /* AudioScorePlayer.swift */; };
 		81B60FEC97A8C22ED1419D3D /* Bravura-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = D6AD0997FFEF86679EE68186 /* Bravura-OFL.txt */; };
+		8203B523AE84FC81C8B82EF3 /* london-bridge.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = CC33ED298269E69EE1682144 /* london-bridge.catalog.json */; };
 		848EAD0BC9A5ADDB82E82B05 /* MySongsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A64B952548F14C1604CDDE9 /* MySongsView.swift */; };
+		85D1A72EFFFC4E58D4802BEB /* greensleeves__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 71CAD47A3970A0E4B579207D /* greensleeves__intermediate.musicxml */; };
+		8687D4AD3D84BC556673AFEA /* ex-rhythm-quarters-halves__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 8395C031A71DF5864F03D524 /* ex-rhythm-quarters-halves__beginner.musicxml */; };
+		892CF57C1091A01F1250B3D7 /* ex-middle-c__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = DD6DA837943E5332B4D69B92 /* ex-middle-c__beginner.musicxml */; };
+		89983632B670605174BCB82D /* InputHeldNoteTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 813F84EC614FB2C4E61A07EB /* InputHeldNoteTracker.swift */; };
+		8DB6C72234B3771296D7AC5B /* ex-c-position-lh__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 5502CFBF6BAF5FD96434FD1A /* ex-c-position-lh__beginner.musicxml */; };
+		8E2713E108F86CA606341F60 /* NotationScoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FF46B7D94E23A919F06F45 /* NotationScoreView.swift */; };
+		8FD20BE2F3C8A70D95CED67F /* Practice.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6B570D28EB52433E179E834 /* Practice.swift */; };
+		91E2ADC94474EAAF87AFF94B /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E13C737C79FFEE1BB65CA05F /* ProfileStore.swift */; };
+		91E424BD64BD5CB32A048381 /* Timeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ACB9A121273BCFE6E932FE /* Timeline.swift */; };
+		939002F402F5DB053072160D /* AudioCommandQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DB6280D3A9060E009420BFE /* AudioCommandQueue.swift */; };
+		93F397F2BA3668E3643C0257 /* KeyboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280A27019508B793C906181 /* KeyboardView.swift */; };
+		93F82DCDB43F91748FCCBB14 /* ex-chord-progression-i-iv-v__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = F34B914FCF4302852B8D953A /* ex-chord-progression-i-iv-v__intermediate.musicxml */; };
+		948F5D14DE8DCAC36915B4C5 /* NotationLayoutModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8171976F5DDCB165FE15A2FE /* NotationLayoutModel.swift */; };
+		97702D4B78E37D52EA933378 /* ParsersMIDIFileReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5539583476AE1DEF9A4510B2 /* ParsersMIDIFileReader.swift */; };
+		984F5F8C2AD74F7D10F450A6 /* InputMIDISource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F39B452BFC0E76788FD219 /* InputMIDISource.swift */; };
+		A1424BB56133EEE33BBE53B4 /* swan-lake__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 16BA0DED89C9233E976D0AF8 /* swan-lake__beginner.musicxml */; };
+		A32D28711446A46C0542A8EE /* ode-to-joy__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 3BE3AE534F8C9AEEC39059D0 /* ode-to-joy__beginner.musicxml */; };
+		A33B02F047A656C73F7AD859 /* ex-chord-progression-i-iv-v.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = DA5B1204F6B1A5C4F2D30E75 /* ex-chord-progression-i-iv-v.catalog.json */; };
+		A56077AC2293FF10E5AB7083 /* AudioLookaheadScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9712CAF7D9A01CA300BD63F /* AudioLookaheadScheduler.swift */; };
+		A61C30499FDA8680FEC0B49D /* ex-triads-c-f-g__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 8D9D4CA336AEB4DACDE008BB /* ex-triads-c-f-g__beginner.musicxml */; };
+		A98AE131D38B7F8BC08ECF23 /* ex-c-position-both.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = ECFE475153ACDDB46891B3DE /* ex-c-position-both.catalog.json */; };
+		AAA51E38843013F52F0BBD9A /* Input.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDF770FF5E37BEB30EB4CAE5 /* Input.swift */; };
+		AFDF61BF49A874D71887F9DE /* morning-mood.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = BCE47059E690BF8246FD11D3 /* morning-mood.catalog.json */; };
+		B2621917ED2BA18CC5451273 /* prelude-in-c.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 2D9DDC0587DFFD1B73D084AE /* prelude-in-c.catalog.json */; };
+		B55B65A77F83436C404BEE77 /* KeyboardTouch.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFAFF3F394421C5A1A3A5BAD /* KeyboardTouch.swift */; };
+		BB9D6ECA5CD2B699AE7F1664 /* amazing-grace__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = B772E911AE713AEA8F550360 /* amazing-grace__beginner.musicxml */; };
+		BCBEBE62C0E5958B6477985E /* InputBluetoothMIDIPairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D8098E58BCAA5EED6F5A5A /* InputBluetoothMIDIPairingView.swift */; };
+		C328843C713B21C4E19F6560 /* ex-c-position-both__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 74BA166E092797B493AB8E0A /* ex-c-position-both__beginner.musicxml */; };
+		C8C6456E1F0592687A5761D1 /* InputConcurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFD0D88E532BDE9AF9C03BD /* InputConcurrency.swift */; };
+		CAAF6F472161F8302D77EB91 /* canon-in-d__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 8A2825DA3A6F2233AB69CA6C /* canon-in-d__intermediate.musicxml */; };
+		CBA06D64A55E1FB6BB398B8C /* scarborough-fair__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 504FA77E83BE8BA2731B22D2 /* scarborough-fair__beginner.musicxml */; };
+		CBDC8C944A168AFCE5D408A5 /* Score.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6782D8E20308790309146C28 /* Score.swift */; };
+		CD986D96F9299FC686BE0D59 /* InputHubRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC4C1BEC1242DA8E7EAF635 /* InputHubRouter.swift */; };
+		D19FE038891EB562E2683281 /* ParsersMIDIImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266CD755B878469F1D28B491 /* ParsersMIDIImporter.swift */; };
+		D1E694AB9DC1E7922E40D4B6 /* AudioPlaybackPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94185FE1DE0D9389930ED515 /* AudioPlaybackPlan.swift */; };
+		D274A85E7CEE193EE7177A14 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4750945E6A8332DB633ED31 /* Library.swift */; };
+		D40162FF27B4A81F75DBD2B6 /* AudioSynthVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D2024323D580C6569AB9A60 /* AudioSynthVoice.swift */; };
 		D4161BF0F6871B4637E190BD /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD44D01B02EE6A255D3AA85D /* AppModel.swift */; };
-		F12B46289DBF51094F5FE841 /* LearnPianoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F202B1299ADB5D00D06DED6D /* LearnPianoApp.swift */; };
+		D7820349F60E9D68D744CBB4 /* ex-intervals.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = BBD336A46AE34063766DBC36 /* ex-intervals.catalog.json */; };
+		D7EAB6EC1652C315DDD14D4A /* ex-middle-c.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = CF616D777067B7FEBBBD80EC /* ex-middle-c.catalog.json */; };
+		D8D5BB2ED24C3620F0AA80EE /* ex-blues-improv-base.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = C2D683C548475AB52BD6BA2A /* ex-blues-improv-base.catalog.json */; };
+		D90BC413F2CB4D60C2B69836 /* PracticeRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE5D39685B9C066386E6661 /* PracticeRequest.swift */; };
+		D9777DAC26ABEC01BDDC7118 /* ParsersSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC68A56AC4DB1CA4B3D27BB /* ParsersSupport.swift */; };
+		D9CC08C16AE2ED1AE40B5E6F /* ex-triads-c-f-g.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = D8DE4F3F14474B57BB908455 /* ex-triads-c-f-g.catalog.json */; };
+		DECD81DCBD159035F2429BE3 /* AudioSessionConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B107BA55EBAD798ACF301267 /* AudioSessionConfigurator.swift */; };
+		DF5A8A98823ECF5E61AE8B0A /* ex-rhythm-eighths.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 59995E27C4E64EF99B5A8352 /* ex-rhythm-eighths.catalog.json */; };
+		DFE04B4E84ED3E382E63FF35 /* prelude-in-c__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 3A56E823286349D321242B32 /* prelude-in-c__intermediate.musicxml */; };
+		E08B3ECE7B3341123FE3340F /* nocturne-op9-no2__pro.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9E396A1A4545D604792783ED /* nocturne-op9-no2__pro.musicxml */; };
+		E3309EC9F28BB5C452B82FF5 /* ave-maria-schubert__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = B4A4FB2CA2E11702B4357BC8 /* ave-maria-schubert__intermediate.musicxml */; };
+		E6957899C5B3A157AAB0038C /* gymnopedie-1.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = F473CAC9F6B71F1B1B427151 /* gymnopedie-1.catalog.json */; };
+		E958617FE7CA26547771ADA1 /* InputMicrophoneSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9098D84BA8D1F9F4979BAFE3 /* InputMicrophoneSource.swift */; };
+		E9E2F433BBEF96D99758B3AF /* canon-in-d.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = FDC448FB5085F02F000125F4 /* canon-in-d.catalog.json */; };
+		EA71DE93EA539C0DD2865258 /* ex-intervals__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = CD0E977786B5C1E4B732B72B /* ex-intervals__beginner.musicxml */; };
+		EAD7DF8FFC3F5E8585085ACE /* ode-to-joy__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 8CF80D4A84F64C9E9105B646 /* ode-to-joy__intermediate.musicxml */; };
+		EBD1C57D2F658C7F7D823DF5 /* ex-rhythm-eighths__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = D2DE6DC5B4A4D54C5497E4C5 /* ex-rhythm-eighths__beginner.musicxml */; };
+		EC0B37B49BCD3B16C3401777 /* ex-blues-improv-base__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = D69D8DAF2A4B4B2D2ADD85C5 /* ex-blues-improv-base__intermediate.musicxml */; };
+		ECC288F3E491FDDAB2442FAB /* InputSpectrumAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76449CE08ACC1A27E7F324C /* InputSpectrumAnalyzer.swift */; };
+		ED0A6B573662A533A80397C7 /* greensleeves__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 8DFED3CB706DBB614C803BCA /* greensleeves__beginner.musicxml */; };
+		ED124A357340D3A660DAEAC8 /* twinkle-twinkle__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = C18461775E9CBF636AD88BFD /* twinkle-twinkle__beginner.musicxml */; };
+		ED2682A721020CBF1EBFEBD3 /* KeyboardKeyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6BEE5E1DA9A1D06C15E08D /* KeyboardKeyState.swift */; };
+		F04F6756E909305A0DE10D31 /* Duration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E17AA188A2950C9ABEB4FD3 /* Duration.swift */; };
+		F5357BC7914FDE350F9AF231 /* nocturne-op9-no2.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = AE90E90B59BA9792BB84EDCB /* nocturne-op9-no2.catalog.json */; };
+		F583CC69C907AF79775FC366 /* InputPitchDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835FD1A49641A41C77AC793B /* InputPitchDetector.swift */; };
+		F60AC2476D3268453D7F311E /* InputMicrophoneStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4712C4E526E22850D4F69238 /* InputMicrophoneStatusView.swift */; };
 		F7388BADB1CA0636538A558A /* Bravura.otf in Resources */ = {isa = PBXBuildFile; fileRef = 15955ED952C15281AB72AFA8 /* Bravura.otf */; };
+		F738DB984B2EF23915969E17 /* InputMIDINoteMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562C0DE89602379E0551DE7B /* InputMIDINoteMapper.swift */; };
+		F929B06C69BAC19D0267FCB1 /* moonlight-sonata__advanced.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 2D838D1A13BADFE0E2C04087 /* moonlight-sonata__advanced.musicxml */; };
+		F9810580D2F48E275976CF5A /* AudioSynthRenderState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D579DB8D29F6114B8F304B90 /* AudioSynthRenderState.swift */; };
+		FC7010274DE3693FD7CFA07A /* minuet-in-g.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 1431C780E6FB24B022EEE877 /* minuet-in-g.catalog.json */; };
+		FDA25D1D31B9A0B059189906 /* jingle-bells__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = DBA5A12E2568EF2E996610AC /* jingle-bells__beginner.musicxml */; };
+		FF774F5D3E5BB4575BA5F6AA /* PracticeWaitFollower.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B58637CA967B11F4C2460C3 /* PracticeWaitFollower.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,23 +182,181 @@
 
 /* Begin PBXFileReference section */
 		01BB15869E7B354028B4A6A6 /* SongsBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongsBrowserView.swift; sourceTree = "<group>"; };
+		059E3CB056C825F16F2BE65B /* morning-mood__beginner.musicxml */ = {isa = PBXFileReference; path = "morning-mood__beginner.musicxml"; sourceTree = "<group>"; };
+		05E1E69E176A54732B803CCE /* jingle-bells.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "jingle-bells.catalog.json"; sourceTree = "<group>"; };
 		07F03B360C356D797748BF92 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		0853C0F118B9F2B686117765 /* AudioTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTests.swift; sourceTree = "<group>"; };
+		0917BE7CB1FFA93A20487DD6 /* InputVirtualKeyboardSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputVirtualKeyboardSource.swift; sourceTree = "<group>"; };
+		0D2024323D580C6569AB9A60 /* AudioSynthVoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSynthVoice.swift; sourceTree = "<group>"; };
+		0D97793929E4DF0F957F671D /* NotationLayoutEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotationLayoutEngine.swift; sourceTree = "<group>"; };
 		0E07FD180E24A804810A5482 /* LearnPianoTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LearnPianoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0EFB95FE7A6999434879276C /* PracticeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeScreen.swift; sourceTree = "<group>"; };
+		0FFC1BF1975FDFDD76638C1A /* the-entertainer.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "the-entertainer.catalog.json"; sourceTree = "<group>"; };
+		11D552CAC791ED3B540163A8 /* minuet-in-g__intermediate.musicxml */ = {isa = PBXFileReference; path = "minuet-in-g__intermediate.musicxml"; sourceTree = "<group>"; };
+		13152FFB1BA3FF6F5FBD8623 /* ex-g-major-scale__intermediate.musicxml */ = {isa = PBXFileReference; path = "ex-g-major-scale__intermediate.musicxml"; sourceTree = "<group>"; };
+		1431C780E6FB24B022EEE877 /* minuet-in-g.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "minuet-in-g.catalog.json"; sourceTree = "<group>"; };
+		159383E4D38E954FE0A07810 /* KeyboardStageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardStageView.swift; sourceTree = "<group>"; };
 		15955ED952C15281AB72AFA8 /* Bravura.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Bravura.otf; sourceTree = "<group>"; };
-		41F8EC4246C24B790F13C39D /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		15ACFFB0238E30654D05EBC2 /* AudioTransportMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTransportMapper.swift; sourceTree = "<group>"; };
+		15DFB098BB486A8E42DABB34 /* moonlight-sonata.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "moonlight-sonata.catalog.json"; sourceTree = "<group>"; };
+		16BA0DED89C9233E976D0AF8 /* swan-lake__beginner.musicxml */ = {isa = PBXFileReference; path = "swan-lake__beginner.musicxml"; sourceTree = "<group>"; };
+		1B7E63410D3E8969A39DB40A /* ex-c-major-scale__intermediate.musicxml */ = {isa = PBXFileReference; path = "ex-c-major-scale__intermediate.musicxml"; sourceTree = "<group>"; };
+		1D402AE6D19BA62B89A7D1EC /* PracticeTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeTransport.swift; sourceTree = "<group>"; };
+		1D5A6361E897B960B27D4793 /* KeyboardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardTests.swift; sourceTree = "<group>"; };
+		266CD755B878469F1D28B491 /* ParsersMIDIImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsersMIDIImporter.swift; sourceTree = "<group>"; };
+		2AD46E53C82A25453DB678D2 /* ode-to-joy.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ode-to-joy.catalog.json"; sourceTree = "<group>"; };
+		2D838D1A13BADFE0E2C04087 /* moonlight-sonata__advanced.musicxml */ = {isa = PBXFileReference; path = "moonlight-sonata__advanced.musicxml"; sourceTree = "<group>"; };
+		2D9D813846ECE420EF5BEF17 /* fur-elise__advanced.musicxml */ = {isa = PBXFileReference; path = "fur-elise__advanced.musicxml"; sourceTree = "<group>"; };
+		2D9DDC0587DFFD1B73D084AE /* prelude-in-c.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "prelude-in-c.catalog.json"; sourceTree = "<group>"; };
+		2E17AA188A2950C9ABEB4FD3 /* Duration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Duration.swift; sourceTree = "<group>"; };
+		2E87BAF275795F1963D65036 /* NotationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotationTests.swift; sourceTree = "<group>"; };
+		345794F44314CEF6F0EB1724 /* turkish-march__advanced.musicxml */ = {isa = PBXFileReference; path = "turkish-march__advanced.musicxml"; sourceTree = "<group>"; };
+		3596DDB1843014A009975A58 /* InputHub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHub.swift; sourceTree = "<group>"; };
+		36BF5034189009E613F8646A /* ParsersMusicXMLExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsersMusicXMLExporter.swift; sourceTree = "<group>"; };
+		392B90CAB38319BD2446F64C /* KeyboardMiniMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardMiniMap.swift; sourceTree = "<group>"; };
+		3A56E823286349D321242B32 /* prelude-in-c__intermediate.musicxml */ = {isa = PBXFileReference; path = "prelude-in-c__intermediate.musicxml"; sourceTree = "<group>"; };
+		3A6CAD19E47AE9112709FD4A /* PracticeSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeSession.swift; sourceTree = "<group>"; };
+		3B58637CA967B11F4C2460C3 /* PracticeWaitFollower.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeWaitFollower.swift; sourceTree = "<group>"; };
+		3BE3AE534F8C9AEEC39059D0 /* ode-to-joy__beginner.musicxml */ = {isa = PBXFileReference; path = "ode-to-joy__beginner.musicxml"; sourceTree = "<group>"; };
+		3DB6280D3A9060E009420BFE /* AudioCommandQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCommandQueue.swift; sourceTree = "<group>"; };
+		42661C5150BFBDAB02D50A46 /* swan-lake.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "swan-lake.catalog.json"; sourceTree = "<group>"; };
+		4280A27019508B793C906181 /* KeyboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardView.swift; sourceTree = "<group>"; };
+		43BDF83EF5FFA7719909212A /* amazing-grace__intermediate.musicxml */ = {isa = PBXFileReference; path = "amazing-grace__intermediate.musicxml"; sourceTree = "<group>"; };
+		44601C3D6A672BB1FF23DEB7 /* Courses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Courses.swift; sourceTree = "<group>"; };
+		4712C4E526E22850D4F69238 /* InputMicrophoneStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMicrophoneStatusView.swift; sourceTree = "<group>"; };
+		48E64185B496089C1DCDACF2 /* ave-maria-schubert.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ave-maria-schubert.catalog.json"; sourceTree = "<group>"; };
+		4906FEAC3BC25CB4048B4A7A /* ex-c-position-rh.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ex-c-position-rh.catalog.json"; sourceTree = "<group>"; };
+		4C2A1431B960F1815377A5F9 /* london-bridge__beginner.musicxml */ = {isa = PBXFileReference; path = "london-bridge__beginner.musicxml"; sourceTree = "<group>"; };
+		504FA77E83BE8BA2731B22D2 /* scarborough-fair__beginner.musicxml */ = {isa = PBXFileReference; path = "scarborough-fair__beginner.musicxml"; sourceTree = "<group>"; };
+		517076341CA75A65BC9A27E4 /* PracticeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeTests.swift; sourceTree = "<group>"; };
+		53250716285A62A669884423 /* PracticeRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeRecord.swift; sourceTree = "<group>"; };
+		5502CFBF6BAF5FD96434FD1A /* ex-c-position-lh__beginner.musicxml */ = {isa = PBXFileReference; path = "ex-c-position-lh__beginner.musicxml"; sourceTree = "<group>"; };
+		551D018C2662B5B04643B580 /* AudioScorePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioScorePlayer.swift; sourceTree = "<group>"; };
+		5539583476AE1DEF9A4510B2 /* ParsersMIDIFileReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsersMIDIFileReader.swift; sourceTree = "<group>"; };
+		55DE5EA7129647AEC795B197 /* NotationStaffGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotationStaffGeometry.swift; sourceTree = "<group>"; };
+		56168A4E04AA449C56E414DF /* AudioPianoSynth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPianoSynth.swift; sourceTree = "<group>"; };
+		562C0DE89602379E0551DE7B /* InputMIDINoteMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMIDINoteMapper.swift; sourceTree = "<group>"; };
+		58C4E4C4093540342DAFAABB /* ex-g-major-scale.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ex-g-major-scale.catalog.json"; sourceTree = "<group>"; };
+		59995E27C4E64EF99B5A8352 /* ex-rhythm-eighths.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ex-rhythm-eighths.catalog.json"; sourceTree = "<group>"; };
+		5D83620A2D20F8F7EA5E0F24 /* clair-de-lune.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "clair-de-lune.catalog.json"; sourceTree = "<group>"; };
+		5FE2BC5643DECF953D3E2D08 /* KeyboardLanes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardLanes.swift; sourceTree = "<group>"; };
+		63B47266B8BD3FF6B1C0064E /* amazing-grace.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "amazing-grace.catalog.json"; sourceTree = "<group>"; };
 		640AE2A11C76568F282135E4 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		65ACB9A121273BCFE6E932FE /* Timeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timeline.swift; sourceTree = "<group>"; };
+		6782D8E20308790309146C28 /* Score.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Score.swift; sourceTree = "<group>"; };
+		6BB52AEDA035A65A279A5A9F /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		6BC4C1BEC1242DA8E7EAF635 /* InputHubRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHubRouter.swift; sourceTree = "<group>"; };
 		6D835BB29BF81E6F49B0A5A8 /* LearnPiano.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = LearnPiano.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6DFE50148012178FADF86B23 /* NotationGlyphs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotationGlyphs.swift; sourceTree = "<group>"; };
+		6EFD0D88E532BDE9AF9C03BD /* InputConcurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputConcurrency.swift; sourceTree = "<group>"; };
+		6F671416C00733B51E3637EE /* ParsersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsersTests.swift; sourceTree = "<group>"; };
+		71CAD47A3970A0E4B579207D /* greensleeves__intermediate.musicxml */ = {isa = PBXFileReference; path = greensleeves__intermediate.musicxml; sourceTree = "<group>"; };
+		74BA166E092797B493AB8E0A /* ex-c-position-both__beginner.musicxml */ = {isa = PBXFileReference; path = "ex-c-position-both__beginner.musicxml"; sourceTree = "<group>"; };
+		77A444B8C3C110236753EA6A /* gymnopedie-1__intermediate.musicxml */ = {isa = PBXFileReference; path = "gymnopedie-1__intermediate.musicxml"; sourceTree = "<group>"; };
+		78FF1197A798C517E70DA99E /* Validation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Validation.swift; sourceTree = "<group>"; };
 		7A64B952548F14C1604CDDE9 /* MySongsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MySongsView.swift; sourceTree = "<group>"; };
 		7B0D65ABED6407DDE51E7E52 /* ImportHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportHomeView.swift; sourceTree = "<group>"; };
+		7D9E43BB4B5B3FD4F556671F /* InputMIDIParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMIDIParser.swift; sourceTree = "<group>"; };
+		80017C662390325DD6609BAD /* happy-birthday__beginner.musicxml */ = {isa = PBXFileReference; path = "happy-birthday__beginner.musicxml"; sourceTree = "<group>"; };
+		80E42BC15D0C9FD9CD6CE4E9 /* InputPitchPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputPitchPipeline.swift; sourceTree = "<group>"; };
+		813F84EC614FB2C4E61A07EB /* InputHeldNoteTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHeldNoteTracker.swift; sourceTree = "<group>"; };
+		8171976F5DDCB165FE15A2FE /* NotationLayoutModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotationLayoutModel.swift; sourceTree = "<group>"; };
+		835FD1A49641A41C77AC793B /* InputPitchDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputPitchDetector.swift; sourceTree = "<group>"; };
+		8395C031A71DF5864F03D524 /* ex-rhythm-quarters-halves__beginner.musicxml */ = {isa = PBXFileReference; path = "ex-rhythm-quarters-halves__beginner.musicxml"; sourceTree = "<group>"; };
+		8A2825DA3A6F2233AB69CA6C /* canon-in-d__intermediate.musicxml */ = {isa = PBXFileReference; path = "canon-in-d__intermediate.musicxml"; sourceTree = "<group>"; };
+		8CF80D4A84F64C9E9105B646 /* ode-to-joy__intermediate.musicxml */ = {isa = PBXFileReference; path = "ode-to-joy__intermediate.musicxml"; sourceTree = "<group>"; };
+		8D9D4CA336AEB4DACDE008BB /* ex-triads-c-f-g__beginner.musicxml */ = {isa = PBXFileReference; path = "ex-triads-c-f-g__beginner.musicxml"; sourceTree = "<group>"; };
+		8DFED3CB706DBB614C803BCA /* greensleeves__beginner.musicxml */ = {isa = PBXFileReference; path = greensleeves__beginner.musicxml; sourceTree = "<group>"; };
+		9098D84BA8D1F9F4979BAFE3 /* InputMicrophoneSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMicrophoneSource.swift; sourceTree = "<group>"; };
+		91FE9F48FDDE2D873C6A438E /* happy-birthday.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "happy-birthday.catalog.json"; sourceTree = "<group>"; };
+		93F39B452BFC0E76788FD219 /* InputMIDISource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMIDISource.swift; sourceTree = "<group>"; };
+		93FDFC18A80AE4066B744FD8 /* ParsersCompactScoreImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsersCompactScoreImporter.swift; sourceTree = "<group>"; };
+		94185FE1DE0D9389930ED515 /* AudioPlaybackPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlaybackPlan.swift; sourceTree = "<group>"; };
+		9C4794A6A4E887A82770A45A /* scarborough-fair.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "scarborough-fair.catalog.json"; sourceTree = "<group>"; };
+		9E396A1A4545D604792783ED /* nocturne-op9-no2__pro.musicxml */ = {isa = PBXFileReference; path = "nocturne-op9-no2__pro.musicxml"; sourceTree = "<group>"; };
+		9E6B3E257941E95538554117 /* twinkle-twinkle__intermediate.musicxml */ = {isa = PBXFileReference; path = "twinkle-twinkle__intermediate.musicxml"; sourceTree = "<group>"; };
+		A265A6624B8E533051D4C84B /* Import.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Import.swift; sourceTree = "<group>"; };
+		A76449CE08ACC1A27E7F324C /* InputSpectrumAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSpectrumAnalyzer.swift; sourceTree = "<group>"; };
+		A847B7EEE6E9A4D93542DADD /* InputMicrophoneProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputMicrophoneProcessor.swift; sourceTree = "<group>"; };
 		A92CC14C237CA49E34012662 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		AB699F2441DE0014384B5E62 /* fur-elise__beginner.musicxml */ = {isa = PBXFileReference; path = "fur-elise__beginner.musicxml"; sourceTree = "<group>"; };
+		ABE5D39685B9C066386E6661 /* PracticeRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeRequest.swift; sourceTree = "<group>"; };
 		ACD6A929B2F7E960EC5A14E0 /* CoursesHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoursesHomeView.swift; sourceTree = "<group>"; };
+		AE0D57DC3F5BC32EE9001305 /* InputNoteTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputNoteTracker.swift; sourceTree = "<group>"; };
+		AE90E90B59BA9792BB84EDCB /* nocturne-op9-no2.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "nocturne-op9-no2.catalog.json"; sourceTree = "<group>"; };
 		AFA6294344BCCDF59D4200EC /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
+		B107BA55EBAD798ACF301267 /* AudioSessionConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSessionConfigurator.swift; sourceTree = "<group>"; };
+		B27889B839608498723AEEDF /* ex-c-major-scale.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ex-c-major-scale.catalog.json"; sourceTree = "<group>"; };
+		B4A4FB2CA2E11702B4357BC8 /* ave-maria-schubert__intermediate.musicxml */ = {isa = PBXFileReference; path = "ave-maria-schubert__intermediate.musicxml"; sourceTree = "<group>"; };
+		B509EB6279132D2FAF382304 /* clair-de-lune__pro.musicxml */ = {isa = PBXFileReference; path = "clair-de-lune__pro.musicxml"; sourceTree = "<group>"; };
+		B65583D5CCE92B92330CD18E /* twinkle-twinkle.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "twinkle-twinkle.catalog.json"; sourceTree = "<group>"; };
+		B772E911AE713AEA8F550360 /* amazing-grace__beginner.musicxml */ = {isa = PBXFileReference; path = "amazing-grace__beginner.musicxml"; sourceTree = "<group>"; };
+		B7F4A4B953D0C4FDFF26064D /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
+		BBD336A46AE34063766DBC36 /* ex-intervals.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ex-intervals.catalog.json"; sourceTree = "<group>"; };
+		BCE47059E690BF8246FD11D3 /* morning-mood.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "morning-mood.catalog.json"; sourceTree = "<group>"; };
+		BD232C96274728C8B2625CCA /* ex-c-position-rh__beginner.musicxml */ = {isa = PBXFileReference; path = "ex-c-position-rh__beginner.musicxml"; sourceTree = "<group>"; };
 		BD44D01B02EE6A255D3AA85D /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		BD561FA4D82B08F92D40DBAD /* the-entertainer__advanced.musicxml */ = {isa = PBXFileReference; path = "the-entertainer__advanced.musicxml"; sourceTree = "<group>"; };
+		BDA53D87DB43D76C14C7848A /* LearnPianoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnPianoApp.swift; sourceTree = "<group>"; };
+		BED55BA48CC6BA2F2CD970D8 /* fur-elise.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "fur-elise.catalog.json"; sourceTree = "<group>"; };
+		C18461775E9CBF636AD88BFD /* twinkle-twinkle__beginner.musicxml */ = {isa = PBXFileReference; path = "twinkle-twinkle__beginner.musicxml"; sourceTree = "<group>"; };
+		C2D683C548475AB52BD6BA2A /* ex-blues-improv-base.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ex-blues-improv-base.catalog.json"; sourceTree = "<group>"; };
+		C322BA76D3E6163492073066 /* ContentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentStore.swift; sourceTree = "<group>"; };
+		C9DDA3A899741D0C86C96453 /* turkish-march.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "turkish-march.catalog.json"; sourceTree = "<group>"; };
+		CA38428F58E72A2D941C866C /* ex-rhythm-quarters-halves.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ex-rhythm-quarters-halves.catalog.json"; sourceTree = "<group>"; };
+		CAC68A56AC4DB1CA4B3D27BB /* ParsersSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsersSupport.swift; sourceTree = "<group>"; };
+		CBFA29C828F509FBEDFAC745 /* swan-lake__intermediate.musicxml */ = {isa = PBXFileReference; path = "swan-lake__intermediate.musicxml"; sourceTree = "<group>"; };
+		CC33ED298269E69EE1682144 /* london-bridge.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "london-bridge.catalog.json"; sourceTree = "<group>"; };
+		CD0E977786B5C1E4B732B72B /* ex-intervals__beginner.musicxml */ = {isa = PBXFileReference; path = "ex-intervals__beginner.musicxml"; sourceTree = "<group>"; };
+		CD6BEE5E1DA9A1D06C15E08D /* KeyboardKeyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardKeyState.swift; sourceTree = "<group>"; };
+		CD9A2DB2FB3CA1DA1406BDBB /* NotationHighlightModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotationHighlightModel.swift; sourceTree = "<group>"; };
+		CD9E27B9D736CD801558AC67 /* ParsersZipArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsersZipArchive.swift; sourceTree = "<group>"; };
+		CF616D777067B7FEBBBD80EC /* ex-middle-c.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ex-middle-c.catalog.json"; sourceTree = "<group>"; };
+		CFAFF3F394421C5A1A3A5BAD /* KeyboardTouch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardTouch.swift; sourceTree = "<group>"; };
+		CFB320A1CB3CE27C69506649 /* PracticeMaterial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeMaterial.swift; sourceTree = "<group>"; };
+		D117BBB7CEF4FC1B71B719AE /* PracticeJustPlayFollower.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeJustPlayFollower.swift; sourceTree = "<group>"; };
+		D2DE6DC5B4A4D54C5497E4C5 /* ex-rhythm-eighths__beginner.musicxml */ = {isa = PBXFileReference; path = "ex-rhythm-eighths__beginner.musicxml"; sourceTree = "<group>"; };
+		D2F995D459DFCB85681388A8 /* ex-c-position-lh.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ex-c-position-lh.catalog.json"; sourceTree = "<group>"; };
+		D4750945E6A8332DB633ED31 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
+		D579DB8D29F6114B8F304B90 /* AudioSynthRenderState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSynthRenderState.swift; sourceTree = "<group>"; };
+		D69D8DAF2A4B4B2D2ADD85C5 /* ex-blues-improv-base__intermediate.musicxml */ = {isa = PBXFileReference; path = "ex-blues-improv-base__intermediate.musicxml"; sourceTree = "<group>"; };
 		D6AD0997FFEF86679EE68186 /* Bravura-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bravura-OFL.txt"; sourceTree = "<group>"; };
-		F202B1299ADB5D00D06DED6D /* LearnPianoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnPianoApp.swift; sourceTree = "<group>"; };
+		D6B570D28EB52433E179E834 /* Practice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Practice.swift; sourceTree = "<group>"; };
+		D8DE4F3F14474B57BB908455 /* ex-triads-c-f-g.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ex-triads-c-f-g.catalog.json"; sourceTree = "<group>"; };
+		D8FF46B7D94E23A919F06F45 /* NotationScoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotationScoreView.swift; sourceTree = "<group>"; };
+		DA5B1204F6B1A5C4F2D30E75 /* ex-chord-progression-i-iv-v.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ex-chord-progression-i-iv-v.catalog.json"; sourceTree = "<group>"; };
+		DBA5A12E2568EF2E996610AC /* jingle-bells__beginner.musicxml */ = {isa = PBXFileReference; path = "jingle-bells__beginner.musicxml"; sourceTree = "<group>"; };
+		DD6DA837943E5332B4D69B92 /* ex-middle-c__beginner.musicxml */ = {isa = PBXFileReference; path = "ex-middle-c__beginner.musicxml"; sourceTree = "<group>"; };
+		DEC7ADB43E93FDC0F1450A23 /* the-entertainer__intermediate.musicxml */ = {isa = PBXFileReference; path = "the-entertainer__intermediate.musicxml"; sourceTree = "<group>"; };
+		DFF9B6F692CE96FAE6434A5A /* fur-elise__intermediate.musicxml */ = {isa = PBXFileReference; path = "fur-elise__intermediate.musicxml"; sourceTree = "<group>"; };
+		E046F707214EA2C0CB3CFBD5 /* Pitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pitch.swift; sourceTree = "<group>"; };
+		E1355237AF473C3B57E52221 /* greensleeves.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = greensleeves.catalog.json; sourceTree = "<group>"; };
+		E13C737C79FFEE1BB65CA05F /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
+		E208564984C48C4930053F75 /* NotationRenderPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotationRenderPlan.swift; sourceTree = "<group>"; };
+		E7D8098E58BCAA5EED6F5A5A /* InputBluetoothMIDIPairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputBluetoothMIDIPairingView.swift; sourceTree = "<group>"; };
+		E9BA4510AEC452D11B543316 /* canon-in-d__beginner.musicxml */ = {isa = PBXFileReference; path = "canon-in-d__beginner.musicxml"; sourceTree = "<group>"; };
+		ECFE475153ACDDB46891B3DE /* ex-c-position-both.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ex-c-position-both.catalog.json"; sourceTree = "<group>"; };
+		F280EC7B2BE0D93330FCC028 /* KeyboardGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardGeometry.swift; sourceTree = "<group>"; };
+		F34B914FCF4302852B8D953A /* ex-chord-progression-i-iv-v__intermediate.musicxml */ = {isa = PBXFileReference; path = "ex-chord-progression-i-iv-v__intermediate.musicxml"; sourceTree = "<group>"; };
+		F473CAC9F6B71F1B1B427151 /* gymnopedie-1.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "gymnopedie-1.catalog.json"; sourceTree = "<group>"; };
+		F4E4E8A7AA8B2E848FF813F7 /* InputClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputClock.swift; sourceTree = "<group>"; };
+		F95954B0679FC474B0C35969 /* ParsersMusicXMLImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsersMusicXMLImporter.swift; sourceTree = "<group>"; };
+		F9712CAF7D9A01CA300BD63F /* AudioLookaheadScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLookaheadScheduler.swift; sourceTree = "<group>"; };
+		FB27722FC9307298A2A8A2C5 /* AudioMetronome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMetronome.swift; sourceTree = "<group>"; };
+		FDC448FB5085F02F000125F4 /* canon-in-d.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "canon-in-d.catalog.json"; sourceTree = "<group>"; };
+		FDF770FF5E37BEB30EB4CAE5 /* Input.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Input.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		0059A61179DA8C20F3FA5101 /* Shell */ = {
+			isa = PBXGroup;
+			children = (
+				BDA53D87DB43D76C14C7848A /* LearnPianoApp.swift */,
+				6BB52AEDA035A65A279A5A9F /* RootView.swift */,
+			);
+			path = Shell;
+			sourceTree = "<group>";
+		};
 		069A05F2B882CFF5EC02BAB1 /* Library */ = {
 			isa = PBXGroup;
 			children = (
@@ -62,6 +369,13 @@
 		06E1EA0E464C2C0275478128 /* Parsers */ = {
 			isa = PBXGroup;
 			children = (
+				93FDFC18A80AE4066B744FD8 /* ParsersCompactScoreImporter.swift */,
+				5539583476AE1DEF9A4510B2 /* ParsersMIDIFileReader.swift */,
+				266CD755B878469F1D28B491 /* ParsersMIDIImporter.swift */,
+				36BF5034189009E613F8646A /* ParsersMusicXMLExporter.swift */,
+				F95954B0679FC474B0C35969 /* ParsersMusicXMLImporter.swift */,
+				CAC68A56AC4DB1CA4B3D27BB /* ParsersSupport.swift */,
+				CD9E27B9D736CD801558AC67 /* ParsersZipArchive.swift */,
 			);
 			path = Parsers;
 			sourceTree = "<group>";
@@ -77,13 +391,37 @@
 		0ECE5B957F9B4659A2425DC1 /* Audio */ = {
 			isa = PBXGroup;
 			children = (
+				3DB6280D3A9060E009420BFE /* AudioCommandQueue.swift */,
+				F9712CAF7D9A01CA300BD63F /* AudioLookaheadScheduler.swift */,
+				FB27722FC9307298A2A8A2C5 /* AudioMetronome.swift */,
+				56168A4E04AA449C56E414DF /* AudioPianoSynth.swift */,
+				94185FE1DE0D9389930ED515 /* AudioPlaybackPlan.swift */,
+				551D018C2662B5B04643B580 /* AudioScorePlayer.swift */,
+				B107BA55EBAD798ACF301267 /* AudioSessionConfigurator.swift */,
+				D579DB8D29F6114B8F304B90 /* AudioSynthRenderState.swift */,
+				0D2024323D580C6569AB9A60 /* AudioSynthVoice.swift */,
+				15ACFFB0238E30654D05EBC2 /* AudioTransportMapper.swift */,
 			);
 			path = Audio;
+			sourceTree = "<group>";
+		};
+		16DEE64B59AFC8F12D781E8A /* PracticeUI */ = {
+			isa = PBXGroup;
+			children = (
+				0EFB95FE7A6999434879276C /* PracticeScreen.swift */,
+			);
+			path = PracticeUI;
 			sourceTree = "<group>";
 		};
 		2116E7BCE289A221DCE90F4E /* Practice */ = {
 			isa = PBXGroup;
 			children = (
+				D117BBB7CEF4FC1B71B719AE /* PracticeJustPlayFollower.swift */,
+				CFB320A1CB3CE27C69506649 /* PracticeMaterial.swift */,
+				53250716285A62A669884423 /* PracticeRecord.swift */,
+				3A6CAD19E47AE9112709FD4A /* PracticeSession.swift */,
+				1D402AE6D19BA62B89A7D1EC /* PracticeTransport.swift */,
+				3B58637CA967B11F4C2460C3 /* PracticeWaitFollower.swift */,
 			);
 			path = Practice;
 			sourceTree = "<group>";
@@ -108,6 +446,11 @@
 		826BD34D61E3DAD9D647F212 /* LearnPianoTests */ = {
 			isa = PBXGroup;
 			children = (
+				0853C0F118B9F2B686117765 /* AudioTests.swift */,
+				1D5A6361E897B960B27D4793 /* KeyboardTests.swift */,
+				2E87BAF275795F1963D65036 /* NotationTests.swift */,
+				6F671416C00733B51E3637EE /* ParsersTests.swift */,
+				517076341CA75A65BC9A27E4 /* PracticeTests.swift */,
 				AFA6294344BCCDF59D4200EC /* SmokeTests.swift */,
 			);
 			path = LearnPianoTests;
@@ -116,6 +459,23 @@
 		9485E18ADC07FFE15F2EDA0D /* Input */ = {
 			isa = PBXGroup;
 			children = (
+				E7D8098E58BCAA5EED6F5A5A /* InputBluetoothMIDIPairingView.swift */,
+				F4E4E8A7AA8B2E848FF813F7 /* InputClock.swift */,
+				6EFD0D88E532BDE9AF9C03BD /* InputConcurrency.swift */,
+				813F84EC614FB2C4E61A07EB /* InputHeldNoteTracker.swift */,
+				3596DDB1843014A009975A58 /* InputHub.swift */,
+				6BC4C1BEC1242DA8E7EAF635 /* InputHubRouter.swift */,
+				A847B7EEE6E9A4D93542DADD /* InputMicrophoneProcessor.swift */,
+				9098D84BA8D1F9F4979BAFE3 /* InputMicrophoneSource.swift */,
+				4712C4E526E22850D4F69238 /* InputMicrophoneStatusView.swift */,
+				562C0DE89602379E0551DE7B /* InputMIDINoteMapper.swift */,
+				7D9E43BB4B5B3FD4F556671F /* InputMIDIParser.swift */,
+				93F39B452BFC0E76788FD219 /* InputMIDISource.swift */,
+				AE0D57DC3F5BC32EE9001305 /* InputNoteTracker.swift */,
+				835FD1A49641A41C77AC793B /* InputPitchDetector.swift */,
+				80E42BC15D0C9FD9CD6CE4E9 /* InputPitchPipeline.swift */,
+				A76449CE08ACC1A27E7F324C /* InputSpectrumAnalyzer.swift */,
+				0917BE7CB1FFA93A20487DD6 /* InputVirtualKeyboardSource.swift */,
 			);
 			path = Input;
 			sourceTree = "<group>";
@@ -132,9 +492,10 @@
 			isa = PBXGroup;
 			children = (
 				BD44D01B02EE6A255D3AA85D /* AppModel.swift */,
-				F202B1299ADB5D00D06DED6D /* LearnPianoApp.swift */,
-				41F8EC4246C24B790F13C39D /* RootView.swift */,
+				ABE5D39685B9C066386E6661 /* PracticeRequest.swift */,
+				E13C737C79FFEE1BB65CA05F /* ProfileStore.swift */,
 				640AE2A11C76568F282135E4 /* Theme.swift */,
+				0059A61179DA8C20F3FA5101 /* Shell */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -142,6 +503,17 @@
 		A4CC7E73C632ACDA93060FD2 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				44601C3D6A672BB1FF23DEB7 /* Courses.swift */,
+				2E17AA188A2950C9ABEB4FD3 /* Duration.swift */,
+				B7F4A4B953D0C4FDFF26064D /* Helpers.swift */,
+				A265A6624B8E533051D4C84B /* Import.swift */,
+				FDF770FF5E37BEB30EB4CAE5 /* Input.swift */,
+				D4750945E6A8332DB633ED31 /* Library.swift */,
+				E046F707214EA2C0CB3CFBD5 /* Pitch.swift */,
+				D6B570D28EB52433E179E834 /* Practice.swift */,
+				6782D8E20308790309146C28 /* Score.swift */,
+				65ACB9A121273BCFE6E932FE /* Timeline.swift */,
+				78FF1197A798C517E70DA99E /* Validation.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -149,6 +521,13 @@
 		A5AF023156E845D45B9EA6CC /* Keyboard */ = {
 			isa = PBXGroup;
 			children = (
+				F280EC7B2BE0D93330FCC028 /* KeyboardGeometry.swift */,
+				CD6BEE5E1DA9A1D06C15E08D /* KeyboardKeyState.swift */,
+				5FE2BC5643DECF953D3E2D08 /* KeyboardLanes.swift */,
+				392B90CAB38319BD2446F64C /* KeyboardMiniMap.swift */,
+				159383E4D38E954FE0A07810 /* KeyboardStageView.swift */,
+				CFAFF3F394421C5A1A3A5BAD /* KeyboardTouch.swift */,
+				4280A27019508B793C906181 /* KeyboardView.swift */,
 			);
 			path = Keyboard;
 			sourceTree = "<group>";
@@ -171,9 +550,93 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		C79FAAC8E9DDC5B58864019A /* Songs */ = {
+			isa = PBXGroup;
+			children = (
+				B772E911AE713AEA8F550360 /* amazing-grace__beginner.musicxml */,
+				43BDF83EF5FFA7719909212A /* amazing-grace__intermediate.musicxml */,
+				63B47266B8BD3FF6B1C0064E /* amazing-grace.catalog.json */,
+				B4A4FB2CA2E11702B4357BC8 /* ave-maria-schubert__intermediate.musicxml */,
+				48E64185B496089C1DCDACF2 /* ave-maria-schubert.catalog.json */,
+				E9BA4510AEC452D11B543316 /* canon-in-d__beginner.musicxml */,
+				8A2825DA3A6F2233AB69CA6C /* canon-in-d__intermediate.musicxml */,
+				FDC448FB5085F02F000125F4 /* canon-in-d.catalog.json */,
+				B509EB6279132D2FAF382304 /* clair-de-lune__pro.musicxml */,
+				5D83620A2D20F8F7EA5E0F24 /* clair-de-lune.catalog.json */,
+				D69D8DAF2A4B4B2D2ADD85C5 /* ex-blues-improv-base__intermediate.musicxml */,
+				C2D683C548475AB52BD6BA2A /* ex-blues-improv-base.catalog.json */,
+				1B7E63410D3E8969A39DB40A /* ex-c-major-scale__intermediate.musicxml */,
+				B27889B839608498723AEEDF /* ex-c-major-scale.catalog.json */,
+				74BA166E092797B493AB8E0A /* ex-c-position-both__beginner.musicxml */,
+				ECFE475153ACDDB46891B3DE /* ex-c-position-both.catalog.json */,
+				5502CFBF6BAF5FD96434FD1A /* ex-c-position-lh__beginner.musicxml */,
+				D2F995D459DFCB85681388A8 /* ex-c-position-lh.catalog.json */,
+				BD232C96274728C8B2625CCA /* ex-c-position-rh__beginner.musicxml */,
+				4906FEAC3BC25CB4048B4A7A /* ex-c-position-rh.catalog.json */,
+				F34B914FCF4302852B8D953A /* ex-chord-progression-i-iv-v__intermediate.musicxml */,
+				DA5B1204F6B1A5C4F2D30E75 /* ex-chord-progression-i-iv-v.catalog.json */,
+				13152FFB1BA3FF6F5FBD8623 /* ex-g-major-scale__intermediate.musicxml */,
+				58C4E4C4093540342DAFAABB /* ex-g-major-scale.catalog.json */,
+				CD0E977786B5C1E4B732B72B /* ex-intervals__beginner.musicxml */,
+				BBD336A46AE34063766DBC36 /* ex-intervals.catalog.json */,
+				DD6DA837943E5332B4D69B92 /* ex-middle-c__beginner.musicxml */,
+				CF616D777067B7FEBBBD80EC /* ex-middle-c.catalog.json */,
+				D2DE6DC5B4A4D54C5497E4C5 /* ex-rhythm-eighths__beginner.musicxml */,
+				59995E27C4E64EF99B5A8352 /* ex-rhythm-eighths.catalog.json */,
+				8395C031A71DF5864F03D524 /* ex-rhythm-quarters-halves__beginner.musicxml */,
+				CA38428F58E72A2D941C866C /* ex-rhythm-quarters-halves.catalog.json */,
+				8D9D4CA336AEB4DACDE008BB /* ex-triads-c-f-g__beginner.musicxml */,
+				D8DE4F3F14474B57BB908455 /* ex-triads-c-f-g.catalog.json */,
+				2D9D813846ECE420EF5BEF17 /* fur-elise__advanced.musicxml */,
+				AB699F2441DE0014384B5E62 /* fur-elise__beginner.musicxml */,
+				DFF9B6F692CE96FAE6434A5A /* fur-elise__intermediate.musicxml */,
+				BED55BA48CC6BA2F2CD970D8 /* fur-elise.catalog.json */,
+				8DFED3CB706DBB614C803BCA /* greensleeves__beginner.musicxml */,
+				71CAD47A3970A0E4B579207D /* greensleeves__intermediate.musicxml */,
+				E1355237AF473C3B57E52221 /* greensleeves.catalog.json */,
+				77A444B8C3C110236753EA6A /* gymnopedie-1__intermediate.musicxml */,
+				F473CAC9F6B71F1B1B427151 /* gymnopedie-1.catalog.json */,
+				80017C662390325DD6609BAD /* happy-birthday__beginner.musicxml */,
+				91FE9F48FDDE2D873C6A438E /* happy-birthday.catalog.json */,
+				DBA5A12E2568EF2E996610AC /* jingle-bells__beginner.musicxml */,
+				05E1E69E176A54732B803CCE /* jingle-bells.catalog.json */,
+				4C2A1431B960F1815377A5F9 /* london-bridge__beginner.musicxml */,
+				CC33ED298269E69EE1682144 /* london-bridge.catalog.json */,
+				11D552CAC791ED3B540163A8 /* minuet-in-g__intermediate.musicxml */,
+				1431C780E6FB24B022EEE877 /* minuet-in-g.catalog.json */,
+				2D838D1A13BADFE0E2C04087 /* moonlight-sonata__advanced.musicxml */,
+				15DFB098BB486A8E42DABB34 /* moonlight-sonata.catalog.json */,
+				059E3CB056C825F16F2BE65B /* morning-mood__beginner.musicxml */,
+				BCE47059E690BF8246FD11D3 /* morning-mood.catalog.json */,
+				9E396A1A4545D604792783ED /* nocturne-op9-no2__pro.musicxml */,
+				AE90E90B59BA9792BB84EDCB /* nocturne-op9-no2.catalog.json */,
+				3BE3AE534F8C9AEEC39059D0 /* ode-to-joy__beginner.musicxml */,
+				8CF80D4A84F64C9E9105B646 /* ode-to-joy__intermediate.musicxml */,
+				2AD46E53C82A25453DB678D2 /* ode-to-joy.catalog.json */,
+				3A56E823286349D321242B32 /* prelude-in-c__intermediate.musicxml */,
+				2D9DDC0587DFFD1B73D084AE /* prelude-in-c.catalog.json */,
+				504FA77E83BE8BA2731B22D2 /* scarborough-fair__beginner.musicxml */,
+				9C4794A6A4E887A82770A45A /* scarborough-fair.catalog.json */,
+				16BA0DED89C9233E976D0AF8 /* swan-lake__beginner.musicxml */,
+				CBFA29C828F509FBEDFAC745 /* swan-lake__intermediate.musicxml */,
+				42661C5150BFBDAB02D50A46 /* swan-lake.catalog.json */,
+				BD561FA4D82B08F92D40DBAD /* the-entertainer__advanced.musicxml */,
+				DEC7ADB43E93FDC0F1450A23 /* the-entertainer__intermediate.musicxml */,
+				0FFC1BF1975FDFDD76638C1A /* the-entertainer.catalog.json */,
+				345794F44314CEF6F0EB1724 /* turkish-march__advanced.musicxml */,
+				C9DDA3A899741D0C86C96453 /* turkish-march.catalog.json */,
+				C18461775E9CBF636AD88BFD /* twinkle-twinkle__beginner.musicxml */,
+				9E6B3E257941E95538554117 /* twinkle-twinkle__intermediate.musicxml */,
+				B65583D5CCE92B92330CD18E /* twinkle-twinkle.catalog.json */,
+			);
+			path = Songs;
+			sourceTree = "<group>";
+		};
 		CF1ECF2DD858B99033A38758 /* Content */ = {
 			isa = PBXGroup;
 			children = (
+				C322BA76D3E6163492073066 /* ContentStore.swift */,
+				C79FAAC8E9DDC5B58864019A /* Songs */,
 			);
 			path = Content;
 			sourceTree = "<group>";
@@ -181,6 +644,13 @@
 		D8F53AB2F629755765F370AC /* Notation */ = {
 			isa = PBXGroup;
 			children = (
+				6DFE50148012178FADF86B23 /* NotationGlyphs.swift */,
+				CD9A2DB2FB3CA1DA1406BDBB /* NotationHighlightModel.swift */,
+				0D97793929E4DF0F957F671D /* NotationLayoutEngine.swift */,
+				8171976F5DDCB165FE15A2FE /* NotationLayoutModel.swift */,
+				E208564984C48C4930053F75 /* NotationRenderPlan.swift */,
+				D8FF46B7D94E23A919F06F45 /* NotationScoreView.swift */,
+				55DE5EA7129647AEC795B197 /* NotationStaffGeometry.swift */,
 			);
 			path = Notation;
 			sourceTree = "<group>";
@@ -209,6 +679,7 @@
 				D8F53AB2F629755765F370AC /* Notation */,
 				06E1EA0E464C2C0275478128 /* Parsers */,
 				2116E7BCE289A221DCE90F4E /* Practice */,
+				16DEE64B59AFC8F12D781E8A /* PracticeUI */,
 				C777DBCB793F4E32B8732BDF /* Resources */,
 				2E8EE452DAE16865DA7B0857 /* Settings */,
 			);
@@ -298,6 +769,81 @@
 			files = (
 				81B60FEC97A8C22ED1419D3D /* Bravura-OFL.txt in Resources */,
 				F7388BADB1CA0636538A558A /* Bravura.otf in Resources */,
+				5B0B4F67E63287685785C214 /* amazing-grace.catalog.json in Resources */,
+				BB9D6ECA5CD2B699AE7F1664 /* amazing-grace__beginner.musicxml in Resources */,
+				1485DC1069E5B62B56216CC6 /* amazing-grace__intermediate.musicxml in Resources */,
+				590F3DC897778D8AFBE3A674 /* ave-maria-schubert.catalog.json in Resources */,
+				E3309EC9F28BB5C452B82FF5 /* ave-maria-schubert__intermediate.musicxml in Resources */,
+				E9E2F433BBEF96D99758B3AF /* canon-in-d.catalog.json in Resources */,
+				7202C5FB4CB24FD34E37C98C /* canon-in-d__beginner.musicxml in Resources */,
+				CAAF6F472161F8302D77EB91 /* canon-in-d__intermediate.musicxml in Resources */,
+				13A61573202B877E0D77D3F8 /* clair-de-lune.catalog.json in Resources */,
+				131FFFC44E68F59178E5069D /* clair-de-lune__pro.musicxml in Resources */,
+				D8D5BB2ED24C3620F0AA80EE /* ex-blues-improv-base.catalog.json in Resources */,
+				EC0B37B49BCD3B16C3401777 /* ex-blues-improv-base__intermediate.musicxml in Resources */,
+				25DFA722E1B9201C6213B860 /* ex-c-major-scale.catalog.json in Resources */,
+				06DE7E0DB0DCF4EB61094D24 /* ex-c-major-scale__intermediate.musicxml in Resources */,
+				A98AE131D38B7F8BC08ECF23 /* ex-c-position-both.catalog.json in Resources */,
+				C328843C713B21C4E19F6560 /* ex-c-position-both__beginner.musicxml in Resources */,
+				3FD66FB1B0918009052A51EF /* ex-c-position-lh.catalog.json in Resources */,
+				8DB6C72234B3771296D7AC5B /* ex-c-position-lh__beginner.musicxml in Resources */,
+				2B30B9828421B77EB0D7660E /* ex-c-position-rh.catalog.json in Resources */,
+				23F9C77D8F3C1D03D6313A40 /* ex-c-position-rh__beginner.musicxml in Resources */,
+				A33B02F047A656C73F7AD859 /* ex-chord-progression-i-iv-v.catalog.json in Resources */,
+				93F82DCDB43F91748FCCBB14 /* ex-chord-progression-i-iv-v__intermediate.musicxml in Resources */,
+				5AAF2FB4D73301BC21CDEA4A /* ex-g-major-scale.catalog.json in Resources */,
+				2AD6AA63F42815AFA6E2CF8F /* ex-g-major-scale__intermediate.musicxml in Resources */,
+				D7820349F60E9D68D744CBB4 /* ex-intervals.catalog.json in Resources */,
+				EA71DE93EA539C0DD2865258 /* ex-intervals__beginner.musicxml in Resources */,
+				D7EAB6EC1652C315DDD14D4A /* ex-middle-c.catalog.json in Resources */,
+				892CF57C1091A01F1250B3D7 /* ex-middle-c__beginner.musicxml in Resources */,
+				DF5A8A98823ECF5E61AE8B0A /* ex-rhythm-eighths.catalog.json in Resources */,
+				EBD1C57D2F658C7F7D823DF5 /* ex-rhythm-eighths__beginner.musicxml in Resources */,
+				4BD09B9EE73AFD735B68B763 /* ex-rhythm-quarters-halves.catalog.json in Resources */,
+				8687D4AD3D84BC556673AFEA /* ex-rhythm-quarters-halves__beginner.musicxml in Resources */,
+				D9CC08C16AE2ED1AE40B5E6F /* ex-triads-c-f-g.catalog.json in Resources */,
+				A61C30499FDA8680FEC0B49D /* ex-triads-c-f-g__beginner.musicxml in Resources */,
+				12A0101AA0E1089D54548BD3 /* fur-elise.catalog.json in Resources */,
+				26EC216B33C785B64E5E8AF8 /* fur-elise__advanced.musicxml in Resources */,
+				6BDC75C33CD0619EC02991F9 /* fur-elise__beginner.musicxml in Resources */,
+				792673FCF8FA821612721A11 /* fur-elise__intermediate.musicxml in Resources */,
+				7BB7D209CE2633E2DC306FE2 /* greensleeves.catalog.json in Resources */,
+				ED0A6B573662A533A80397C7 /* greensleeves__beginner.musicxml in Resources */,
+				85D1A72EFFFC4E58D4802BEB /* greensleeves__intermediate.musicxml in Resources */,
+				E6957899C5B3A157AAB0038C /* gymnopedie-1.catalog.json in Resources */,
+				742BF8D7DFCD7FE4A6447199 /* gymnopedie-1__intermediate.musicxml in Resources */,
+				4B17CFC3635B74345A0DBB87 /* happy-birthday.catalog.json in Resources */,
+				23654D551AABB28B0E5E1EFA /* happy-birthday__beginner.musicxml in Resources */,
+				19991C575FD6C8D63FDE9152 /* jingle-bells.catalog.json in Resources */,
+				FDA25D1D31B9A0B059189906 /* jingle-bells__beginner.musicxml in Resources */,
+				8203B523AE84FC81C8B82EF3 /* london-bridge.catalog.json in Resources */,
+				34BD12DE620B8E0A94CA9482 /* london-bridge__beginner.musicxml in Resources */,
+				FC7010274DE3693FD7CFA07A /* minuet-in-g.catalog.json in Resources */,
+				6C602223BE350B4502C9B0A1 /* minuet-in-g__intermediate.musicxml in Resources */,
+				534EF95853DC1ED2CA0DDC5F /* moonlight-sonata.catalog.json in Resources */,
+				F929B06C69BAC19D0267FCB1 /* moonlight-sonata__advanced.musicxml in Resources */,
+				AFDF61BF49A874D71887F9DE /* morning-mood.catalog.json in Resources */,
+				24B4D8CC4D793EDA1F107BB9 /* morning-mood__beginner.musicxml in Resources */,
+				F5357BC7914FDE350F9AF231 /* nocturne-op9-no2.catalog.json in Resources */,
+				E08B3ECE7B3341123FE3340F /* nocturne-op9-no2__pro.musicxml in Resources */,
+				11F8CA94E458E4EF71352A51 /* ode-to-joy.catalog.json in Resources */,
+				A32D28711446A46C0542A8EE /* ode-to-joy__beginner.musicxml in Resources */,
+				EAD7DF8FFC3F5E8585085ACE /* ode-to-joy__intermediate.musicxml in Resources */,
+				B2621917ED2BA18CC5451273 /* prelude-in-c.catalog.json in Resources */,
+				DFE04B4E84ED3E382E63FF35 /* prelude-in-c__intermediate.musicxml in Resources */,
+				717DC81C8AD1801FE56EC401 /* scarborough-fair.catalog.json in Resources */,
+				CBA06D64A55E1FB6BB398B8C /* scarborough-fair__beginner.musicxml in Resources */,
+				3ADEC4D2987A7594C6260D47 /* swan-lake.catalog.json in Resources */,
+				A1424BB56133EEE33BBE53B4 /* swan-lake__beginner.musicxml in Resources */,
+				28C44689641374912CD3AA7F /* swan-lake__intermediate.musicxml in Resources */,
+				7C66D52557E6A640B83D1227 /* the-entertainer.catalog.json in Resources */,
+				17ED15414D5741714BCD5BF0 /* the-entertainer__advanced.musicxml in Resources */,
+				1EC8857B70444DEE7D1AD7BD /* the-entertainer__intermediate.musicxml in Resources */,
+				5C3CF2E847221EF6A98111CC /* turkish-march.catalog.json in Resources */,
+				375E0650B94EF30B16C67AE5 /* turkish-march__advanced.musicxml in Resources */,
+				160C4A91095D279E7C9D4EBC /* twinkle-twinkle.catalog.json in Resources */,
+				ED124A357340D3A660DAEAC8 /* twinkle-twinkle__beginner.musicxml in Resources */,
+				5C04E8A83342F2DDCD309977 /* twinkle-twinkle__intermediate.musicxml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -309,14 +855,83 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4161BF0F6871B4637E190BD /* AppModel.swift in Sources */,
+				939002F402F5DB053072160D /* AudioCommandQueue.swift in Sources */,
+				A56077AC2293FF10E5AB7083 /* AudioLookaheadScheduler.swift in Sources */,
+				57D9D3F88C8D64C3441D2398 /* AudioMetronome.swift in Sources */,
+				1E8C9FE19A37D801B33C078F /* AudioPianoSynth.swift in Sources */,
+				D1E694AB9DC1E7922E40D4B6 /* AudioPlaybackPlan.swift in Sources */,
+				8194DB5A631A6FE5AA100721 /* AudioScorePlayer.swift in Sources */,
+				DECD81DCBD159035F2429BE3 /* AudioSessionConfigurator.swift in Sources */,
+				F9810580D2F48E275976CF5A /* AudioSynthRenderState.swift in Sources */,
+				D40162FF27B4A81F75DBD2B6 /* AudioSynthVoice.swift in Sources */,
+				1F3CF8C13BFA3358F1262DBE /* AudioTransportMapper.swift in Sources */,
+				7303BDB2A5675485F8D8F59A /* ContentStore.swift in Sources */,
+				4B9C267ACC8261D6BEC34DEA /* Courses.swift in Sources */,
 				7327773382234A21CA7D4C28 /* CoursesHomeView.swift in Sources */,
+				F04F6756E909305A0DE10D31 /* Duration.swift in Sources */,
+				5ACEAA965B45CCEC36FC8C54 /* Helpers.swift in Sources */,
+				16B747CBA2BCE434070E7DCD /* Import.swift in Sources */,
 				162E8A528C689359F1CF3D77 /* ImportHomeView.swift in Sources */,
-				F12B46289DBF51094F5FE841 /* LearnPianoApp.swift in Sources */,
+				AAA51E38843013F52F0BBD9A /* Input.swift in Sources */,
+				BCBEBE62C0E5958B6477985E /* InputBluetoothMIDIPairingView.swift in Sources */,
+				0C4A740C65F8F25ADDC07673 /* InputClock.swift in Sources */,
+				C8C6456E1F0592687A5761D1 /* InputConcurrency.swift in Sources */,
+				89983632B670605174BCB82D /* InputHeldNoteTracker.swift in Sources */,
+				3EF6ABBF9C5672402C10C131 /* InputHub.swift in Sources */,
+				CD986D96F9299FC686BE0D59 /* InputHubRouter.swift in Sources */,
+				F738DB984B2EF23915969E17 /* InputMIDINoteMapper.swift in Sources */,
+				39E8623BA1A35B8CFCB90A22 /* InputMIDIParser.swift in Sources */,
+				984F5F8C2AD74F7D10F450A6 /* InputMIDISource.swift in Sources */,
+				0E70F7DF4226FD4BAD3584CC /* InputMicrophoneProcessor.swift in Sources */,
+				E958617FE7CA26547771ADA1 /* InputMicrophoneSource.swift in Sources */,
+				F60AC2476D3268453D7F311E /* InputMicrophoneStatusView.swift in Sources */,
+				1E3B65025C9BF41CCE71290C /* InputNoteTracker.swift in Sources */,
+				F583CC69C907AF79775FC366 /* InputPitchDetector.swift in Sources */,
+				43ED8564A19752CB31AA9AB1 /* InputPitchPipeline.swift in Sources */,
+				ECC288F3E491FDDAB2442FAB /* InputSpectrumAnalyzer.swift in Sources */,
+				276527FD19AD6A21067C46CA /* InputVirtualKeyboardSource.swift in Sources */,
+				61936127D0D219129C296EFF /* KeyboardGeometry.swift in Sources */,
+				ED2682A721020CBF1EBFEBD3 /* KeyboardKeyState.swift in Sources */,
+				6F3E75159D687E977872533D /* KeyboardLanes.swift in Sources */,
+				0F5161E193E1382D8924A7BE /* KeyboardMiniMap.swift in Sources */,
+				004D58F0CE3BA97256DEA135 /* KeyboardStageView.swift in Sources */,
+				B55B65A77F83436C404BEE77 /* KeyboardTouch.swift in Sources */,
+				93F397F2BA3668E3643C0257 /* KeyboardView.swift in Sources */,
+				311B24CE60FE6F68324D3A65 /* LearnPianoApp.swift in Sources */,
+				D274A85E7CEE193EE7177A14 /* Library.swift in Sources */,
 				848EAD0BC9A5ADDB82E82B05 /* MySongsView.swift in Sources */,
-				6F29550B2C406164674C2153 /* RootView.swift in Sources */,
+				1584A33CC58AD3D7706428BF /* NotationGlyphs.swift in Sources */,
+				4D1EC3E7054F5043F5ADF80D /* NotationHighlightModel.swift in Sources */,
+				3E46DC62780DC38116BC94EB /* NotationLayoutEngine.swift in Sources */,
+				948F5D14DE8DCAC36915B4C5 /* NotationLayoutModel.swift in Sources */,
+				02BAE7D74BED50A06A563891 /* NotationRenderPlan.swift in Sources */,
+				8E2713E108F86CA606341F60 /* NotationScoreView.swift in Sources */,
+				6AB8EA2DDAC59B77E8E7C34D /* NotationStaffGeometry.swift in Sources */,
+				63EC5EE57412A798382BB8D1 /* ParsersCompactScoreImporter.swift in Sources */,
+				97702D4B78E37D52EA933378 /* ParsersMIDIFileReader.swift in Sources */,
+				D19FE038891EB562E2683281 /* ParsersMIDIImporter.swift in Sources */,
+				738ABF0CC39F7B1059CD8130 /* ParsersMusicXMLExporter.swift in Sources */,
+				45C8647DED2C808DF8908001 /* ParsersMusicXMLImporter.swift in Sources */,
+				D9777DAC26ABEC01BDDC7118 /* ParsersSupport.swift in Sources */,
+				67CBBAB3F7C570BC5AF3C579 /* ParsersZipArchive.swift in Sources */,
+				41FB42269111EA13C92D6E4D /* Pitch.swift in Sources */,
+				8FD20BE2F3C8A70D95CED67F /* Practice.swift in Sources */,
+				4B74ABE89FF780F0319753C7 /* PracticeJustPlayFollower.swift in Sources */,
+				1D79E6257FEF3BD65553EC9B /* PracticeMaterial.swift in Sources */,
+				70D52EEF89D1365356E10F64 /* PracticeRecord.swift in Sources */,
+				D90BC413F2CB4D60C2B69836 /* PracticeRequest.swift in Sources */,
+				602617AF498A62EB27C8EBEC /* PracticeScreen.swift in Sources */,
+				771489B32C9F2D1635E87CD2 /* PracticeSession.swift in Sources */,
+				1C59C8EA1B769A1F34447906 /* PracticeTransport.swift in Sources */,
+				FF774F5D3E5BB4575BA5F6AA /* PracticeWaitFollower.swift in Sources */,
+				91E2ADC94474EAAF87AFF94B /* ProfileStore.swift in Sources */,
+				15C24BEA7CE2863C93496649 /* RootView.swift in Sources */,
+				CBDC8C944A168AFCE5D408A5 /* Score.swift in Sources */,
 				1BE359F48C4423A82311F3FC /* SettingsView.swift in Sources */,
 				5620187EC16F87BD4B5B5F39 /* SongsBrowserView.swift in Sources */,
 				029E0A0C6C47EA71286328BA /* Theme.swift in Sources */,
+				91E424BD64BD5CB32A048381 /* Timeline.swift in Sources */,
+				5A95F3964922255328B299D5 /* Validation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -324,6 +939,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				55B83ED2482E8510E69F1A92 /* AudioTests.swift in Sources */,
+				49486918B0D727D6CB1FCF36 /* KeyboardTests.swift in Sources */,
+				5C94C9391188AD41388D6F41 /* NotationTests.swift in Sources */,
+				4F514999C0A2C84980C734EC /* ParsersTests.swift in Sources */,
+				69BF2366A67533D5B72EFECD /* PracticeTests.swift in Sources */,
 				7705B06B8C9E05347763E1C6 /* SmokeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

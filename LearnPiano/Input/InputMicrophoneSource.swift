@@ -208,16 +208,8 @@ final class InputMicrophoneSource: NoteInputSource {
         processor.update(detector: configuration)
 
         let sampleRate = format.sampleRate
-        input.installTap(onBus: 0, bufferSize: 2048, format: format) { buffer, when in
-            guard let channels = buffer.floatChannelData else { return }
-            let count = Int(buffer.frameLength)
-            guard count > 0 else { return }
-            let samples = Array(UnsafeBufferPointer(start: channels[0], count: count))
-            let start = when.isHostTimeValid
-                ? InputClock.seconds(hostTime: when.hostTime)
-                : InputClock.now - Double(count) / sampleRate
-            processor.enqueue(samples: samples, startTime: start)
-        }
+        input.installTap(onBus: 0, bufferSize: 2048, format: format,
+                         block: Self.makeTapBlock(processor: processor, sampleRate: sampleRate))
         engine.prepare()
         do {
             try engine.start()
@@ -233,6 +225,24 @@ final class InputMicrophoneSource: NoteInputSource {
         errorMessage = nil
         observeConfigurationChanges(of: engine)
         setState(.running)
+    }
+
+    /// Builds the input tap block outside the main actor's isolation domain.
+    ///
+    /// The tap runs on a real-time audio thread; a closure formed inside a `@MainActor` method would be
+    /// inferred main-actor isolated (and trap under Swift 6 dynamic isolation checks), so it is created here.
+    /// The block only copies the first channel and hands it to the processor's serial queue.
+    nonisolated private static func makeTapBlock(processor: InputMicrophoneProcessor, sampleRate: Double) -> AVAudioNodeTapBlock {
+        { buffer, when in
+            guard let channels = buffer.floatChannelData else { return }
+            let count = Int(buffer.frameLength)
+            guard count > 0 else { return }
+            let samples = Array(UnsafeBufferPointer(start: channels[0], count: count))
+            let start = when.isHostTimeValid
+                ? InputClock.seconds(hostTime: when.hostTime)
+                : InputClock.now - Double(count) / sampleRate
+            processor.enqueue(samples: samples, startTime: start)
+        }
     }
 
     /// Stops the engine, removes the tap and releases sounding notes.

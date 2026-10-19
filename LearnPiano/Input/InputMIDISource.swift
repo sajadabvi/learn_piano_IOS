@@ -129,30 +129,15 @@ final class InputMIDISource: NoteInputSource {
     private func ensurePort() -> Bool {
         if handles.value.port != 0 { return true }
         var client = MIDIClientRef()
-        let clientStatus = MIDIClientCreateWithBlock("LearnPiano" as CFString, &client) { [weak self] notification in
-            let id = notification.pointee.messageID
-            guard id == .msgSetupChanged || id == .msgObjectAdded || id == .msgObjectRemoved || id == .msgPropertyChanged else { return }
-            InputMainActor.run { self?.scheduleRescan() }
-        }
+        let clientStatus = MIDIClientCreateWithBlock("LearnPiano" as CFString, &client, Self.makeNotifyBlock(owner: self))
         guard clientStatus == noErr else {
             errorMessage = "MIDI is unavailable (error \(clientStatus))."
             Self.log.error("MIDIClientCreateWithBlock failed: \(clientStatus)")
             return false
         }
         var port = MIDIPortRef()
-        let receiver = self.receiver
-        let relay = self.relay
-        let portStatus = MIDIInputPortCreateWithProtocol(client, "LearnPiano Input" as CFString, ._1_0, &port) { [weak self] eventList, refCon in
-            let token = Int(bitPattern: refCon)
-            var events: [NoteInputEvent] = []
-            for packet in eventList.unsafeSequence() {
-                let time = InputClock.seconds(hostTime: packet.pointee.timeStamp)
-                events += receiver.handle(words: packet.words(), time: time, token: token)
-            }
-            guard let last = events.last else { return }
-            relay.send(events)
-            InputMainActor.run { self?.lastEvent = last }
-        }
+        let portStatus = MIDIInputPortCreateWithProtocol(client, "LearnPiano Input" as CFString, ._1_0, &port,
+                                                         Self.makeReceiveBlock(owner: self, receiver: receiver, relay: relay))
         guard portStatus == noErr else {
             MIDIClientDispose(client)
             errorMessage = "Could not open a MIDI input (error \(portStatus))."
@@ -161,6 +146,38 @@ final class InputMIDISource: NoteInputSource {
         }
         handles.value = (client, port)
         return true
+    }
+
+    /// The client notification block: any setup change (device plugged in or removed, Bluetooth keyboard
+    /// connected, property changed) schedules a coalesced rescan on the main actor.
+    ///
+    /// Built in a nonisolated context because CoreMIDI calls it on its own thread; a closure formed inside a
+    /// `@MainActor` method would be inferred main-actor isolated.
+    nonisolated private static func makeNotifyBlock(owner: InputMIDISource) -> MIDINotifyBlock {
+        { [weak owner] notification in
+            let id = notification.pointee.messageID
+            guard id == .msgSetupChanged || id == .msgObjectAdded || id == .msgObjectRemoved || id == .msgPropertyChanged else { return }
+            InputMainActor.run { owner?.scheduleRescan() }
+        }
+    }
+
+    /// The input port's receive block: decodes every packet of the event list with the endpoint's parser
+    /// (identified by the connection token in `srcConnRefCon`), stamps it with the packet's host time and
+    /// delivers the note events on CoreMIDI's receive thread. Only the "last event" UI mirror hops to the
+    /// main actor. Nonisolated for the same reason as `makeNotifyBlock`.
+    nonisolated private static func makeReceiveBlock(owner: InputMIDISource, receiver: InputMIDIReceiver,
+                                                     relay: InputEventRelay) -> MIDIReceiveBlock {
+        { [weak owner] eventList, refCon in
+            let token = Int(bitPattern: refCon)
+            var events: [NoteInputEvent] = []
+            for packet in eventList.unsafeSequence() {
+                let time = InputClock.seconds(hostTime: packet.pointee.timeStamp)
+                events += receiver.handle(words: packet.words(), time: time, token: token)
+            }
+            guard let last = events.last else { return }
+            relay.send(events)
+            InputMainActor.run { owner?.lastEvent = last }
+        }
     }
 
     /// Coalesces bursts of setup notifications into one rescan.
