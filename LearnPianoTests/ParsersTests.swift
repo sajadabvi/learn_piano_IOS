@@ -1008,3 +1008,14 @@ final class ParsersTests: XCTestCase {
         }
     }
 }
+
+final class ParsersMIDITitleTests: XCTestCase {
+    func testGenericTrackNamesAreNotTitles() {
+        for name in ["control track", "Track 1", "track_2", "Piano", "Acoustic Grand Piano", "  ", "Channel 10", "Right Hand", "Conductor", "lower:2", "upper:1", "Piano 2"] {
+            XCTAssertTrue(ParsersMIDIImporter.isGenericTrackName(name), name)
+        }
+        for name in ["Prelude in C", "Für Elise", "Gymnopédie No. 1", "Piano Sonata K. 331"] {
+            XCTAssertFalse(ParsersMIDIImporter.isGenericTrackName(name), name)
+        }
+    }
+}

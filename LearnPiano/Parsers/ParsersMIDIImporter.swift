@@ -49,6 +49,22 @@ struct ParsersMIDINote: Hashable, Sendable {
 /// first meter segment becomes a pickup), tempo per measure (time-weighted average of the tempo map), key from the
 /// key-signature meta event or estimated from the pitch histogram (Krumhansl–Kessler profiles).
 struct ParsersMIDIImporter: ScoreImporter, Sendable {
+
+    /// Track names that describe the track rather than the piece ("control track" from LilyPond, "Track 1", "Piano",
+    /// General MIDI instrument names). Such names must not become the song title; the file name is used instead.
+    static func isGenericTrackName(_ name: String) -> Bool {
+        var n = name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        // LilyPond and other engravers append staff/voice numbers: "upper:1", "lower:2", "Piano 2".
+        if let colon = n.firstIndex(of: ":") { n = String(n[..<colon]) }
+        n = n.replacingOccurrences(of: #"[\s_-]*\d+$"#, with: "", options: .regularExpression).trimmingCharacters(in: .whitespaces)
+        if n.isEmpty { return true }
+        let exact: Set<String> = ["control track", "conductor", "conductor track", "tempo track", "tempo", "untitled", "new track",
+                                  "sequence", "midi", "piano", "acoustic grand piano", "grand piano", "bright acoustic piano",
+                                  "electric grand piano", "electric piano", "keyboard", "right hand", "left hand", "rh", "lh",
+                                  "treble", "bass", "upper", "lower", "melody", "accompaniment", "staff", "music"]
+        if exact.contains(n) { return true }
+        return n.range(of: #"^(track|channel|staff|part|instrument|voice|piano)[\s_-]*\d*$"#, options: .regularExpression) != nil
+    }
     var supportedExtensions: [String] { ["mid", "midi", "smf", "kar"] }
     var displayName: String { "MIDI" }
 
@@ -360,7 +376,8 @@ struct ParsersMIDIScoreBuilder {
                                     events: perMeasure[i], barline: i == slots.count - 1 ? Barline(isFinal: true) : .plain))
         }
 
-        let trackTitle = content.trackNames.keys.sorted().compactMap { content.trackNames[$0] }.first { !$0.isEmpty }
+        let trackTitle = content.trackNames.keys.sorted().compactMap { content.trackNames[$0] }
+            .first { !$0.isEmpty && !ParsersMIDIImporter.isGenericTrackName($0) }
         let title = trackTitle ?? ParsersMusicXMLScoreBuilder.titleFromFileName(fileName)
         let score = Score(metadata: ScoreMetadata(title: title, source: .midi, sourceFileName: fileName),
                           initialTime: initialTime, initialKey: key(at: 0), initialTempoBPM: initialTempo,

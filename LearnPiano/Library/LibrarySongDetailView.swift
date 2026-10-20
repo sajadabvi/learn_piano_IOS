@@ -14,7 +14,6 @@ struct LibrarySongDetailView: View {
     @State private var selectedArrangementID: String?
     @State private var isConfirmingDelete = false
     @State private var deleteErrorMessage: String?
-    @State private var contentWidth: CGFloat = 0
     /// Printed measure numbers per arrangement id, loaded from the score so trouble spots match the sheet.
     @State private var measureNumbers: [String: [Int]] = [:]
 
@@ -50,6 +49,15 @@ struct LibrarySongDetailView: View {
     // MARK: Layout
 
     private func content(for song: SongEntry) -> some View {
+        // The width comes from a GeometryReader around the scroll view: its size depends only on the space offered,
+        // never on the content, so switching between the wide and narrow layouts cannot feed back into the width
+        // (measuring with onGeometryChange into @State oscillated and hung the main thread).
+        GeometryReader { proxy in
+            content(for: song, width: proxy.size.width)
+        }
+    }
+
+    private func content(for song: SongEntry, width contentWidth: CGFloat) -> some View {
         let selected = selectedArrangement(in: song)
         let wide = contentWidth >= 900
         return ScrollView {
@@ -69,7 +77,6 @@ struct LibrarySongDetailView: View {
             }
             .padding(24)
         }
-        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { contentWidth = $0 }
         .safeAreaInset(edge: .bottom) {
             if let selected {
                 actionBar(song: song, arrangement: selected)

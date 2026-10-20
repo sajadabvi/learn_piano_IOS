@@ -232,7 +232,8 @@ enum ImportDifficultyEstimator {
         let accidentals = abs(score.initialKey.fifths)
 
         var points = 0.0
-        points += min(4, density * 1.1)
+        // Steady figuration (e.g. constant sixteenths) is dense but repetitive, so density is capped lower than before.
+        points += min(3, density * 0.8)
         if bothHands { points += 1 }
         if maxChord >= 3 { points += 0.75 }
         if maxChord >= 5 { points += 0.75 }
@@ -242,8 +243,8 @@ enum ImportDifficultyEstimator {
 
         switch points {
         case ..<2.5: return .beginner
-        case ..<4.5: return .intermediate
-        case ..<6.5: return .advanced
+        case ..<5.0: return .intermediate
+        case ..<6.75: return .advanced
         default: return .pro
         }
     }
