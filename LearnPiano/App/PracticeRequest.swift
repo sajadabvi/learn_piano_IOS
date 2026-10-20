@@ -13,6 +13,9 @@ struct PracticeRequest: Identifiable {
     /// Set for lesson exercises: instructions shown above the score and the pass criteria.
     var exerciseInstructions: String?
     var passCriteria: ExercisePassCriteria?
+    /// Custom pass rule for exercises (set by Courses). When present it replaces the default rule below, so the
+    /// practice screen's "Passed!" banner and the lesson's progress always agree.
+    var grade: ((PracticeSummary) -> Bool)?
     /// Called on the main actor whenever a session ends (stop, finish, or screen dismissed), possibly several times per screen.
     var onFinish: ((PracticeSummary) -> Void)?
 
@@ -29,6 +32,7 @@ struct PracticeRequest: Identifiable {
 
     /// Whether a summary satisfies the exercise's pass criteria (always true for songs).
     func passes(_ summary: PracticeSummary) -> Bool {
+        if let grade { return grade(summary) }
         guard let c = passCriteria else { return true }
         let accuracyOK = summary.mode == .wait ? summary.reachedEnd : summary.accuracy >= c.minimumAccuracy
         return accuracyOK && summary.wrongNotes <= c.maxWrongNotes

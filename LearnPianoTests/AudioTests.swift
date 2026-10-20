@@ -1018,7 +1018,11 @@ final class AudioHandOverTests: XCTestCase {
                 if abs(lhs.seconds - rhs.seconds) > 1e-6 { return lhs.seconds < rhs.seconds }
                 return lhs.midi < rhs.midi
             }
-            return timed.map { entry in "\(entry.midi)@" + String(format: "%.4f", entry.seconds) }
+            return timed.map { entry in
+                // Host-clock quantization can leave -0.00000x; print it as 0.0000.
+                let rounded = (entry.seconds * 10_000).rounded() / 10_000
+                return "\(entry.midi)@" + String(format: "%.4f", rounded == 0 ? 0 : rounded)
+            }
         }
         XCTAssertEqual(events(.noteOn), ["60@0.0000", "55@0.6875", "57@0.7250", "57@0.8500", "60@0.8500", "62@1.1000"],
                        "every note is struck exactly once, at its old-speed time before the cutoff and new-speed time after it")

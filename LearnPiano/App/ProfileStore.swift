@@ -79,7 +79,7 @@ final class ProfileStore {
         update { p in
             var lp = p.lessons[lessonID] ?? LessonProgress(lessonID: lessonID)
             lp.completedExerciseIDs.insert(exerciseID)
-            lp.completed = Set(allExerciseIDs).isSubset(of: lp.completedExerciseIDs)
+            lp.completed = lp.completed || Set(allExerciseIDs).isSubset(of: lp.completedExerciseIDs)
             p.lessons[lessonID] = lp
         }
     }
