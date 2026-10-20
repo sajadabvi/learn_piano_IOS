@@ -221,6 +221,14 @@ final class InputHub: NoteInputSource {
         router.clearAppSounding()
     }
 
+    /// Tells echo suppression which keys the learner is expected to play next, so a melody note that happens to
+    /// be the octave or twelfth of a note the app is sounding is not dropped as an echo (see
+    /// `InputHubEchoConfiguration.expectedPartialAttackWindow`). Call whenever the expected step changes.
+    /// Thread-safe.
+    nonisolated func setExpectedPitches(_ pitches: [Int], anyOctave: Bool = false) {
+        router.setExpectedPitches(Set(pitches), anyOctave: anyOctave)
+    }
+
     /// Echo-suppression parameters (MIDI echo window, app-sounding tail, echo intervals). Thread-safe.
     nonisolated var echoConfiguration: InputHubEchoConfiguration {
         get { router.echoConfiguration }

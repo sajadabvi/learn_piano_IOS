@@ -220,10 +220,11 @@ final class SettingsInputMonitor {
     // MARK: Audio session
 
     /// Makes sure the session allows playing and recording at once (normally done at launch by the app).
+    /// The session must also be ACTIVE before the microphone engine reads its input format: the app configures the
+    /// category at launch, so "already configured" does not mean "active" (an inactive session reports a 0-channel input).
     private func ensureAudioSession() {
-        guard !AudioSessionConfigurator.isConfigured() else { return }
         do {
-            try AudioSessionConfigurator.configure()
+            if !AudioSessionConfigurator.isConfigured() { try AudioSessionConfigurator.configure() }
             try AudioSessionConfigurator.activate()
             audioProblem = nil
         } catch {

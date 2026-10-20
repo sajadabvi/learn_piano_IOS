@@ -1,4 +1,7 @@
 import Foundation
+import os
+
+private let echoLog = Logger(subsystem: "LearnPiano", category: "InputEcho")
 
 /// Which physical input the learner uses. The on-screen keyboard is always accepted in addition.
 enum InputHubSelection: String, Codable, Hashable, CaseIterable, Sendable {
@@ -86,6 +89,11 @@ struct InputHubEchoConfiguration: Hashable, Sendable {
     var echoIntervals: Set<Int> = [0, 12, 19, 24]
     /// App-sounding intervals that ended this long before the newest one started are forgotten.
     var appSoundingRetention: TimeInterval = 5
+    /// For pitches the learner is currently expected to play, partial echoes (octave, twelfth, double octave of a
+    /// pitch the app sounds) are only suppressed this long after the app's attack: a partial's onset coincides
+    /// with the app's own strike, while a later onset on an expected key is the learner. Without this, a melody
+    /// note on the octave or fifth of the app's bass note (extremely common) would be dropped as an echo.
+    var expectedPartialAttackWindow: TimeInterval = 0.2
 
     init() {}
 }
@@ -131,6 +139,11 @@ final class InputHubRouter: @unchecked Sendable {
     private var swallowedMicrophoneKeys: Set<Int> = []
     /// Intervals during which the app itself sounds each key.
     private var appSounding: [Int: [ClosedRange<TimeInterval>]] = [:]
+    /// Keys the learner is currently expected to play (set by the practice screen); see
+    /// `InputHubEchoConfiguration.expectedPartialAttackWindow`.
+    private var expectedPitches: Set<Int> = []
+    /// When true, every octave of an expected pitch class counts as expected (octave-tolerant practice).
+    private var expectedAnyOctave = false
     private var enabled: Set<InputSourceKind>
     private var running = false
     private var sequence = 0
@@ -190,6 +203,21 @@ final class InputHubRouter: @unchecked Sendable {
         lock.withLock { appSounding.removeAll() }
     }
 
+    /// Sets the keys the learner is expected to play next (empty = none). Thread-safe.
+    func setExpectedPitches(_ pitches: Set<Int>, anyOctave: Bool) {
+        lock.withLock {
+            expectedPitches = pitches
+            expectedAnyOctave = anyOctave
+        }
+    }
+
+    private func isExpectedLocked(_ midi: Int) -> Bool {
+        if expectedPitches.contains(midi) { return true }
+        guard expectedAnyOctave else { return false }
+        let pitchClass = ((midi % 12) + 12) % 12
+        return expectedPitches.contains { (($0 % 12) + 12) % 12 == pitchClass }
+    }
+
     /// Changes the accepted kinds; keys held by kinds that are no longer accepted are released.
     /// Returns what was delivered (the releases).
     @discardableResult
@@ -222,6 +250,7 @@ final class InputHubRouter: @unchecked Sendable {
             if event.source == .microphone {
                 switch event.kind {
                 case .on where isMicrophoneEchoLocked(event):
+                    echoLog.debug("Echo dropped: microphone note-on \(event.midi) t=\(event.time, format: .fixed(precision: 3))")
                     swallowedMicrophoneKeys.insert(event.midi)
                     return Routed(events: [], snapshot: snapshotLocked())
                 case .off where swallowedMicrophoneKeys.contains(event.midi):
@@ -318,8 +347,12 @@ final class InputHubRouter: @unchecked Sendable {
                 if tracker.holders[source]?.contains(.midi) == true { return true }
                 if let on = lastMIDIOnTime[source], abs(event.time - on) <= echo.midiEchoWindow { return true }
             }
+            // A partial (not the same key) of an app note, on a key the learner is expected to play, is only an
+            // echo during the app's attack; afterwards a new onset there is the learner's.
+            let protectedAfterAttack = interval != 0 && isExpectedLocked(event.midi)
             if let intervals = appSounding[source], intervals.contains(where: {
-                event.time >= $0.lowerBound - echo.appSoundingLead && event.time <= $0.upperBound + echo.appSoundingTail
+                guard event.time >= $0.lowerBound - echo.appSoundingLead && event.time <= $0.upperBound + echo.appSoundingTail else { return false }
+                return !protectedAfterAttack || event.time <= $0.lowerBound + echo.expectedPartialAttackWindow
             }) { return true }
         }
         return false

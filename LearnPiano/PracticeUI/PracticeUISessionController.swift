@@ -140,8 +140,10 @@ final class PracticeUISessionController {
         self.hub = hub
         inputSubscription = hub.addMainActorHandler { [weak self] event in
             self?.session.handle(event)
+            self?.syncExpectedPitches()
         }
         hub.start()
+        syncExpectedPitches()
     }
 
     /// Stops the session (reporting it), the engines and the input; safe to call repeatedly.
@@ -266,7 +268,13 @@ final class PracticeUISessionController {
                                                 text: PracticeUISummaryFormatter.format(record.summary, score: session.score, request: request))
     }
 
+    /// Keeps the input hub's echo suppression aware of the keys the learner should play next.
+    private func syncExpectedPitches() {
+        hub?.setExpectedPitches(session.expectedPitches, anyOctave: session.settings.octaveTolerance)
+    }
+
     private func followerEvent(_ event: PracticeFollowerEvent) {
+        defer { syncExpectedPitches() }
         switch event {
         case .soundChord(let chord, _):
             hub?.noteAppSounding(chord)

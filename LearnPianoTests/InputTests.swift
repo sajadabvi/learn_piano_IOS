@@ -1151,3 +1151,47 @@ final class InputHubTests: XCTestCase {
         XCTAssertEqual(source.state, .idle)
     }
 }
+
+/// Echo suppression must not swallow the learner's melody notes that sit on a partial of the app's own notes.
+final class InputHubExpectedPitchEchoTests: XCTestCase {
+    private func makeRouter() -> InputHubRouter {
+        let router = InputHubRouter(selection: .microphone)
+        router.isRunning = true
+        // The app plays the left-hand C3 (MIDI 48) from t = 10 to t = 12.6 (a whole note at 92 BPM).
+        router.noteAppSounding(pitches: [48], from: 10, until: 12.6)
+        return router
+    }
+
+    func testPartialOfAppNoteIsDroppedWhenNotExpected() {
+        let router = makeRouter()
+        XCTAssertTrue(router.receive(.on(60, time: 11, source: .microphone)).events.isEmpty, "C4 = octave of C3, nobody expects it: echo")
+        XCTAssertTrue(router.receive(.on(67, time: 11.5, source: .microphone)).events.isEmpty, "G4 = twelfth of C3: echo")
+    }
+
+    func testExpectedOctaveAndTwelfthPassAfterTheAttack() {
+        let router = makeRouter()
+        router.setExpectedPitches([60], anyOctave: false)
+        XCTAssertEqual(router.receive(.on(60, time: 11, source: .microphone)).events.map(\.midi), [60], "the learner's C4 over the app's C3")
+        router.setExpectedPitches([67], anyOctave: false)
+        XCTAssertEqual(router.receive(.on(67, time: 11.8, source: .microphone)).events.map(\.midi), [67], "the learner's G4 over the app's C3")
+    }
+
+    func testExpectedPartialIsStillDroppedDuringTheAppAttack() {
+        let router = makeRouter()
+        router.setExpectedPitches([67], anyOctave: false)
+        XCTAssertTrue(router.receive(.on(67, time: 10.08, source: .microphone)).events.isEmpty,
+                      "an onset at the app's own strike is the C3's partial, even if G4 is expected")
+    }
+
+    func testSameKeyAsTheAppIsAlwaysAnEcho() {
+        let router = makeRouter()
+        router.setExpectedPitches([48], anyOctave: false)
+        XCTAssertTrue(router.receive(.on(48, time: 11, source: .microphone)).events.isEmpty, "unison with the app cannot be told apart")
+    }
+
+    func testOctaveTolerantExpectationProtectsEveryOctave() {
+        let router = makeRouter()
+        router.setExpectedPitches([72], anyOctave: true)
+        XCTAssertEqual(router.receive(.on(60, time: 11, source: .microphone)).events.map(\.midi), [60])
+    }
+}
