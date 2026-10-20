@@ -6,8 +6,14 @@ import SwiftUI
 /// Both halves receive the same `visibleRange` and animate range changes with identical timing, so the
 /// lanes stay aligned with the keys while zooming or scrolling.
 // INTEGRATION: PracticeUI composes this with `KeyboardKeyStateMapper.states(from: snapshot, timeline:)`
-// for `keyStates`, the player's `positionTick` (or the Wait-Mode cursor tick) for `currentTick`,
-// `timeline.tickRange(of: settings.loop)` for `loopTicks` (nil when no loop is set), and routes
+// for `keyStates` (pass the same `PlaybackTimeline` the snapshot refers to; the mapper caches its event index,
+// or keep a `KeyboardKeyStateMapper.EventIndex(timeline:)` and pass it as `eventIndex:`).
+// Lane position: pass `tickProvider: { player.positionTick }` (AudioScorePlayer interpolates it) and
+// `isPlaying: player.isPlaying` (or the session's transport == .playing) so the falling notes are sampled at
+// the display rate (120 Hz on ProMotion) inside the lanes only; do NOT wrap the stage in a TimelineView, which
+// would re-evaluate KeyboardView every frame. While nothing is playing (Wait Mode standing at a step, paused),
+// either keep the provider with `isPlaying: false` or pass the session's cursor tick as `currentTick` with no
+// provider. Pass `timeline.tickRange(of: settings.loop)` for `loopTicks` (nil when no loop is set), and route
 // `onNoteEvent` into the Input hub. While the learner drags `KeyboardMiniMap`, pass `isRangeInteractive: true`
 // (from the mini map's `onDragActiveChanged`) so the keys and lanes track the finger.
 struct KeyboardStageView: View {
@@ -15,7 +21,12 @@ struct KeyboardStageView: View {
     var keyStates: [Int: KeyboardKeyState] = [:]
     /// Timeline for the lanes; nil hides the notes but keeps the lane area.
     var timeline: PlaybackTimeline? = nil
+    /// Static lane position, used when `tickProvider` is nil.
     var currentTick: Double = 0
+    /// Per-frame lane position source (see `KeyboardLanesView`); overrides `currentTick`.
+    var tickProvider: (@MainActor () -> Double)? = nil
+    /// Runs the lanes' display-rate loop so `tickProvider` is sampled every frame.
+    var isPlaying: Bool = false
     var lookaheadTicks: Ticks = Ticks.perQuarter * 8
     /// Vertical lane scale; nil fits `lookaheadTicks` into `laneHeight`.
     var pixelsPerTick: CGFloat? = nil
@@ -39,6 +50,8 @@ struct KeyboardStageView: View {
             if laneHeight > 0 {
                 KeyboardLanesView(timeline: timeline,
                                   currentTick: currentTick,
+                                  tickProvider: tickProvider,
+                                  isPlaying: isPlaying,
                                   lookaheadTicks: lookaheadTicks,
                                   pixelsPerTick: pixelsPerTick,
                                   visibleRange: visibleRange,

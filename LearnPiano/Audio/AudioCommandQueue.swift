@@ -48,9 +48,10 @@ enum AudioHostClock {
 struct AudioRenderCommand: Equatable {
     /// What to do.
     enum Kind: UInt8, Equatable {
-        /// Start a note (`midi`, `value` = velocity 0…1).
+        /// Start a note (`midi`, `value` = velocity 0…1, optional `strikeID` naming this strike).
         case noteOn
-        /// Release a note (`midi`).
+        /// Release a note (`midi`). With a non-zero `strikeID` only the voice started by that strike is released;
+        /// with `strikeID` 0 every voice of the key started by the same producer `tag` is released.
         case noteOff
         /// Release every sounding note.
         case allNotesOff
@@ -73,15 +74,22 @@ struct AudioRenderCommand: Equatable {
     var value: Float
     /// Host time (raw ticks) at which the command becomes due; 0 = as soon as possible.
     var hostTime: UInt64
-    /// Producer tag so a client (player, metronome) can cancel only its own pending commands. 0 = untagged.
+    /// Producer tag so a client (player, metronome) can cancel only its own pending commands. 0 = untagged
+    /// (immediate notes).
     var tag: UInt32
+    /// Identity of one strike, so its release cannot cut a later strike of the same key. 0 = anonymous: the
+    /// note-off then releases every voice of the key that carries the same `tag`.
+    var strikeID: UInt32 = 0
 
-    static func noteOn(_ midi: Int, velocity: Double, hostTime: UInt64 = 0, tag: UInt32 = 0) -> AudioRenderCommand {
-        AudioRenderCommand(kind: .noteOn, midi: UInt8(clamping: midi), value: Float(max(0, min(1, velocity))), hostTime: hostTime, tag: tag)
+    /// A note-on; pass a fresh `strikeID` (see `AudioRenderCommandSink.makeStrikeID()`) to release it individually.
+    static func noteOn(_ midi: Int, velocity: Double, hostTime: UInt64 = 0, tag: UInt32 = 0, strikeID: UInt32 = 0) -> AudioRenderCommand {
+        AudioRenderCommand(kind: .noteOn, midi: UInt8(clamping: midi), value: Float(max(0, min(1, velocity))), hostTime: hostTime, tag: tag, strikeID: strikeID)
     }
-    static func noteOff(_ midi: Int, hostTime: UInt64 = 0, tag: UInt32 = 0) -> AudioRenderCommand {
-        AudioRenderCommand(kind: .noteOff, midi: UInt8(clamping: midi), value: 0, hostTime: hostTime, tag: tag)
+    /// A note-off; a non-zero `strikeID` releases only that strike, 0 releases the key for `tag`.
+    static func noteOff(_ midi: Int, hostTime: UInt64 = 0, tag: UInt32 = 0, strikeID: UInt32 = 0) -> AudioRenderCommand {
+        AudioRenderCommand(kind: .noteOff, midi: UInt8(clamping: midi), value: 0, hostTime: hostTime, tag: tag, strikeID: strikeID)
     }
+    /// Releases every sounding note, whatever its producer.
     static func allNotesOff(hostTime: UInt64 = 0) -> AudioRenderCommand {
         AudioRenderCommand(kind: .allNotesOff, midi: 0, value: 0, hostTime: hostTime, tag: 0)
     }
@@ -89,11 +97,25 @@ struct AudioRenderCommand: Equatable {
     static func cancelPending(tag: UInt32, cutoffHostTime: UInt64 = 0) -> AudioRenderCommand {
         AudioRenderCommand(kind: .cancelPending, midi: 0, value: 0, hostTime: cutoffHostTime, tag: tag)
     }
+    /// See `Kind.flushPending`.
     static func flushPending(tag: UInt32) -> AudioRenderCommand {
         AudioRenderCommand(kind: .flushPending, midi: 0, value: 0, hostTime: 0, tag: tag)
     }
+    /// A metronome click.
     static func click(accented: Bool, hostTime: UInt64 = 0, tag: UInt32 = 0) -> AudioRenderCommand {
         AudioRenderCommand(kind: .click, midi: 0, value: accented ? 1 : 0, hostTime: hostTime, tag: tag)
+    }
+
+    /// Whether the command is still worth applying after the render thread was not running: control commands
+    /// always are (they act on what is pending), timed commands only when they are due after `hostTime`.
+    /// Commands with host time 0 ("as soon as possible") that waited for a stopped engine are stale.
+    func isFresh(atHostTime hostTime: UInt64) -> Bool {
+        switch kind {
+        case .cancelPending, .flushPending:
+            return true
+        case .noteOn, .noteOff, .click, .allNotesOff:
+            return self.hostTime != 0 && self.hostTime > hostTime
+        }
     }
 }
 
@@ -159,27 +181,54 @@ final class AudioCommandQueue: @unchecked Sendable {
 
     /// Whether the queue currently holds no commands (approximate).
     var isEmpty: Bool { approximateCount == 0 }
+
+    /// Drops the commands that went stale while no render callback was draining the queue, keeping the
+    /// future-dated ones in their original order (see `AudioRenderCommand.isFresh(atHostTime:)`). Returns the
+    /// number of commands dropped.
+    ///
+    /// Consumer-side operation: call it only while the render thread is not running (engine stopped), e.g.
+    /// right before `AVAudioEngine.start()`. Producers may keep pushing meanwhile.
+    @discardableResult
+    func discardStale(atHostTime now: UInt64) -> Int {
+        var kept: [AudioRenderCommand] = []
+        var dropped = 0
+        while let command = pop() {
+            if command.isFresh(atHostTime: now) { kept.append(command) } else { dropped += 1 }
+        }
+        for command in kept where !push(command) { dropped += 1 }
+        return dropped
+    }
 }
 
 /// Thread-safe front door to the synth's render thread. The main actor (immediate notes), the score
 /// player's scheduler thread and the metronome all push through the same sink.
 final class AudioRenderCommandSink: @unchecked Sendable {
     let queue: AudioCommandQueue
+    /// Last strike identity handed out (0 is reserved for anonymous strikes).
+    private let strikeCounter = Atomic<UInt32>(0)
 
     init(queue: AudioCommandQueue = AudioCommandQueue()) { self.queue = queue }
 
-    /// Starts a note at `hostTime` (0 = now).
-    @discardableResult
-    func noteOn(_ midi: Int, velocity: Double, hostTime: UInt64 = 0, tag: UInt32 = 0) -> Bool {
-        guard (0...127).contains(midi) else { return false }
-        return queue.push(.noteOn(midi, velocity: velocity, hostTime: hostTime, tag: tag))
+    /// A fresh, non-zero strike identity (wraps after 2³² − 1 strikes, skipping 0). Thread-safe.
+    func makeStrikeID() -> UInt32 {
+        while true {
+            let id = strikeCounter.wrappingAdd(1, ordering: .relaxed).newValue
+            if id != 0 { return id }
+        }
     }
 
-    /// Releases a note at `hostTime` (0 = now).
+    /// Starts a note at `hostTime` (0 = now). See `AudioRenderCommand.strikeID`.
     @discardableResult
-    func noteOff(_ midi: Int, hostTime: UInt64 = 0, tag: UInt32 = 0) -> Bool {
+    func noteOn(_ midi: Int, velocity: Double, hostTime: UInt64 = 0, tag: UInt32 = 0, strikeID: UInt32 = 0) -> Bool {
         guard (0...127).contains(midi) else { return false }
-        return queue.push(.noteOff(midi, hostTime: hostTime, tag: tag))
+        return queue.push(.noteOn(midi, velocity: velocity, hostTime: hostTime, tag: tag, strikeID: strikeID))
+    }
+
+    /// Releases a note at `hostTime` (0 = now): only the strike `strikeID`, or with 0 the key for `tag`.
+    @discardableResult
+    func noteOff(_ midi: Int, hostTime: UInt64 = 0, tag: UInt32 = 0, strikeID: UInt32 = 0) -> Bool {
+        guard (0...127).contains(midi) else { return false }
+        return queue.push(.noteOff(midi, hostTime: hostTime, tag: tag, strikeID: strikeID))
     }
 
     /// Releases every sounding note at `hostTime` (0 = now).
@@ -205,13 +254,22 @@ final class AudioRenderCommandSink: @unchecked Sendable {
     }
 
     /// Sounds a chord at `hostTime` and releases it `durationSeconds` later (at least 30 ms).
-    func playChord(_ pitches: [Int], velocity: Double, durationSeconds: Double, hostTime: UInt64 = 0, tag: UInt32 = 0) {
+    ///
+    /// Every pitch is a separate *strike* with its own identity, and its scheduled release names that strike,
+    /// so an earlier chord's release never cuts a newer strike of the same key (Wait Mode re-strikes the other
+    /// hand's notes before their notated length has elapsed). Returns the strike identities, sorted by pitch.
+    @discardableResult
+    func playChord(_ pitches: [Int], velocity: Double, durationSeconds: Double, hostTime: UInt64 = 0, tag: UInt32 = 0) -> [UInt32] {
         let start = hostTime == 0 ? AudioHostClock.now() : hostTime
         let length = durationSeconds.isFinite ? max(0.03, durationSeconds) : 0.8
         let end = AudioHostClock.hostTime(forSeconds: AudioHostClock.seconds(forHostTime: start) + length)
-        for p in Set(pitches) {
-            noteOn(p, velocity: velocity, hostTime: hostTime, tag: tag)
-            noteOff(p, hostTime: end, tag: tag)
+        var ids: [UInt32] = []
+        for p in Set(pitches).sorted() where (0...127).contains(p) {
+            let id = makeStrikeID()
+            noteOn(p, velocity: velocity, hostTime: hostTime, tag: tag, strikeID: id)
+            noteOff(p, hostTime: end, tag: tag, strikeID: id)
+            ids.append(id)
         }
+        return ids
     }
 }

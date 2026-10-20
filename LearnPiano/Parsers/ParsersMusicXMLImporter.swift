@@ -322,8 +322,12 @@ final class ParsersMusicXMLSAXDelegate: NSObject, XMLParserDelegate {
 
 /// Imports MusicXML 3.x/4.0 (`.musicxml`, `.xml`) and compressed MusicXML (`.mxl`) into a Core `Score`.
 ///
-/// Right hand = staff 1 of a two-staff part (or the first part when the parts are single-staff);
-/// left hand = staff 2 (or the second part). Repeats and volta endings are kept as `Barline`
+/// Right hand = staff 1 of a two-staff part, left hand = staff 2 (the voice decides instead when the part uses the
+/// usual 1–4 / 5–8 voice numbering on both staves, which keeps cross-staff notes in their hand). Next to a two-staff
+/// part, a single-staff part goes to the hand its clef suggests; when every part is single-staff, the first is the
+/// right hand and the others the left. Parts sharing a hand get disjoint voice numbers (with a warning), so their
+/// events never overlap within one voice. Clef changes are reported but not kept (Core has no clef concept).
+/// Repeats and volta endings are kept as `Barline`
 /// structure so `Score.makeTimeline()` can expand them. Grace notes are dropped. Unsupported or
 /// inconsistent content produces measure-numbered diagnostics instead of failing the import.
 struct ParsersMusicXMLImporter: ScoreImporter, Sendable {
@@ -463,13 +467,29 @@ struct ParsersMusicXMLScoreBuilder {
         let profiles = orderedParts.map { profile(of: $0) }
         let notedProfiles = profiles.filter { $0.hasPitchedNotes }
         guard !notedProfiles.isEmpty else { throw ImportError.empty }
-        if notedProfiles.count > 2 {
-            log.add(.warning, "The file has \(notedProfiles.count) parts with notes; parts after the second are merged into the left hand.")
-        }
+        let layout = PartLayout(notedPartCount: notedProfiles.count, hasGrandStaffPart: notedProfiles.contains { $0.usesTwoStaves })
 
+        // Parts that share a hand get disjoint voice numbers: each later part's voices are numbered after the highest
+        // voice the earlier parts used in that hand (so a melody part plus a grand-staff piano part never collide).
         var perPart: [[PartMeasure]] = []
+        var voiceBase: [Hand: Int] = [.right: 0, .left: 0]
+        var handOwners: [Hand: [String]] = [.right: [], .left: []]
         for (rank, profile) in notedProfiles.enumerated() {
-            perPart.append(processPart(profile, rank: rank, notedPartCount: notedProfiles.count, log: &log))
+            let processed = processPart(profile, rank: rank, layout: layout, voiceOffset: voiceBase, log: &log)
+            perPart.append(processed.measures)
+            for hand in Hand.allCases {
+                let used = processed.maxVoice[hand] ?? 0
+                guard used > 0 else { continue }
+                voiceBase[hand, default: 0] += used
+                handOwners[hand, default: []].append(partLabel(profile.part))
+            }
+        }
+        for hand in Hand.allCases {
+            let owners = handOwners[hand] ?? []
+            if owners.count > 1 {
+                let list = owners.map { "\"\($0)\"" }.joined(separator: ", ")
+                log.add(.warning, "Parts \(list) are all placed in the \(hand.displayName.lowercased()); each later part's voices are numbered after the earlier ones'.")
+            }
         }
         let measureCount = perPart.map { $0.count }.max() ?? 0
         if Set(perPart.map { $0.count }).count > 1 {
@@ -564,6 +584,19 @@ struct ParsersMusicXMLScoreBuilder {
         return cleaned.isEmpty ? "Imported score" : cleaned
     }
 
+    /// How single-staff parts are distributed over the hands.
+    private struct PartLayout {
+        var notedPartCount: Int
+        /// Some part is a two-staff (grand staff) piano part; single-staff parts are then placed by their clef.
+        var hasGrandStaffPart: Bool
+    }
+
+    /// Display name of a part for messages: its `<part-name>` when present, otherwise its id.
+    private func partLabel(_ part: ParsersMusicXMLRawPart) -> String {
+        let name = document.partList.first { $0.id == part.id }?.name.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return name.isEmpty ? part.id : name
+    }
+
     // MARK: Part analysis
 
     private func orderParts() -> [ParsersMusicXMLRawPart] {
@@ -601,17 +634,7 @@ struct ParsersMusicXMLScoreBuilder {
             if case .note(let n) = item, !n.isGrace, !n.isCue { return n }
             return nil
         } }
-        // Conventional voice layout: at least 80 % of the notes have voice 1–4 on staff 1 or 5–8 on staff 2.
-        var conventional = false
-        if twoStaves, !notes.isEmpty {
-            let agreeing = notes.filter { n in
-                guard let v = Int(n.voice ?? "") else { return false }
-                let staff = n.staff ?? 1
-                return (staff == 1 && (1...4).contains(v)) || (staff == 2 && (5...8).contains(v))
-            }.count
-            let allNumeric = notes.allSatisfy { n in Int(n.voice ?? "").map { (1...8).contains($0) } ?? false }
-            conventional = allNumeric && Double(agreeing) >= 0.8 * Double(notes.count)
-        }
+        let conventional = twoStaves && ParsersMusicXMLScoreBuilder.usesConventionalVoices(notes)
         // Collect voice ids per hand (hand depends on the staff layout only; part rank is applied later).
         var rawVoices: [Hand: [String]] = [.right: [], .left: []]
         for n in notes {
@@ -638,15 +661,43 @@ struct ParsersMusicXMLScoreBuilder {
                            voiceIDs: rawVoices, conventionalVoices: conventional, conventionalVoiceNumbers: conventionalNumbers)
     }
 
+    /// Whether a two-staff part follows the usual voice numbering (voices 1–4 on staff 1, 5–8 on staff 2), so that the
+    /// voice decides the hand and a note whose staff disagrees is cross-staff writing.
+    ///
+    /// Agreement is measured per staff, so a part dominated by right-hand notes cannot outvote a lower staff that uses
+    /// voice 2: every voice id must be numeric (1–8), at least 80 % of the staff-1 notes must use voices 1–4, at least
+    /// 50 % of the staff-2 notes must use voices 5–8, and at least one staff-2 note must use voices 5–8. Otherwise the
+    /// staff decides the hand.
+    static func usesConventionalVoices(_ notes: [ParsersMusicXMLRawNote]) -> Bool {
+        guard !notes.isEmpty else { return false }
+        let allNumeric = notes.allSatisfy { n in Int(n.voice ?? "").map { (1...8).contains($0) } ?? false }
+        guard allNumeric else { return false }
+        func voice(_ n: ParsersMusicXMLRawNote) -> Int { Int(n.voice ?? "") ?? 0 }
+        let upper = notes.filter { ($0.staff ?? 1) == 1 }
+        let lower = notes.filter { $0.staff == 2 }
+        let upperAgreeing = upper.filter { (1...4).contains(voice($0)) }.count
+        let lowerAgreeing = lower.filter { (5...8).contains(voice($0)) }.count
+        guard lowerAgreeing >= 1 else { return false }
+        return Double(upperAgreeing) >= 0.8 * Double(upper.count) && Double(lowerAgreeing) >= 0.5 * Double(lower.count)
+    }
+
     // MARK: Part processing
 
-    private func processPart(_ profile: PartProfile, rank: Int, notedPartCount: Int, log: inout ParsersDiagnosticLog) -> [PartMeasure] {
+    /// Converts one part's measures. `voiceOffset` is added to every Core voice number of the given hand (the voices
+    /// earlier parts already use there); the result reports the highest voice this part used per hand, before the offset.
+    private func processPart(_ profile: PartProfile, rank: Int, layout: PartLayout, voiceOffset: [Hand: Int],
+                             log: inout ParsersDiagnosticLog) -> (measures: [PartMeasure], maxVoice: [Hand: Int]) {
         var out: [PartMeasure] = []
+        var maxVoice: [Hand: Int] = [:]
         var converter: ParsersTickConverter? = nil
         var openEndings: [Int] = []
         var warnedStaff3 = false
         var droppedGrace = 0
         var droppedCue = 0
+        /// Clef in force per staff number, to report clef changes (Core has no clef concept: staff 1 is drawn in treble
+        /// clef and staff 2 in bass clef, and a staff's notes keep their hand whatever its clef).
+        var clefByStaff: [Int: ParsersMusicXMLRawClef] = [:]
+        var clefChangeMeasures: [Int] = []
 
         /// Hand for a note of this part and whether it is drawn on the other hand's staff (cross-staff writing).
         func placement(staff: Int?, voice: String?) -> (hand: Hand, crossStaff: Bool) {
@@ -662,8 +713,10 @@ struct ParsersMusicXMLScoreBuilder {
                 }
                 return (staffHand, false)
             }
-            if notedPartCount >= 2 { return (rank == 0 ? .right : .left, false) }
-            return (profile.firstClefIsBass ? .left : .right, false)
+            // Next to a grand-staff piano part, a single-staff part (a melody, a bass line) goes where its clef puts it.
+            if layout.hasGrandStaffPart || layout.notedPartCount < 2 { return (profile.firstClefIsBass ? .left : .right, false) }
+            // Only single-staff parts: the first is the right hand, the others the left.
+            return (rank == 0 ? .right : .left, false)
         }
 
         /// Core voice number (1 = main) for a raw voice id. Single-staff parts always report the voices under the hand they map to.
@@ -690,6 +743,13 @@ struct ParsersMusicXMLScoreBuilder {
             for item in raw.items {
                 switch item {
                 case .attributes(let a):
+                    for clef in a.clefs {
+                        if let previous = clefByStaff[clef.number], previous.sign != clef.sign || previous.line != clef.line,
+                           clefChangeMeasures.last != mi {
+                            clefChangeMeasures.append(mi)
+                        }
+                        clefByStaff[clef.number] = clef
+                    }
                     if let d = a.divisions {
                         if d > 0 { converter = ParsersTickConverter(divisions: d) } else { log.add(.error, measureIndex: mi, "Invalid <divisions> value \(d).") }
                     }
@@ -742,7 +802,8 @@ struct ParsersMusicXMLScoreBuilder {
                     }
                     let place = placement(staff: n.staff, voice: n.voice)
                     let noteHand = place.hand
-                    let noteVoice = voiceNumber(n.voice, hand: noteHand)
+                    let partVoice = voiceNumber(n.voice, hand: noteHand)
+                    let noteVoice = partVoice + (voiceOffset[noteHand] ?? 0)
                     // Pitch
                     var chordNote: ChordNote? = nil
                     if !n.isRest {
@@ -822,13 +883,20 @@ struct ParsersMusicXMLScoreBuilder {
 
             pm.barline.endings = measureEndings
             if closeEndingsAfter { openEndings = [] }
+            for e in events {
+                maxVoice[e.hand] = max(maxVoice[e.hand] ?? 0, e.voice - (voiceOffset[e.hand] ?? 0))
+            }
             pm.events = events
             out.append(pm)
         }
         if droppedGrace > 0 { log.add(.info, "\(droppedGrace) grace note(s) were dropped (they are not practised).") }
         if droppedCue > 0 { log.add(.info, "\(droppedCue) cue note(s) were dropped.") }
+        if let first = clefChangeMeasures.first {
+            let where_ = clefChangeMeasures.count == 1 ? "measure \(first + 1)" : "\(clefChangeMeasures.count) places (first in measure \(first + 1))"
+            log.add(.info, measureIndex: first, "Part \(partLabel(profile.part)) changes clef in \(where_); clef changes are not kept (staff 1 is shown in treble clef, staff 2 in bass clef), and the notes keep their hand and pitch.")
+        }
         if converter == nil { log.add(.error, measureIndex: 0, "Part \(profile.part.id) never defines <divisions>.") }
-        return out
+        return (out, maxVoice)
     }
 
     /// The notated value for a note when `<type>` (+ dots + tuplet) matches its tick length exactly; otherwise nil so

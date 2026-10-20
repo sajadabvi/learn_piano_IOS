@@ -22,6 +22,9 @@ import Foundation
 ///   `gap`. The gap lasts `seconds(step k → step k+1, speed) × waitModeRestScale`; other-hand events whose
 ///   onsets fall in the gap are sounded at their scaled offsets. A zero-length gap resolves immediately.
 /// * Note-ons during a gap that match the next step are credited when it becomes current (early attacks).
+///   The chord state of the completed step is cleared when the gap opens, so during a gap `missingPitches`,
+///   `satisfiedPitches` and `feedback()` describe the approached step from its early attacks only (a repeated
+///   note is shown as expected again, not as already correct; the just-played step keeps its correct flash).
 /// * Held keys (`PracticeWaitOptions.creditsHeldKeys`): a key still down when a step becomes current is
 ///   credited at most once per physical press (`creditedHeld`), so holding a key cannot replay a loop by itself.
 ///
@@ -113,11 +116,18 @@ final class PracticeWaitFollower {
     /// Pitches the learner must play for the current step.
     var expectedPitches: [Int] { currentPosition.map { material.expected[$0] } ?? [] }
 
-    /// Pitches of the current step not yet satisfied.
-    var missingPitches: [Int] { expectedPitches.filter { satisfied[$0] == nil } }
+    /// Pitches of the current step not yet satisfied (during a gap: not yet attacked early).
+    var missingPitches: [Int] { expectedPitches.filter { !isSatisfied($0) } }
 
-    /// Pitches of the current step already satisfied.
-    var satisfiedPitches: [Int] { expectedPitches.filter { satisfied[$0] != nil } }
+    /// Pitches of the current step already satisfied (during a gap: attacked early).
+    var satisfiedPitches: [Int] { expectedPitches.filter { isSatisfied($0) } }
+
+    /// Whether an expected pitch of the current step counts as played: from the chord state while waiting,
+    /// from the early-attack buffer during the gap before the step (the completed step's state is gone).
+    private func isSatisfied(_ pitch: Int) -> Bool {
+        if case .gap = phase { return earlyAttacks[pitch] != nil }
+        return satisfied[pitch] != nil
+    }
 
     var isFinished: Bool { phase == .finished }
 
@@ -252,10 +262,10 @@ final class PracticeWaitFollower {
             let step = material.steps[k]
             current = step.index
             let expected = material.expected[k]
-            for p in expected { keys[p] = satisfied[p] != nil ? .correct : .expected }
-            missing = expected.filter { satisfied[$0] == nil }
+            for p in expected { keys[p] = isSatisfied(p) ? .correct : .expected }
+            missing = expected.filter { !isSatisfied($0) }
             for e in step.events where material.hands.includes(e.hand) && !e.attackPitches.isEmpty {
-                events[e.id] = e.attackPitches.allSatisfy { satisfied[$0] != nil } ? .correct : .expected
+                events[e.id] = e.attackPitches.allSatisfy { isSatisfied($0) } ? .correct : .expected
             }
             if options.upcomingSteps > 0 {
                 for j in (k + 1)...(k + options.upcomingSteps) where j < material.steps.count {
@@ -348,6 +358,11 @@ final class PracticeWaitFollower {
         if wrongsInStep > 0 { statistics.stepsWithMistakes += 1 }
         wrongsInStep = 0
         records.append(record)
+        // The step is done: its chord state must not leak into the next step's display during the gap
+        // (with repeated notes it would show the next note as already correct). `recentCorrectEvents` keeps
+        // the just-played step's flash.
+        satisfied = [:]
+        windowStart = nil
         var out: [PracticeFollowerEvent] = [.played(record)]
         for e in step.events where material.hands.includes(e.hand) && !e.attackPitches.isEmpty { recentCorrectEvents[e.id] = now }
         if settings.playOtherHands {

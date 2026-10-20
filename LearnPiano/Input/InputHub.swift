@@ -5,7 +5,8 @@ import Observation
 ///
 /// Merges any number of `NoteInputSource`s (CoreMIDI, microphone, on-screen keyboard), accepts only the
 /// kinds the learner selected (the on-screen keyboard is always accepted), de-duplicates keys held by
-/// several sources, and tracks which keys are held. It is itself a `NoteInputSource`, so anything written
+/// several sources, drops microphone echoes of the MIDI keyboard and of the app's own playback
+/// (`noteAppSounding(pitches:from:until:)`), and tracks which keys are held. It is itself a `NoteInputSource`, so anything written
 /// against the Core protocol can consume it.
 ///
 /// Delivery paths (pick one per consumer):
@@ -187,6 +188,43 @@ final class InputHub: NoteInputSource {
             guard !routed.events.isEmpty else { return }
             InputMainActor.run { [weak self] in self?.applyRouted(routed) }
         }
+    }
+
+    // MARK: Echo suppression (the app's own playback)
+
+    // INTEGRATION: the microphone hears the app's speaker. App/PracticeUI must register everything the app
+    // sounds so it is not reported as the learner's playing:
+    // - in `ScorePlaybackControlling.onEventStarted` (Just Play accompaniment, Listen):
+    //   `hub.noteAppSounding(pitches: event.pitches, from: InputClock.now, until: InputClock.now + seconds)`,
+    //   where `seconds` is the event's duration from the timeline's tempo map at the current speed;
+    // - next to every `ScorePlaybackControlling.playImmediately(chord)` (Wait Mode's other hands):
+    //   `hub.noteAppSounding(chord)`;
+    // - `hub.clearAppSounding()` when playback stops or seeks.
+    // Times are on the Input clock (`InputClock.now`, the `NoteInputEvent.time` clock = system uptime).
+
+    /// Registers that the app itself sounds `pitches` (MIDI numbers) from `from` until `until` (Input clock
+    /// seconds). Microphone note-ons on those keys, or on their octave, twelfth or double octave, during that
+    /// interval plus a short decay tail are dropped (`InputHubEchoConfiguration`). MIDI and on-screen input are
+    /// never affected. Thread-safe.
+    nonisolated func noteAppSounding(pitches: [Int], from: TimeInterval, until: TimeInterval) {
+        router.noteAppSounding(pitches: pitches, from: from, until: until)
+    }
+
+    /// Registers a chord the app plays right now through `ScorePlaybackControlling.playImmediately`
+    /// (see `noteAppSounding(pitches:from:until:)`). Thread-safe.
+    nonisolated func noteAppSounding(_ chord: ImmediateChord, at time: TimeInterval = InputClock.now) {
+        router.noteAppSounding(pitches: chord.pitches, from: time, until: time + max(0, chord.durationSeconds))
+    }
+
+    /// Forgets every `noteAppSounding` registration (playback stopped or seeked). Thread-safe.
+    nonisolated func clearAppSounding() {
+        router.clearAppSounding()
+    }
+
+    /// Echo-suppression parameters (MIDI echo window, app-sounding tail, echo intervals). Thread-safe.
+    nonisolated var echoConfiguration: InputHubEchoConfiguration {
+        get { router.echoConfiguration }
+        set { router.echoConfiguration = newValue }
     }
 
     // MARK: Subscriptions

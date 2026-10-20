@@ -175,6 +175,7 @@ struct NotationScrollStage: View {
 
     @State private var viewportWidth: CGFloat = 0
     @State private var transition = NotationScrollTransition()
+    @State private var clock = NotationScrollClock()
     @State private var panOffset: CGFloat = 0
     @State private var panBase: CGFloat?
     @State private var selection = NotationSelectionTracker()
@@ -203,6 +204,7 @@ struct NotationScrollStage: View {
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { viewportWidth = $0 }
         .onChange(of: NotationScrollSample(tick: highlight.positionTick, measureIndex: state.cursor?.measureIndex, offset: target)) { old, new in
             let t = Date().timeIntervalSinceReferenceDate
+            let sinceLast = clock.tick(at: t)
             if new.tick != old.tick, panOffset != 0, panBase == nil {
                 // Playback moved while the score was panned by hand: glide back to the cursor.
                 let displayed = displayedOffset(target: old.offset, at: t)
@@ -210,11 +212,11 @@ struct NotationScrollStage: View {
                 transition = .starting(from: displayed, at: t)
                 return
             }
-            // Same tick with a new offset is a layout or viewport change: follow it directly.
-            guard new.offset != old.offset, new.tick != old.tick else { return }
             let pulse = old.measureIndex.flatMap { plan.layout.measures.indices.contains($0) ? plan.layout.measures[$0].timeSignature.pulseTicks : nil } ?? Ticks.perQuarter
-            guard NotationScrollTransition.isJump(fromTick: old.tick, toTick: new.tick, fromMeasure: old.measureIndex, toMeasure: new.measureIndex, pulseTicks: pulse) else { return }
-            transition = .starting(from: displayedOffset(target: old.offset, at: t), at: t)
+            if let next = transition.next(from: old, to: new, displayedOld: displayedOffset(target: old.offset, at: t),
+                                          viewportWidth: viewportWidth, pulseTicks: pulse, sinceLastUpdate: sinceLast, at: t) {
+                transition = next
+            }
         }
         .task(id: transition) {
             // Re-evaluate once the easing has finished so the timeline pauses.
@@ -271,16 +273,6 @@ struct NotationScrollStage: View {
             }
             .onEnded { _ in panBase = nil }
     }
-}
-
-/// The inputs the scroll stage compares between updates to decide whether an offset change is a jump.
-struct NotationScrollSample: Equatable {
-    /// Playback position in timeline ticks.
-    var tick: Double
-    /// Measure under the cursor.
-    var measureIndex: Int?
-    /// Automatic scroll offset (points) for this position.
-    var offset: CGFloat
 }
 
 // MARK: - Page stage

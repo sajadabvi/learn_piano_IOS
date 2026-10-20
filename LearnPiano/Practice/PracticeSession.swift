@@ -20,8 +20,14 @@ import Observation
 /// * Just Play: note-ons during the count-in are buffered; those within one timing window of the downbeat
 ///   are replayed into the follower when the transport starts and judged as early against the first step,
 ///   so landing the first note a little early is not lost (also after resuming from pause).
-/// * A statistics "session" runs from the first `play()` to `stop()` or `finished`. Settings changes in the
-///   middle (mode, hands, speed, loop…) rebuild the follower at the current position and keep the counters.
+/// * A statistics "session" runs from the first `play()` to `stop()` or `finished`, under one mode, hands,
+///   speed and loop (the fields Core's `PracticeSummary` carries). Changing any of those mid-session ends the
+///   running session with the previous settings (a `PracticeSessionRecord` is emitted, `reachedEnd == false`)
+///   and the transport continues at the cursor in a fresh session. Other structural changes (octave
+///   tolerance, windows, rest scale, other-hands demo) rebuild the follower at the cursor and keep the counters.
+/// * `reachedEnd` is reported only when the learner covered the whole piece in the session: it started at the
+///   first step with no loop and never jumped forward (forward seek, phrase skip, Just Play forward re-sync).
+///   Jumping back to the very start restores coverage. Listen mode never reports `reachedEnd`.
 ///
 /// ## Driving
 /// All timing comes from the injected `PracticeClock`. With `drivesItself` (the default in the app) the
@@ -159,6 +165,9 @@ final class PracticeSession {
     @ObservationIgnored private var accumulatedSeconds: Double = 0
     @ObservationIgnored private var playingSince: TimeInterval?
     @ObservationIgnored private var needsFreshSession = true
+    /// Whether the learner has played the current statistics session continuously from the first step of the
+    /// whole piece (no loop, no forward jump). `reachedEnd` is only reported when this holds.
+    @ObservationIgnored private var coveredFromStart = false
     /// Clock-driven count-in when no metronome is attached.
     @ObservationIgnored private var countInStartedAt: TimeInterval?
     @ObservationIgnored private var countInBeatSeconds: Double = 0
@@ -224,7 +233,8 @@ final class PracticeSession {
         case .playing, .countingIn:
             return
         case .paused:
-            if hasFollowerForMode { resumeFromPause() } else { begin(resuming: false) }
+            // A settings change while paused may have ended the statistics session: start a new one.
+            if hasFollowerForMode, !needsFreshSession { resumeFromPause() } else { begin(resuming: false) }
         case .finished:
             startTick = material.tickRange.lowerBound
             begin(resuming: false)
@@ -411,8 +421,14 @@ final class PracticeSession {
 
     /// Starts the transport at `startTick` in the current mode (count-in first for timed modes).
     private func begin(resuming: Bool) {
-        if needsFreshSession { startStatisticsSession() }
+        let fresh = needsFreshSession
+        if fresh { startStatisticsSession() }
         startTick = clampedIntoLoop(startTick)
+        if isAtPieceStart(startTick) {
+            coveredFromStart = true
+        } else if fresh {
+            coveredFromStart = false
+        }
         if settings.mode != .wait, settings.countInMeasures > 0 {
             beginCountIn(resuming: resuming)
         } else {
@@ -431,7 +447,25 @@ final class PracticeSession {
         playingSince = nil
         loopsCompleted = 0
         lastPlayed = nil
+        coveredFromStart = false
         sessionStartedAt = dateProvider()
+    }
+
+    /// Whether starting at `tick` plays the whole piece: no loop and at/before the first step of the material.
+    private func isAtPieceStart(_ tick: Ticks) -> Bool {
+        guard settings.loop == nil else { return false }
+        return tick <= (material.steps.first?.tick ?? material.tickRange.lowerBound)
+    }
+
+    /// Updates `coveredFromStart` for a jump of the running session to `tick`: a jump to the very start
+    /// restores coverage, any jump forward past the cursor loses it, a jump back keeps it.
+    private func noteJump(toTick tick: Double) {
+        guard !needsFreshSession else { return }
+        if isAtPieceStart(Int(tick.rounded(.down))) {
+            coveredFromStart = true
+        } else if tick > cursorTick + 0.5 {
+            coveredFromStart = false
+        }
     }
 
     /// Resumes from `paused` (count-in again in timed modes when configured).
@@ -598,6 +632,10 @@ final class PracticeSession {
     }
 
     /// Applies structural settings changes: banks the follower, rebuilds the material, continues at the cursor.
+    ///
+    /// A change of mode, hands, speed or loop first ends the running statistics session labelled with the
+    /// `previous` settings (Core's `PracticeSummary` holds one mode/hands/speed, so counters gathered under
+    /// different settings must not be merged); a running transport then continues in a fresh session.
     private func rebuild(previous: PracticeSettings) {
         let wasState = transportState
         let resumeTick = Int(cursorTick.rounded(.down))
@@ -605,6 +643,13 @@ final class PracticeSession {
             halt()
         } else {
             bankFollowers()
+        }
+        let summaryFieldsChanged = previous.mode != settings.mode || previous.hands != settings.hands || previous.speed != settings.speed || previous.loop != settings.loop
+        if summaryFieldsChanged, !needsFreshSession {
+            endSession(reachedEnd: false, settings: previous)
+            // The on-screen counters describe the session under the new settings.
+            statistics = PracticeStatistics()
+            practicedSeconds = 0
         }
         material = PracticeMaterial(timeline: timeline, hands: settings.hands, loop: settings.loop)
         virtualTransport = PracticeVirtualTransport(timeline: timeline, speed: settings.speed)
@@ -631,6 +676,7 @@ final class PracticeSession {
     private func seek(toTick rawTick: Ticks) {
         let tick = clampedIntoLoop(rawTick)
         let now = clock.now
+        noteJump(toTick: Double(tick))
         switch transportState {
         case .stopped, .finished:
             if transportState == .finished { transportState = .stopped }
@@ -684,13 +730,18 @@ final class PracticeSession {
         metronome?.stop()
         virtualTransport.pause(now: now)
         transportState = .finished
-        endSession(reachedEnd: true)
+        endSession(reachedEnd: coveredFromStart)
         updateDriver()
     }
 
     /// Builds and emits the session record; the next `play()` starts a fresh statistics session.
+    /// - Parameters:
+    ///   - reachedEnd: the end of the whole piece was reached after covering it from the start (Listen mode
+    ///     is always reported as not reached by `PracticeSummaryBuilder`).
+    ///   - settings: the settings the counters were gathered under (default: the current ones).
     @discardableResult
-    private func endSession(reachedEnd: Bool) -> PracticeSessionRecord? {
+    private func endSession(reachedEnd: Bool, settings sessionSettings: PracticeSettings? = nil) -> PracticeSessionRecord? {
+        let sessionSettings = sessionSettings ?? settings
         guard !needsFreshSession else { return nil }
         needsFreshSession = true
         let stats = currentStatistics()
@@ -699,7 +750,7 @@ final class PracticeSession {
         practicedSeconds = accumulatedSeconds
         guard accumulatedSeconds > 0 || !played.isEmpty else { return nil }
         let started = sessionStartedAt ?? dateProvider()
-        let record = PracticeSummaryBuilder.record(arrangementID: arrangementID, scoreTitle: score.metadata.title, startedAt: started, endedAt: started.addingTimeInterval(accumulatedSeconds), durationSeconds: accumulatedSeconds, settings: settings, statistics: stats, played: played, reachedEnd: reachedEnd)
+        let record = PracticeSummaryBuilder.record(arrangementID: arrangementID, scoreTitle: score.metadata.title, startedAt: started, endedAt: started.addingTimeInterval(accumulatedSeconds), durationSeconds: accumulatedSeconds, settings: sessionSettings, statistics: stats, played: played, reachedEnd: reachedEnd && sessionSettings.mode != .listen)
         lastRecord = record
         onSessionEnded?(record)
         return record
@@ -722,6 +773,8 @@ final class PracticeSession {
             case .loopWrapped:
                 loopsCompleted += 1
             case .resyncRequested(let tick):
+                // Jumping ahead skips steps the learner never played: the piece is no longer covered.
+                if Double(tick) > transportPosition() + 0.5 { coveredFromStart = false }
                 player?.seek(toTick: tick)
                 virtualTransport.seek(toTick: Double(tick), now: clock.now)
                 if settings.metronome, transportState == .playing { startMetronome(fromTick: tick) }

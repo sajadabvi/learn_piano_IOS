@@ -147,6 +147,7 @@
 		E08B3ECE7B3341123FE3340F /* nocturne-op9-no2__pro.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = 9E396A1A4545D604792783ED /* nocturne-op9-no2__pro.musicxml */; };
 		E3309EC9F28BB5C452B82FF5 /* ave-maria-schubert__intermediate.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = B4A4FB2CA2E11702B4357BC8 /* ave-maria-schubert__intermediate.musicxml */; };
 		E6957899C5B3A157AAB0038C /* gymnopedie-1.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = F473CAC9F6B71F1B1B427151 /* gymnopedie-1.catalog.json */; };
+		E7924BC53A9E755B3FFF1A60 /* InputTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD587A2FC73A738887E1BD45 /* InputTests.swift */; };
 		E958617FE7CA26547771ADA1 /* InputMicrophoneSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9098D84BA8D1F9F4979BAFE3 /* InputMicrophoneSource.swift */; };
 		E9E2F433BBEF96D99758B3AF /* canon-in-d.catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = FDC448FB5085F02F000125F4 /* canon-in-d.catalog.json */; };
 		EA71DE93EA539C0DD2865258 /* ex-intervals__beginner.musicxml in Resources */ = {isa = PBXBuildFile; fileRef = CD0E977786B5C1E4B732B72B /* ex-intervals__beginner.musicxml */; };
@@ -326,6 +327,7 @@
 		D8FF46B7D94E23A919F06F45 /* NotationScoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotationScoreView.swift; sourceTree = "<group>"; };
 		DA5B1204F6B1A5C4F2D30E75 /* ex-chord-progression-i-iv-v.catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ex-chord-progression-i-iv-v.catalog.json"; sourceTree = "<group>"; };
 		DBA5A12E2568EF2E996610AC /* jingle-bells__beginner.musicxml */ = {isa = PBXFileReference; path = "jingle-bells__beginner.musicxml"; sourceTree = "<group>"; };
+		DD587A2FC73A738887E1BD45 /* InputTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputTests.swift; sourceTree = "<group>"; };
 		DD6DA837943E5332B4D69B92 /* ex-middle-c__beginner.musicxml */ = {isa = PBXFileReference; path = "ex-middle-c__beginner.musicxml"; sourceTree = "<group>"; };
 		DEC7ADB43E93FDC0F1450A23 /* the-entertainer__intermediate.musicxml */ = {isa = PBXFileReference; path = "the-entertainer__intermediate.musicxml"; sourceTree = "<group>"; };
 		DFF9B6F692CE96FAE6434A5A /* fur-elise__intermediate.musicxml */ = {isa = PBXFileReference; path = "fur-elise__intermediate.musicxml"; sourceTree = "<group>"; };
@@ -447,6 +449,7 @@
 			isa = PBXGroup;
 			children = (
 				0853C0F118B9F2B686117765 /* AudioTests.swift */,
+				DD587A2FC73A738887E1BD45 /* InputTests.swift */,
 				1D5A6361E897B960B27D4793 /* KeyboardTests.swift */,
 				2E87BAF275795F1963D65036 /* NotationTests.swift */,
 				6F671416C00733B51E3637EE /* ParsersTests.swift */,
@@ -940,6 +943,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				55B83ED2482E8510E69F1A92 /* AudioTests.swift in Sources */,
+				E7924BC53A9E755B3FFF1A60 /* InputTests.swift in Sources */,
 				49486918B0D727D6CB1FCF36 /* KeyboardTests.swift in Sources */,
 				5C94C9391188AD41388D6F41 /* NotationTests.swift in Sources */,
 				4F514999C0A2C84980C734EC /* ParsersTests.swift in Sources */,

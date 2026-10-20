@@ -55,11 +55,18 @@ struct InputPitchDetectorConfiguration: Hashable, Sendable {
     /// Octave-error suppression: the octave below replaces a winner when its odd partials (3, 5, 7) reach this
     /// fraction of its even partials (2, 4, 6)…
     var octaveOddEvidenceRatio: Float = 0.3
-    /// …and its salience reaches this fraction of the winner's.
+    /// …and its salience reaches this fraction of the winner's…
     var octaveSalienceRatio: Float = 0.7
+    /// …and its own fundamental (residual magnitude at partial 1) reaches this fraction of the winner's
+    /// strongest partial, so a leakage or noise peak below a chord cannot invent a sub-octave bass note.
+    var octaveFundamentalRatio: Float = 0.25
     /// A candidate at a harmonic interval above an accepted note (octave, 12th, double octave…) is reported
     /// only when its salience reaches this fraction of the energy attributed to that note.
     var harmonicGhostRatio: Float = 0.3
+    /// …unless the accepted note was sounding before the onset (its fundamental has not risen by this factor
+    /// over the caller's pre-onset reference spectrum) while the candidate's fundamental has: then it is a new
+    /// note struck on a held note's partial (G4 played over a held G2), not left-over energy of that note.
+    var ghostRiseRatio: Float = 2.2
 
     init() {}
 
@@ -84,7 +91,9 @@ struct InputPitchDetectorConfiguration: Hashable, Sendable {
 /// partials), accept the best candidate, subtract its estimated harmonic energy (harmonic subtraction with
 /// spectral smoothness) and repeat up to `maxPolyphony` times. Candidates must show their fundamental or both their 2nd and 3rd harmonic, which
 /// rejects sub-harmonic ghosts; an accepted note is moved down an octave when the lower octave shows its own
-/// fundamental and 3rd harmonic (weak-fundamental octave error).
+/// fundamental and 3rd harmonic (weak-fundamental octave error). The tracker passes the notes it reports as
+/// sounding, so a sustained note is never moved to a phantom sub-octave in mid-sustain, and odd partials that
+/// are really the fundamentals of other notes (G3 is the 3rd partial of C2) do not count as evidence.
 ///
 /// Not thread-safe; one instance per processing queue.
 final class InputPitchDetector {
@@ -167,7 +176,15 @@ final class InputPitchDetector {
     // MARK: Detection
 
     /// Detects up to `maxPolyphony` fundamentals in a magnitude spectrum, strongest first.
-    func detect(spectrum: [Float]) -> [InputDetectedPitch] {
+    /// - Parameters:
+    ///   - spectrum: linear magnitude spectrum of one frame.
+    ///   - sounding: MIDI numbers the note tracker currently reports as sounding (empty for a single frame).
+    ///     A sounding note is only moved down an octave when the lower octave is sounding as well, and
+    ///     sounding notes never count as odd-partial evidence for a sub-octave candidate.
+    ///   - reference: the magnitude spectrum from just before the current onset window (the tracker's
+    ///     `onsetReferenceSpectrum`), or nil outside an onset window. Lets a new note on a held note's
+    ///     partial escape the harmonic-ghost rule.
+    func detect(spectrum: [Float], sounding: Set<Int> = [], reference: [Float]? = nil) -> [InputDetectedPitch] {
         _ = pickPeaks(in: spectrum)
         guard !peaks.isEmpty else { return [] }
         residual = peaks.map(\.amplitude)
@@ -178,18 +195,19 @@ final class InputPitchDetector {
         var decided: Set<Int> = []
         var firstSalience: Float = 0
         let cfg = configuration
-        for _ in 0..<max(1, cfg.maxPolyphony) {
-            guard var best = bestCandidate(excluding: decided) else { break }
+        // Rejected harmonic ghosts do not use up a polyphony slot (a ghost of a held bass note must not hide a
+        // real note on the same partials), but the number of rounds is bounded.
+        var rounds = 0
+        while results.count < max(1, cfg.maxPolyphony), rounds < 3 * max(1, cfg.maxPolyphony) {
+            rounds += 1
+            guard var best = bestCandidate(excluding: decided, sounding: sounding) else { break }
             // Octave-error suppression: a note with a weak fundamental can lose to its upper octave, whose
             // harmonics are exactly the even partials of the true note. Move down while the lower octave has a
             // (possibly weak) fundamental of its own, shows odd partials (3, 5, 7) the upper note cannot explain
             // and scores nearly as well. Requiring the fundamental keeps close-position triads (whose notes are
             // partials 2, 3 and 5 of the octave below) from collapsing into a phantom bass note.
             var corrections = 0
-            while corrections < 2, !decided.contains(best.index - 12), let lower = scoreCandidate(index: best.index - 12),
-                  lower.hasFundamental, lower.oddEvidence > 0,
-                  lower.oddEvidence >= cfg.octaveOddEvidenceRatio * lower.evenEvidence,
-                  lower.salience >= best.salience * cfg.octaveSalienceRatio {
+            while corrections < 2, let lower = octaveBelow(best, decided: decided, sounding: sounding) {
                 best = lower
                 corrections += 1
             }
@@ -198,9 +216,13 @@ final class InputPitchDetector {
             // Harmonic ghosts: what remains of an accepted note's partials after subtraction can masquerade as a
             // note at a harmonic interval above it. Such candidates must carry a real share of energy.
             let midiCandidate = cfg.midiRange.lowerBound + best.index
+            let candidateFrequency = best.frequency
             let isGhost = zip(results, ownSaliences).contains { accepted, own in
                 InputPitchDetector.harmonicIntervals.contains(midiCandidate - accepted.midi)
                     && best.salience < own * cfg.harmonicGhostRatio
+                    && !(sounding.contains(accepted.midi)
+                         && Self.hasRisen(at: candidateFrequency, in: spectrum, over: reference, binWidth: binWidth, ratio: cfg.ghostRiseRatio)
+                         && !Self.hasRisen(at: accepted.frequency, in: spectrum, over: reference, binWidth: binWidth, ratio: cfg.ghostRiseRatio))
             }
             decided.insert(best.index)
             if isGhost {
@@ -219,6 +241,51 @@ final class InputPitchDetector {
         return results
     }
 
+    /// The octave below `best` when it should replace `best` (weak-fundamental octave error), else nil.
+    ///
+    /// The lower candidate must: not be decided yet; not demote a sounding note unless it is sounding itself;
+    /// show its own fundamental at `octaveFundamentalRatio` of the winner's strongest partial; carry odd
+    /// partials (3, 5, 7) at `octaveOddEvidenceRatio` of its even ones, after discarding odd partials that are
+    /// the fundamental of a sounding note or of another candidate nearly as salient as the winner; and reach
+    /// `octaveSalienceRatio` of the winner's salience.
+    private func octaveBelow(_ best: CandidateScore, decided: Set<Int>, sounding: Set<Int>) -> CandidateScore? {
+        let cfg = configuration
+        let lowerIndex = best.index - 12
+        guard !decided.contains(lowerIndex), let lower = scoreCandidate(index: lowerIndex), lower.hasFundamental else { return nil }
+        let bestMIDI = cfg.midiRange.lowerBound + best.index
+        let lowerMIDI = bestMIDI - 12
+        if sounding.contains(bestMIDI), !sounding.contains(lowerMIDI) { return nil }
+        guard lower.salience >= best.salience * cfg.octaveSalienceRatio,
+              lower.fundamentalAmplitude >= best.amplitude * cfg.octaveFundamentalRatio else { return nil }
+        var odd: Float = 0
+        for (k, amplitude) in [(3, lower.thirdAmplitude), (5, lower.fifthAmplitude), (7, lower.seventhAmplitude)] where amplitude > 0 {
+            // Partial k of the lower note sits this many semitones above it (19, 28, 34 when rounded).
+            let partialMIDI = lowerMIDI + Int((12 * log2(Double(k))).rounded())
+            if sounding.contains(partialMIDI) { continue }
+            let partialIndex = partialMIDI - cfg.midiRange.lowerBound
+            if partialIndex != best.index, let other = scoreCandidate(index: partialIndex), other.hasFundamental,
+               other.salience >= best.salience * cfg.octaveSalienceRatio { continue }
+            odd += amplitude
+        }
+        guard odd > 0, odd >= cfg.octaveOddEvidenceRatio * lower.evenEvidence else { return nil }
+        return lower
+    }
+
+    /// Whether the magnitude around `frequency` (the bin nearest to it and its neighbours) in `spectrum` is at
+    /// least `ratio` times the same region of `reference`. False without a usable reference.
+    static func hasRisen(at frequency: Double, in spectrum: [Float], over reference: [Float]?, binWidth: Double, ratio: Float) -> Bool {
+        guard let reference, reference.count == spectrum.count, binWidth > 0 else { return false }
+        let center = Int((frequency / binWidth).rounded())
+        guard center >= 1, center + 1 < spectrum.count else { return false }
+        var now: Float = 0
+        var before: Float = 0
+        for bin in (center - 1)...(center + 1) {
+            now = max(now, spectrum[bin])
+            before = max(before, reference[bin])
+        }
+        return now >= before * ratio
+    }
+
     /// Semitone distances of partials 2…8 above a fundamental (octave, 12th, double octave, 17th, 19th,
     /// 21st (≈ minor 7th), triple octave), where the residue of an accepted note can fake another note.
     static let harmonicIntervals: Set<Int> = [12, 19, 24, 28, 31, 34, 36]
@@ -230,18 +297,30 @@ final class InputPitchDetector {
         var frequency: Double
         var amplitude: Float
         var hasFundamental: Bool
-        /// Residual amplitude at partials 3, 5 and 7 (cannot belong to the octave above).
-        var oddEvidence: Float
+        /// Residual amplitude at partial 1 (0 when no peak matched).
+        var fundamentalAmplitude: Float
+        /// Residual amplitudes at partials 3, 5 and 7 (cannot belong to the octave above); 0 when unmatched.
+        var thirdAmplitude: Float
+        var fifthAmplitude: Float
+        var seventhAmplitude: Float
         /// Residual amplitude at partials 2, 4 and 6 (shared with the octave above).
         var evenEvidence: Float
     }
 
     /// Highest-salience candidate that passes the gating rule and has not been decided on in this frame,
     /// or nil when none scores above zero.
-    private func bestCandidate(excluding decided: Set<Int>) -> CandidateScore? {
+    ///
+    /// A key that is not sounding, whose octave above is sounding and whose own fundamental is weaker than
+    /// `octaveFundamentalRatio` of its strongest partial is skipped: such a "missing fundamental" candidate
+    /// explains a sustained chord as partials of a phantom bass note (C2 for C3-G3-E4) and would steal the
+    /// sounding note's energy whenever the partials beat.
+    private func bestCandidate(excluding decided: Set<Int>, sounding: Set<Int>) -> CandidateScore? {
         var best: CandidateScore?
+        let lowest = configuration.midiRange.lowerBound
         for index in candidateFrequencies.indices where !decided.contains(index) {
             guard let score = scoreCandidate(index: index) else { continue }
+            if !sounding.isEmpty, sounding.contains(lowest + index + 12), !sounding.contains(lowest + index),
+               score.fundamentalAmplitude < score.amplitude * configuration.octaveFundamentalRatio { continue }
             if let b = best, b.salience >= score.salience { continue }
             best = score
         }
@@ -260,7 +339,8 @@ final class InputPitchDetector {
         var hasFundamental = false
         var hasSecond = false
         var hasThird = false
-        var oddEvidence: Float = 0
+        var fundamentalAmplitude: Float = 0
+        var third: Float = 0, fifth: Float = 0, seventh: Float = 0
         var evenEvidence: Float = 0
         for k in 1...max(1, cfg.scoringHarmonics) {
             let target = f0 * Double(k)
@@ -274,13 +354,15 @@ final class InputPitchDetector {
             weightSum += available * w
             amplitude = max(amplitude, available)
             switch k {
-            case 1: hasFundamental = true
+            case 1: hasFundamental = true; fundamentalAmplitude = available
             case 2: hasSecond = true
             case 3: hasThird = true
             default: break
             }
             switch k {
-            case 3, 5, 7: oddEvidence += available
+            case 3: third = available
+            case 5: fifth = available
+            case 7: seventh = available
             case 2, 4, 6: evenEvidence += available
             default: break
             }
@@ -288,7 +370,8 @@ final class InputPitchDetector {
         guard salience > 0, hasFundamental || (hasSecond && hasThird) else { return nil }
         let frequency = weightSum > 0 ? weightedFrequency / Double(weightSum) : f0
         return CandidateScore(index: index, salience: salience, frequency: frequency, amplitude: amplitude,
-                              hasFundamental: hasFundamental, oddEvidence: oddEvidence, evenEvidence: evenEvidence)
+                              hasFundamental: hasFundamental, fundamentalAmplitude: fundamentalAmplitude,
+                              thirdAmplitude: third, fifthAmplitude: fifth, seventhAmplitude: seventh, evenEvidence: evenEvidence)
     }
 
     /// Index of the peak with the largest residual amplitude within tolerance of `target`, or nil when

@@ -89,6 +89,9 @@ final class AudioScorePlayer: @preconcurrency ScorePlaybackControlling {
     @ObservationIgnored var onEventStarted: ((TimelineEvent) -> Void)?
     /// Follower hook (the metronome): a new run started (snapshot) or the transport stopped (nil).
     @ObservationIgnored var onTransportChanged: ((AudioTransportSnapshot?) -> Void)?
+    /// Called on the main actor after the audio engine stopped (`synth.stop()`, a system interruption); the
+    /// player has already paused itself. The integrator wires it to the practice session's pause.
+    @ObservationIgnored var onInterrupted: (() -> Void)?
 
     /// The current run, nil while stopped or paused.
     @ObservationIgnored private(set) var transport: AudioTransportSnapshot?
@@ -109,6 +112,13 @@ final class AudioScorePlayer: @preconcurrency ScorePlaybackControlling {
     init(synth: AudioPianoSynth) {
         self.synth = synth
         self.scheduler = AudioLookaheadScheduler(label: "LearnPiano.AudioScorePlayer", sink: synth.sink)
+        synth.addEngineStopHandler { [weak self] in self?.engineStopped() }
+    }
+
+    /// The engine stopped: stop feeding its queue (keeping the position) and tell the owner.
+    private func engineStopped() {
+        pause()
+        onInterrupted?()
     }
 
     // MARK: Position

@@ -11,6 +11,18 @@ struct AudioPlaybackNote: Equatable, Sendable {
     var velocity: Double
 }
 
+/// A tied pitch that continues sounding through an event. It is normally *not* struck (the earlier attack
+/// was lengthened to cover it), but when a run or a loop lap begins after the previous link of its tie chain,
+/// that attack never plays in the run, so the player strikes the continuation instead.
+struct AudioPlaybackContinuation: Equatable, Sendable {
+    /// The pitch, its velocity, and the end of the whole tie chain.
+    var note: AudioPlaybackNote
+    /// Tick of the chain's original attack.
+    var attackTick: Ticks
+    /// Tick of the chain's previous link (the attack or an earlier continuation event).
+    var tiedFromTick: Ticks
+}
+
 /// One `TimelineEvent` prepared for audio: the pitches it *attacks* (tie continuations are not re-struck,
 /// they lengthen the earlier attack instead) plus the event index for `onEventStarted`.
 struct AudioPlaybackItem: AudioTickPositioned, Equatable, Sendable {
@@ -20,6 +32,15 @@ struct AudioPlaybackItem: AudioTickPositioned, Equatable, Sendable {
     var hand: Hand
     /// Notes struck at this onset (empty for a pure tie continuation, which still reports `onEventStarted`).
     var notes: [AudioPlaybackNote]
+    /// Tied pitches continuing through this event, struck only when a run or loop lap starts inside the tie
+    /// (see `continuationsToStrike(lapStartTick:)`).
+    var continuations: [AudioPlaybackContinuation] = []
+
+    /// The continuation notes to strike when this item is reached in a lap (or run) whose first tick is
+    /// `lapStartTick`: those whose previous tie link lies before it, so they are not already sounding.
+    func continuationsToStrike(lapStartTick: Ticks) -> [AudioPlaybackNote] {
+        continuations.filter { $0.tiedFromTick < lapStartTick }.map(\.note)
+    }
 }
 
 /// Builds the audio view of a `PlaybackTimeline`. Pure and deterministic.
@@ -39,13 +60,18 @@ enum AudioPlaybackPlan {
     ///
     /// Tie handling: a note listed in an event's `pitches` but not in its `attackPitches` continues a tie;
     /// the matching earlier attack (same hand, voice and pitch, still open because it carried `tieStart`)
-    /// is lengthened to the continuation's end instead of being struck again.
+    /// is lengthened to the continuation's end instead of being struck again. The continuation event records
+    /// the pitch in `continuations` (with the chain's final end), so a run or loop lap that starts inside the
+    /// tie can still sound it.
     static func items(from timeline: PlaybackTimeline,
                       rightVelocity: Double = defaultRightVelocity,
                       leftVelocity: Double = defaultLeftVelocity) -> [AudioPlaybackItem] {
         var items: [AudioPlaybackItem] = []
         items.reserveCapacity(timeline.events.count)
-        var open: [TieKey: (item: Int, note: Int)] = [:]
+        /// Open tie chains: the attack's position and the tick of the chain's latest link.
+        var open: [TieKey: (item: Int, note: Int, lastTick: Ticks)] = [:]
+        /// Continuations whose end is the attack's final end, filled in once every chain is complete.
+        var fixups: [(item: Int, continuation: Int, attackItem: Int, attackNote: Int)] = []
         let ordered = timeline.events.enumerated().sorted { a, b in
             a.element.tick != b.element.tick ? a.element.tick < b.element.tick : a.offset < b.offset
         }
@@ -53,6 +79,7 @@ enum AudioPlaybackPlan {
             let attacks = Set(event.attackPitches)
             let velocity = max(0, min(1, event.hand == .right ? rightVelocity : leftVelocity))
             var notes: [AudioPlaybackNote] = []
+            var continuations: [AudioPlaybackContinuation] = []
             var seen = Set<Int>()
             let itemIndex = items.count
             for chordNote in event.notes where seen.insert(chordNote.midi).inserted {
@@ -60,11 +87,18 @@ enum AudioPlaybackPlan {
                 if attacks.contains(chordNote.midi) {
                     open.removeValue(forKey: key)
                     notes.append(AudioPlaybackNote(midi: chordNote.midi, endTick: event.endTick, velocity: velocity))
-                    if chordNote.tieStart { open[key] = (itemIndex, notes.count - 1) }
+                    if chordNote.tieStart { open[key] = (itemIndex, notes.count - 1, event.tick) }
                 } else if let target = open[key] {
-                    let current = items[target.item].notes[target.note].endTick
-                    items[target.item].notes[target.note].endTick = max(current, event.endTick)
-                    if !chordNote.tieStart { open.removeValue(forKey: key) }
+                    let attack = items[target.item].notes[target.note]
+                    items[target.item].notes[target.note].endTick = max(attack.endTick, event.endTick)
+                    continuations.append(AudioPlaybackContinuation(note: attack, attackTick: items[target.item].tick,
+                                                                   tiedFromTick: target.lastTick))
+                    fixups.append((itemIndex, continuations.count - 1, target.item, target.note))
+                    if chordNote.tieStart {
+                        open[key] = (target.item, target.note, event.tick)
+                    } else {
+                        open.removeValue(forKey: key)
+                    }
                 }
             }
             // Pitches the timeline lists as attacks but that are missing from `notes` (defensive: keeps the
@@ -72,7 +106,11 @@ enum AudioPlaybackPlan {
             for midi in event.attackPitches.sorted() where seen.insert(midi).inserted {
                 notes.append(AudioPlaybackNote(midi: midi, endTick: event.endTick, velocity: velocity))
             }
-            items.append(AudioPlaybackItem(tick: event.tick, eventIndex: eventIndex, hand: event.hand, notes: notes))
+            items.append(AudioPlaybackItem(tick: event.tick, eventIndex: eventIndex, hand: event.hand, notes: notes,
+                                           continuations: continuations))
+        }
+        for fixup in fixups {
+            items[fixup.item].continuations[fixup.continuation].note.endTick = items[fixup.attackItem].notes[fixup.attackNote].endTick
         }
         return items
     }

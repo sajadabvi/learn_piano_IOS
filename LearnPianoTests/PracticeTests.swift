@@ -263,6 +263,38 @@ final class PracticeTests: XCTestCase {
         XCTAssertEqual(f.currentPosition, 2)
     }
 
+    /// Regression: during the gap after the first C4 of C4 C4 G4, the completed step's chord state leaked into
+    /// the next step, so the repeated C4 was drawn as already correct and `missingPitches` was empty.
+    func testRepeatedNoteIsExpectedAgainDuringGap() {
+        let clock = ManualPracticeClock()
+        let score = ScoreBuilder.make(title: "Repeat", tempo: 120, right: [[(["C4"], 960), (["C4"], 960), (["G4"], 1920)]])
+        let f = waitFollower(score, restScale: 0.5, clock: clock)
+        f.start()
+        let firstEventID = f.material.steps[0].events.first { !$0.attackPitches.isEmpty }?.id ?? ""
+        let nextEventID = f.material.steps[1].events.first { !$0.attackPitches.isEmpty }?.id ?? ""
+        XCTAssertEqual(records(f.handle(on("C4", clock))).map { $0.outcome }, [.correct])
+        guard case .gap(0, 1, false, _, let duration) = f.phase else { return XCTFail("expected the gap 0 → 1, got \(f.phase)") }
+        XCTAssertEqual(duration, 0.25, accuracy: 1e-9)
+        XCTAssertEqual(f.missingPitches, [midi("C4")], "the repeated C4 is still to be played")
+        XCTAssertEqual(f.satisfiedPitches, [])
+        var snapshot = f.feedback()
+        XCTAssertEqual(snapshot.keyStates[midi("C4")], .expected)
+        XCTAssertEqual(snapshot.missingPitches, [midi("C4")])
+        XCTAssertEqual(snapshot.eventStates[nextEventID], .expected)
+        XCTAssertEqual(snapshot.eventStates[firstEventID], .correct, "the just-played note keeps its correct flash")
+        // Re-attacking C4 during the gap is an early attack for the next step: shown as satisfied, credited later.
+        f.handle(off("C4", clock))
+        clock.advance(by: 0.1)
+        XCTAssertTrue(records(f.handle(on("C4", clock))).isEmpty)
+        XCTAssertEqual(f.missingPitches, [])
+        snapshot = f.feedback()
+        XCTAssertEqual(snapshot.keyStates[midi("C4")], .correct)
+        XCTAssertEqual(snapshot.eventStates[nextEventID], .correct)
+        clock.advance(by: 0.2)
+        XCTAssertEqual(records(f.update()).map { $0.outcome }, [.correct])
+        XCTAssertEqual(f.expectedPitches, [midi("G4")])
+    }
+
     func testOtherHandIsDemonstratedAtOnsetsAndInGaps() {
         let clock = ManualPracticeClock()
         let settings = PracticeSettings(mode: .wait, hands: .right, playOtherHands: true, waitModeRestScale: 1)
@@ -529,17 +561,169 @@ final class PracticeTests: XCTestCase {
     }
 
     @MainActor
-    func testSessionSpeedChangeKeepsStatisticsAndPosition() {
+    func testSessionSpeedChangeEndsSegmentAndKeepsPosition() {
         let clock = ManualPracticeClock()
+        var ended: [PracticeSessionRecord] = []
         let session = PracticeSession(score: Self.scaleScore(), arrangementID: "scale", settings: PracticeSettings(mode: .wait, hands: .right, waitModeRestScale: 0), clock: clock, drivesItself: false)
+        session.onSessionEnded = { ended.append($0) }
         session.play()
         for n in ["C4", "D4"] { session.handle(on(n, clock)); session.handle(off(n, clock)) }
         session.speed = 0.62
         XCTAssertEqual(session.speed, 0.6, accuracy: 1e-9, "speed snaps to 0.05 steps")
+        XCTAssertEqual(session.transportState, .playing)
         XCTAssertEqual(session.expectedPitches, [midi("E4")], "rebuilt follower continues at the cursor")
-        XCTAssertEqual(session.statistics.stepsExpected, 2)
+        XCTAssertEqual(ended.count, 1, "the segment played at full speed is reported on its own")
+        XCTAssertEqual(ended.first?.summary.speed ?? 0, 1.0, accuracy: 1e-9)
+        XCTAssertEqual(ended.first?.summary.mode, .wait)
+        XCTAssertEqual(ended.first?.summary.stepsExpected, 2)
+        XCTAssertEqual(ended.first?.summary.reachedEnd, false)
+        XCTAssertEqual(session.statistics.stepsExpected, 0, "the new segment starts with fresh counters")
+        session.handle(on("E4", clock)); session.handle(off("E4", clock))
+        XCTAssertEqual(session.statistics.stepsExpected, 1)
         session.speed = 0.1
         XCTAssertEqual(session.speed, 0.25, accuracy: 1e-9)
+        XCTAssertEqual(ended.count, 2)
+        XCTAssertEqual(ended.last?.summary.speed ?? 0, 0.6, accuracy: 1e-9)
+        XCTAssertEqual(ended.last?.summary.stepsExpected, 1)
+        XCTAssertEqual(session.expectedPitches, [midi("F4")])
+        // A non-summary change (octave tolerance) keeps the running segment.
+        var s = session.settings
+        s.octaveTolerance = true
+        session.updateSettings(s)
+        XCTAssertEqual(ended.count, 2)
+        XCTAssertEqual(session.expectedPitches, [midi("F4")])
+    }
+
+    /// Regression: Wait Mode at 0.5x, then Just Play at full speed to the end used to persist one summary
+    /// labelled Just Play 1.0 with the Wait Mode hits, so `bestAccuracy` rose without a Just Play note played.
+    @MainActor
+    func testSessionModeChangeReportsEachSegmentWithItsOwnSettings() {
+        let clock = ManualPracticeClock()
+        var ended: [PracticeSessionRecord] = []
+        let session = PracticeSession(score: Self.scaleScore(), arrangementID: "scale", settings: PracticeSettings(mode: .wait, hands: .right, speed: 0.5, countInMeasures: 0, waitModeRestScale: 0), clock: clock, drivesItself: false)
+        session.onSessionEnded = { ended.append($0) }
+        session.play()
+        for n in ["C4", "D4", "E4"] {
+            clock.advance(by: 0.5)
+            session.handle(on(n, clock)); session.handle(off(n, clock))
+        }
+        var s = session.settings
+        s.mode = .justPlay
+        s.speed = 1.0
+        session.updateSettings(s)
+        XCTAssertEqual(ended.count, 1)
+        XCTAssertEqual(ended.first?.summary.mode, .wait)
+        XCTAssertEqual(ended.first?.summary.speed ?? 0, 0.5, accuracy: 1e-9)
+        XCTAssertEqual(ended.first?.summary.stepsExpected, 3)
+        XCTAssertEqual(ended.first?.summary.stepsCorrect, 3)
+        XCTAssertEqual(session.transportState, .playing)
+        clock.advance(by: 5)
+        session.refresh()
+        XCTAssertEqual(session.transportState, .finished)
+        XCTAssertEqual(ended.count, 2)
+        let jp = ended.last?.summary
+        XCTAssertEqual(jp?.mode, .justPlay)
+        XCTAssertEqual(jp?.speed ?? 0, 1.0, accuracy: 1e-9)
+        XCTAssertEqual(jp?.stepsCorrect, 0)
+        XCTAssertEqual(jp?.reachedEnd, false, "the Just Play segment started mid-piece")
+        var profile = UserProfile()
+        for record in ended { profile.record(record.summary) }
+        XCTAssertNil(profile.progress["scale"]?.bestAccuracy)
+        XCTAssertEqual(profile.progress["scale"]?.completedOnce, false)
+    }
+
+    /// Three whole-note measures C4 · D4 · E4 at 120 BPM (2 s each at full speed).
+    private static func threeMeasureScore() -> Score {
+        ScoreBuilder.make(title: "Three", tempo: 120, right: [[(["C4"], 3840)], [(["D4"], 3840)], [(["E4"], 3840)]])
+    }
+
+    /// Regression: seeking to the last measure and playing it used to report `reachedEnd`, which marked the
+    /// song completed with a clean full-speed run in `SongProgress`.
+    @MainActor
+    func testSessionReachedEndRequiresCoveringThePiece() {
+        let clock = ManualPracticeClock()
+        let settings = PracticeSettings(mode: .wait, hands: .right, waitModeRestScale: 0)
+        let session = PracticeSession(score: Self.threeMeasureScore(), arrangementID: "three", settings: settings, clock: clock, drivesItself: false)
+        session.play()
+        session.seek(toMeasure: 2)
+        session.handle(on("E4", clock)); session.handle(off("E4", clock))
+        XCTAssertEqual(session.transportState, .finished)
+        XCTAssertEqual(session.lastRecord?.summary.reachedEnd, false, "only the last measure was played")
+        var profile = UserProfile()
+        if let summary = session.lastRecord?.summary { profile.record(summary) }
+        XCTAssertEqual(profile.progress["three"]?.completedOnce, false)
+        XCTAssertNil(profile.progress["three"]?.bestCleanSpeed)
+
+        // A full run from the start reaches the end.
+        session.play()
+        for n in ["C4", "D4", "E4"] { session.handle(on(n, clock)); session.handle(off(n, clock)) }
+        XCTAssertEqual(session.transportState, .finished)
+        XCTAssertEqual(session.lastRecord?.summary.reachedEnd, true)
+
+        // Skipping ahead and then jumping back to the very start restores coverage.
+        session.play()
+        session.seek(toMeasure: 1)
+        session.handle(on("D4", clock)); session.handle(off("D4", clock))
+        session.seek(toMeasure: 0)
+        for n in ["C4", "D4", "E4"] { session.handle(on(n, clock)); session.handle(off(n, clock)) }
+        XCTAssertEqual(session.lastRecord?.summary.reachedEnd, true)
+    }
+
+    @MainActor
+    func testSessionPhraseSkipForwardLosesCoverage() {
+        let clock = ManualPracticeClock()
+        let measures = (0..<8).map { _ in [(pitches: ["C4"], ticks: 3840)] }
+        let session = PracticeSession(score: ScoreBuilder.make(title: "Long", tempo: 120, right: measures), arrangementID: "long", settings: PracticeSettings(mode: .wait, hands: .right, waitModeRestScale: 0), clock: clock, drivesItself: false)
+        session.play()
+        session.nextPhrase()
+        XCTAssertEqual(session.cursorMeasure.measureIndex, 4)
+        for _ in 4..<8 { session.handle(on("C4", clock)); session.handle(off("C4", clock)) }
+        XCTAssertEqual(session.transportState, .finished)
+        XCTAssertEqual(session.lastRecord?.summary.reachedEnd, false, "measures 1-4 were skipped")
+        // Backward moves keep coverage: play two measures, step back one phrase to the start, play it all.
+        session.play()
+        for _ in 0..<2 { session.handle(on("C4", clock)); session.handle(off("C4", clock)) }
+        session.previousPhrase()
+        XCTAssertEqual(session.cursorMeasure.measureIndex, 0)
+        for _ in 0..<8 { session.handle(on("C4", clock)); session.handle(off("C4", clock)) }
+        XCTAssertEqual(session.transportState, .finished)
+        XCTAssertEqual(session.lastRecord?.summary.reachedEnd, true)
+    }
+
+    @MainActor
+    func testSessionJustPlayForwardResyncLosesCoverage() {
+        let clock = ManualPracticeClock()
+        let session = PracticeSession(score: Self.scaleScore(), arrangementID: "scale", settings: PracticeSettings(mode: .justPlay, hands: .right, countInMeasures: 0, timingWindowSeconds: 0.3), clock: clock, drivesItself: false)
+        var resynced = false
+        session.onFollowerEvent = { if case .resyncRequested = $0 { resynced = true } }
+        session.play()
+        // The learner plays E F G one second ahead of the transport: the transport jumps past C and D.
+        for (i, n) in ["E4", "F4", "G4"].enumerated() {
+            if i > 0 { clock.advance(by: 0.5); session.refresh() }
+            session.handle(on(n, clock)); session.handle(off(n, clock))
+        }
+        XCTAssertTrue(resynced)
+        clock.advance(by: 5)
+        session.refresh()
+        XCTAssertEqual(session.transportState, .finished)
+        XCTAssertEqual(session.lastRecord?.summary.reachedEnd, false, "skipped steps: the piece was not covered")
+    }
+
+    @MainActor
+    func testSessionListenNeverReachesEnd() {
+        let clock = ManualPracticeClock()
+        let session = PracticeSession(score: Self.threeMeasureScore(), arrangementID: "three", settings: PracticeSettings(mode: .listen, countInMeasures: 0), clock: clock, drivesItself: false)
+        session.play()
+        XCTAssertEqual(session.transportState, .playing)
+        clock.advance(by: 7)
+        session.refresh()
+        XCTAssertEqual(session.transportState, .finished)
+        XCTAssertEqual(session.lastRecord?.summary.mode, .listen)
+        XCTAssertEqual(session.lastRecord?.summary.reachedEnd, false, "listening is not completing the song")
+        var profile = UserProfile()
+        if let summary = session.lastRecord?.summary { profile.record(summary) }
+        XCTAssertEqual(profile.progress["three"]?.completedOnce, false)
+        XCTAssertEqual(profile.progress["three"]?.sessions, 1, "the time listened is still recorded")
     }
 
     @MainActor
@@ -691,6 +875,10 @@ final class PracticeTests: XCTestCase {
         let jp = PracticeSummaryBuilder.summary(arrangementID: "a", startedAt: Date(timeIntervalSince1970: 0), durationSeconds: 60, settings: PracticeSettings(mode: .justPlay), statistics: stats, reachedEnd: true)
         XCTAssertEqual(jp.stepsCorrect, 8, "just play: on-time plus early/late")
         XCTAssertEqual(jp.accuracy, 0.8, accuracy: 1e-9)
+        XCTAssertTrue(jp.reachedEnd)
+        let listen = PracticeSummaryBuilder.summary(arrangementID: "a", startedAt: Date(timeIntervalSince1970: 0), durationSeconds: 60, settings: PracticeSettings(mode: .listen), statistics: stats, reachedEnd: true)
+        XCTAssertFalse(listen.reachedEnd, "listen never marks the song completed")
+        XCTAssertEqual(listen.stepsExpected, 0)
         let data = try? JSONEncoder().encode(PracticeSummaryBuilder.record(arrangementID: "a", scoreTitle: "T", startedAt: Date(timeIntervalSince1970: 0), endedAt: Date(timeIntervalSince1970: 60), durationSeconds: 60, settings: PracticeSettings(), statistics: stats, played: [], reachedEnd: false))
         XCTAssertNotNil(data)
         if let data { XCTAssertEqual(try? JSONDecoder().decode(PracticeSessionRecord.self, from: data).statistics, stats) }

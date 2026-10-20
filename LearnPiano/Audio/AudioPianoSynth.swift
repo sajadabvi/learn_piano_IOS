@@ -34,6 +34,15 @@ enum AudioSoundSource: Equatable {
 /// the built-in render node.
 ///
 /// All methods are main-actor. Other threads (the player's scheduler) use `sink`, which is thread-safe.
+///
+/// **Engine lifecycle.** Commands pushed while no render callback runs (before the first start, while
+/// stopped, during an interruption or a configuration-change gap) are not applied in a burst when the engine
+/// starts again: right before every (re)start the queue is filtered and only commands still due in the future
+/// are kept (`AudioCommandQueue.discardStale`), and every voice is silenced. `noteOn`, `play(chord:)` and
+/// `click` start the engine themselves. When the engine stops, for `stop()` or because the system interrupted
+/// it, the engine-stop handlers run (`addEngineStopHandler`): `AudioScorePlayer` pauses and `AudioMetronome`
+/// halts, so nothing keeps feeding a dead queue. The integrator should still call `player.pause()` before
+/// `synth.stop()` so the practice session's own state changes first.
 @MainActor
 @Observable
 final class AudioPianoSynth {
@@ -89,6 +98,8 @@ final class AudioPianoSynth {
     @ObservationIgnored private var renderState: AudioSynthRenderState?
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
     @ObservationIgnored private var soundFontLoadGeneration = 0
+    @ObservationIgnored private var engineStopHandlers: [(id: Int, handler: () -> Void)] = []
+    @ObservationIgnored private var nextEngineStopHandlerID = 0
 
     /// - Parameters:
     ///   - voiceCount: polyphony of the built-in model (minimum 32).
@@ -107,7 +118,7 @@ final class AudioPianoSynth {
         guard let engine, !engine.isRunning else { isRunning = engine?.isRunning ?? false; return }
         engine.prepare()
         do {
-            try engine.start()
+            try startEngineDiscardingStale(engine)
             isRunning = true
             lastError = nil
         } catch {
@@ -120,11 +131,39 @@ final class AudioPianoSynth {
         }
     }
 
-    /// Stops the engine (notes are cut).
+    /// Stops the engine (notes are cut). The engine-stop handlers run first, so the player and the metronome
+    /// stop scheduling before the queue's consumer goes away.
     func stop() {
+        notifyEngineStopped()
         engine?.stop()
         renderState?.killAllVoices()
         isRunning = false
+    }
+
+    /// Registers a main-actor callback run whenever the engine stops (`stop()`, an interruption, a failed
+    /// restart). Returns a token for `removeEngineStopHandler`.
+    @discardableResult
+    func addEngineStopHandler(_ handler: @escaping () -> Void) -> Int {
+        nextEngineStopHandlerID += 1
+        engineStopHandlers.append((nextEngineStopHandlerID, handler))
+        return nextEngineStopHandlerID
+    }
+
+    /// Removes a handler added with `addEngineStopHandler`.
+    func removeEngineStopHandler(_ token: Int) {
+        engineStopHandlers.removeAll { $0.id == token }
+    }
+
+    private func notifyEngineStopped() {
+        for entry in engineStopHandlers { entry.handler() }
+    }
+
+    /// Starts a stopped engine after silencing every voice and dropping the commands that went stale while no
+    /// render callback drained the queue (both are safe only while the engine is stopped).
+    private func startEngineDiscardingStale(_ engine: AVAudioEngine) throws {
+        renderState?.killAllVoices()
+        sink.queue.discardStale(atHostTime: AudioHostClock.now())
+        try engine.start()
     }
 
     private func buildGraph() throws {
@@ -168,8 +207,13 @@ final class AudioPianoSynth {
 
     private func handleConfigurationChange() {
         guard isRunning, let engine, !engine.isRunning else { return }
-        renderState?.killAllVoices()
-        do { try engine.start() } catch { lastError = error.localizedDescription; isRunning = false }
+        do {
+            try startEngineDiscardingStale(engine)
+        } catch {
+            lastError = error.localizedDescription
+            notifyEngineStopped()
+            isRunning = false
+        }
     }
 
     private func handleInterruption(_ note: Notification) {
@@ -177,10 +221,17 @@ final class AudioPianoSynth {
               let type = AVAudioSession.InterruptionType(rawValue: raw) else { return }
         switch type {
         case .began:
+            // The system has stopped (or is stopping) the engine: playback pauses; sound resumes on demand.
+            notifyEngineStopped()
             renderState?.requestReset()
         case .ended:
             guard isRunning, let engine, !engine.isRunning else { return }
-            do { try engine.start() } catch { lastError = error.localizedDescription; isRunning = false }
+            do {
+                try startEngineDiscardingStale(engine)
+            } catch {
+                lastError = error.localizedDescription
+                isRunning = false
+            }
         @unknown default:
             break
         }
@@ -188,6 +239,7 @@ final class AudioPianoSynth {
 
     private func handleMediaServicesReset() {
         let wasRunning = isRunning
+        notifyEngineStopped()
         for o in observers { NotificationCenter.default.removeObserver(o) }
         observers.removeAll()
         engine?.stop()
@@ -203,28 +255,38 @@ final class AudioPianoSynth {
 
     // MARK: Notes
 
-    /// Starts a note now (or at `hostTime`).
+    /// Starts a note now (or at `hostTime`), starting the engine if needed (e.g. the on-screen keyboard).
+    /// The note is anonymous: `noteOff` of the same key releases it.
     func noteOn(_ midi: Int, velocity: Double = 0.8, hostTime: UInt64 = 0) {
-        sink.noteOn(midi, velocity: velocity, hostTime: hostTime)
+        guard ensureRunning() else { return }
+        sink.noteOn(midi, velocity: velocity, hostTime: hostTime, tag: Tag.immediate)
     }
 
-    /// Releases a note now (or at `hostTime`).
+    /// Releases the anonymous immediate notes of a key now (or at `hostTime`). Notes of the score player and
+    /// identified strikes (`play(chord:)`) are not affected. Nothing is sent while the engine is stopped.
     func noteOff(_ midi: Int, hostTime: UInt64 = 0) {
-        sink.noteOff(midi, hostTime: hostTime)
+        guard isRunning else { return }
+        sink.noteOff(midi, hostTime: hostTime, tag: Tag.immediate)
     }
 
     /// Releases every note now.
     func allNotesOff() {
+        guard isRunning else { return }
         sink.allNotesOff()
     }
 
-    /// Sounds a chord for `durationSeconds` ("demo this note").
-    func play(chord pitches: [Int], velocity: Double = 0.8, durationSeconds: Double = 0.8, hostTime: UInt64 = 0) {
-        sink.playChord(pitches, velocity: velocity, durationSeconds: durationSeconds, hostTime: hostTime)
+    /// Sounds a chord for `durationSeconds` ("demo this note"), starting the engine if needed. Each pitch is
+    /// an identified strike, so the chord's release never cuts a later strike of the same key. Returns the
+    /// strike identities (empty when the engine could not start).
+    @discardableResult
+    func play(chord pitches: [Int], velocity: Double = 0.8, durationSeconds: Double = 0.8, hostTime: UInt64 = 0) -> [UInt32] {
+        guard ensureRunning() else { return [] }
+        return sink.playChord(pitches, velocity: velocity, durationSeconds: durationSeconds, hostTime: hostTime, tag: Tag.immediate)
     }
 
-    /// Schedules a metronome click (always rendered by the built-in node).
+    /// Schedules a metronome click (always rendered by the built-in node), starting the engine if needed.
     func click(accented: Bool, hostTime: UInt64 = 0) {
+        guard ensureRunning() else { return }
         sink.click(accented: accented, hostTime: hostTime)
     }
 

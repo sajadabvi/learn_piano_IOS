@@ -73,6 +73,16 @@ final class AudioMetronome: @preconcurrency MetronomeControlling {
         player?.onTransportChanged = { [weak self] snapshot in
             self?.playerTransportChanged(snapshot)
         }
+        synth.addEngineStopHandler { [weak self] in self?.engineStopped() }
+    }
+
+    /// The engine stopped: a count-in in progress is cancelled (no completion) and clicks halt. The metronome
+    /// stays active, so it clicks again with the player's next run; an independent run needs a new `start`.
+    private func engineStopped() {
+        cancelCountIn()
+        _ = clickRuns.advance(keepingPreviousBefore: nil)
+        clickScheduler.halt(releaseSounding: true)
+        currentBeat = nil
     }
 
     // MARK: MetronomeControlling

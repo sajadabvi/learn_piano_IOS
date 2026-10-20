@@ -226,11 +226,16 @@ enum AudioMainDelivery {
 /// Schedules the notes of a timeline run (`AudioTransportMapper` + host anchor) into the render queue.
 ///
 /// Note-offs are held here and pushed only when they come within the lookahead, which keeps the render
-/// thread's pending table small even for long notes at slow speeds. Keys are reference-counted: the render
-/// thread releases every voice of a MIDI number on a note-off, so when notes of the same pitch overlap (a
-/// unison between hands or voices, a hand crossing) only the release of the *last* one is pushed, and the
-/// key sounds until the longest of them ends. Strikes and releases are processed in time order (a release
-/// before a strike at the same instant) so the counts are exact.
+/// thread's pending table small even for long notes at slow speeds. Keys are reference-counted: the job's
+/// releases are anonymous (they release every voice of the key carrying the job's tag, never immediate
+/// notes), so when notes of the same pitch overlap (a unison between hands or voices, a hand crossing) only
+/// the release of the *last* one is pushed, and the key sounds until the longest of them ends. Strikes and
+/// releases are processed in time order (a release before a strike at the same instant) so the counts are
+/// exact.
+///
+/// Ties: a run or loop lap that begins inside a tie never reaches the tie's attack, so the job strikes the
+/// continuation event's tied pitches instead (`AudioPlaybackItem.continuationsToStrike`), unless the key
+/// is already sounding in this job (e.g. a note adopted from the run this one replaced).
 final class AudioPlaybackJob: AudioScheduleJob, @unchecked Sendable {
     /// A scheduled release of one struck note.
     struct HeldOff: Equatable {
@@ -296,7 +301,7 @@ final class AudioPlaybackJob: AudioScheduleJob, @unchecked Sendable {
 
     func pump(untilHostSeconds until: Double, sink: AudioRenderCommandSink) -> Bool {
         let occurrences = mapper.advance(&cursor, items: items, until: until - anchorHostSeconds)
-        var starts: [(item: AudioPlaybackItem, host: Double)] = []
+        var starts: [Start] = []
         for occurrence in occurrences {
             let item = items[occurrence.itemIndex]
             guard let hands = audibleHands, hands.includes(item.hand) else { continue }
@@ -305,7 +310,9 @@ final class AudioPlaybackJob: AudioScheduleJob, @unchecked Sendable {
                 let release = mapper.releaseElapsed(endTick: note.endTick, lap: occurrence.lap, onsetElapsed: occurrence.onsetElapsed)
                 insertHeldOff(HeldOff(hostSeconds: anchorHostSeconds + release, onsetHostSeconds: onsetHost, midi: note.midi))
             }
-            starts.append((item, onsetHost))
+            let lapStart = mapper.lapTickRange(occurrence.lap).lowerBound
+            starts.append(Start(item: item, continuations: item.continuationsToStrike(lapStartTick: lapStart),
+                                host: onsetHost, lap: occurrence.lap, onsetElapsed: occurrence.onsetElapsed))
         }
         // Merge releases and strikes in time order; at equal times the release goes first, so a key released
         // and struck at the same instant is queued as off-then-on. Every release lies strictly after its own
@@ -319,7 +326,7 @@ final class AudioPlaybackJob: AudioScheduleJob, @unchecked Sendable {
                 release(heldOffs[offIndex], sink: sink)
                 offIndex += 1
             } else if hasStart {
-                strike(starts[startIndex].item, atHostSeconds: starts[startIndex].host, sink: sink)
+                strike(starts[startIndex], sink: sink)
                 startIndex += 1
             } else {
                 break
@@ -370,17 +377,37 @@ final class AudioPlaybackJob: AudioScheduleJob, @unchecked Sendable {
         return true
     }
 
-    /// Counts and pushes the strikes of one item, then reports it.
-    private func strike(_ item: AudioPlaybackItem, atHostSeconds host: Double, sink: AudioRenderCommandSink) {
+    /// One audible item occurrence waiting to be struck.
+    private struct Start {
+        var item: AudioPlaybackItem
+        /// Tied pitches to strike because the lap began inside their tie.
+        var continuations: [AudioPlaybackNote]
+        var host: Double
+        var lap: Int
+        var onsetElapsed: Double
+    }
+
+    /// Counts and pushes the strikes of one item occurrence, then reports it.
+    private func strike(_ start: Start, sink: AudioRenderCommandSink) {
+        let host = start.host
         let hostTime = AudioHostClock.hostTime(forSeconds: host)
-        for note in item.notes {
+        for note in start.item.notes {
             let held = sounding[note.midi] ?? 0
             sounding[note.midi] = held + 1
             if held > 0, lastStrikeHost[note.midi] == host { continue }
             lastStrikeHost[note.midi] = host
             sink.noteOn(note.midi, velocity: note.velocity * velocityScale, hostTime: hostTime, tag: tag)
         }
-        onItem(item, host)
+        for note in start.continuations where (sounding[note.midi] ?? 0) == 0 {
+            // Its release lies after this strike (notes last at least 30 ms), so it lands behind the merge
+            // position in `heldOffs` and is processed in order.
+            let release = mapper.releaseElapsed(endTick: note.endTick, lap: start.lap, onsetElapsed: start.onsetElapsed)
+            insertHeldOff(HeldOff(hostSeconds: anchorHostSeconds + release, onsetHostSeconds: host, midi: note.midi))
+            sounding[note.midi] = 1
+            lastStrikeHost[note.midi] = host
+            sink.noteOn(note.midi, velocity: note.velocity * velocityScale, hostTime: hostTime, tag: tag)
+        }
+        onItem(start.item, host)
     }
 
     /// Releases one note: the key is released only when no other note of the same pitch still holds it.

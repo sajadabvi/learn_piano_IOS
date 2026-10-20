@@ -267,26 +267,95 @@ struct NotationScrollTransition: Equatable, Sendable {
         return from + (target - from) * p
     }
 
+    /// Updates closer together than this (seconds) count as one continuous stream, such as per-frame playback.
+    static let streamWindow: TimeInterval = 0.25
+    /// Within a stream, a forward move counts as a jump only if the offset changes by more than this fraction of the
+    /// viewport width in one update.
+    static let streamJumpFraction: CGFloat = 0.25
+
     /// Whether a playback position change is a jump that should be eased (seek, loop restart, repeat jump, Wait-Mode
     /// step) rather than followed directly.
     ///
-    /// The decision is made from ticks, not from the offset change, because continuous playback can move the offset
-    /// by large amounts per update at high zoom or tempo. A jump is: the tick going backwards, the tick advancing by more
-    /// than 1/8 of the pulse (never less than a 32nd note, so short pulses like 3/16 still scroll directly) in one
-    /// update, or the cursor landing on a measure other than the same or the next one
-    /// (a repeat or D.C./D.S. jump in a playback timeline, where ticks stay continuous).
-    static func isJump(fromTick oldTick: Double, toTick newTick: Double, fromMeasure oldMeasure: Int?, toMeasure newMeasure: Int?, pulseTicks: Ticks) -> Bool {
+    /// Always jumps: a non-finite tick, the tick going backwards, or the cursor landing on a measure other than the
+    /// same or the next one (a repeat or D.C./D.S. jump in a playback timeline, where ticks stay continuous).
+    ///
+    /// A forward move within the same or next measure is continuous when it advances by at most 1/8 of the pulse
+    /// (never less than a 32nd note, so short pulses like 3/16 still scroll directly). A larger forward move depends
+    /// on how it arrives:
+    /// - as an isolated update (`sinceLastUpdate` is nil or longer than `streamWindow`, e.g. a seek or a Wait-Mode
+    ///   step after the cursor waited) it is a jump;
+    /// - as part of a stream of frequent updates (fast tempo, compressed Wait-Mode rests, dropped frames) it is
+    ///   motion, unless the offset moves by more than `streamJumpFraction` of the viewport in that single update.
+    static func isJump(fromTick oldTick: Double, toTick newTick: Double, fromMeasure oldMeasure: Int?, toMeasure newMeasure: Int?,
+                       pulseTicks: Ticks, offsetChange: CGFloat = .infinity, viewportWidth: CGFloat = 0,
+                       sinceLastUpdate: TimeInterval? = nil) -> Bool {
         guard oldTick.isFinite, newTick.isFinite else { return true }
         let delta = newTick - oldTick
         if delta < -0.5 { return true }
-        if delta > Double(max(pulseTicks, Ticks.perQuarter)) / 8 { return true }
         if let oldMeasure, let newMeasure, newMeasure != oldMeasure, newMeasure != oldMeasure + 1 { return true }
-        return false
+        if delta <= Double(max(pulseTicks, Ticks.perQuarter)) / 8 { return false }
+        if let dt = sinceLastUpdate, dt >= 0, dt <= streamWindow {
+            return abs(offsetChange) > streamJumpFraction * max(0, viewportWidth)
+        }
+        return true
+    }
+
+    /// The transition to switch to after the scroll inputs change from `old` to `new` at `time`, or nil to keep
+    /// this one (including when no transition is wanted and the offset should follow the target directly).
+    ///
+    /// An active transition already follows the live target (see `offset(target:at:)`), so ordinary motion never
+    /// restarts it; restarting on every update would pin the displayed offset near the start of the ease curve,
+    /// whose slope there is zero. Only a large move (more than `streamJumpFraction` of the viewport) may restart a
+    /// transition, and only once it has run for half its duration, so even a stream of large jumps keeps moving.
+    ///
+    /// - Parameters:
+    ///   - displayedOld: the offset on screen just before this update.
+    ///   - viewportWidth: visible width in points.
+    ///   - pulseTicks: pulse of the measure the cursor was in.
+    ///   - sinceLastUpdate: seconds since the previous update of the scroll inputs, nil if there was none.
+    func next(from old: NotationScrollSample, to new: NotationScrollSample, displayedOld: CGFloat, viewportWidth: CGFloat,
+              pulseTicks: Ticks, sinceLastUpdate: TimeInterval?, at time: TimeInterval) -> NotationScrollTransition? {
+        // Same tick with a new offset is a layout or viewport change: follow it directly.
+        guard new.offset != old.offset, new.tick != old.tick else { return nil }
+        let change = new.offset - old.offset
+        guard Self.isJump(fromTick: old.tick, toTick: new.tick, fromMeasure: old.measureIndex, toMeasure: new.measureIndex,
+                          pulseTicks: pulseTicks, offsetChange: change, viewportWidth: viewportWidth,
+                          sinceLastUpdate: sinceLastUpdate) else { return nil }
+        if isActive(at: time) {
+            let large = abs(change) > Self.streamJumpFraction * max(0, viewportWidth)
+            let elapsed = startTime.map { time - $0 } ?? 0
+            guard large, elapsed >= duration / 2 else { return nil }
+        }
+        return .starting(from: displayedOld, at: time, duration: duration)
     }
 
     /// A transition that starts at the currently displayed offset.
     static func starting(from displayed: CGFloat, at time: TimeInterval, duration: TimeInterval = 0.35) -> NotationScrollTransition {
         NotationScrollTransition(from: displayed, startTime: time, duration: duration)
+    }
+}
+
+/// The inputs the scroll stage compares between updates to decide whether an offset change is a jump.
+struct NotationScrollSample: Equatable, Sendable {
+    /// Playback position in timeline ticks.
+    var tick: Double
+    /// Measure under the cursor.
+    var measureIndex: Int?
+    /// Automatic scroll offset (points) for this position.
+    var offset: CGFloat
+}
+
+/// Remembers when the scroll inputs last changed. A reference type held in `@State`, so recording a time on every
+/// frame does not invalidate the view.
+@MainActor
+final class NotationScrollClock {
+    /// Time (reference-date seconds) of the previous update, nil before the first one.
+    private(set) var lastUpdate: TimeInterval?
+
+    /// Records an update at `time` and returns the seconds since the previous one.
+    func tick(at time: TimeInterval) -> TimeInterval? {
+        defer { lastUpdate = time }
+        return lastUpdate.map { time - $0 }
     }
 }
 

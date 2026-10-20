@@ -93,9 +93,21 @@ struct ParsersCompactScoreImporter: ScoreImporter, Sendable {
 
     /// The measure number the first measure must carry (1 for a standalone document).
     var firstMeasureNumber: Int
+    /// Whether this document ends the piece. In the page-by-page transcription flow every page but the last passes
+    /// false: the last measure of such a page is not the end of the piece, so it must be complete.
+    var isFinalPage: Bool
+    /// Whether the piece starts with a pickup, when this document is a later page (the pickup is declared on page 1).
+    /// nil uses the document's own `"pickup"` field.
+    var pieceHasPickup: Bool?
 
-    init(firstMeasureNumber: Int = 1) {
+    /// - Parameters:
+    ///   - firstMeasureNumber: the number the first measure must carry (pages after the first continue the count).
+    ///   - isFinalPage: false for every page of a multi-page transcription except the last.
+    ///   - pieceHasPickup: the `"pickup"` value of page 1 when this is a later page; nil for a standalone document.
+    init(firstMeasureNumber: Int = 1, isFinalPage: Bool = true, pieceHasPickup: Bool? = nil) {
         self.firstMeasureNumber = firstMeasureNumber
+        self.isFinalPage = isFinalPage
+        self.pieceHasPickup = pieceHasPickup
     }
 
     func importScore(data: Data, fileName: String) throws -> ImportResult {
@@ -105,7 +117,8 @@ struct ParsersCompactScoreImporter: ScoreImporter, Sendable {
     /// Parses and validates an LPC document.
     func parse(data: Data, fileName: String = "score.lpc") throws -> ParsersCompactScoreParseResult {
         let root = try ParsersCompactScoreImporter.jsonObject(data)
-        var reader = ParsersCompactScoreReader(root: root, fileName: fileName, firstMeasureNumber: firstMeasureNumber)
+        var reader = ParsersCompactScoreReader(root: root, fileName: fileName, firstMeasureNumber: firstMeasureNumber,
+                                               isFinalPage: isFinalPage, pieceHasPickup: pieceHasPickup)
         return reader.read()
     }
 
@@ -150,13 +163,19 @@ struct ParsersCompactScoreReader {
     let root: [String: Any]
     let fileName: String
     let firstMeasureNumber: Int
+    /// See `ParsersCompactScoreImporter.isFinalPage`.
+    let isFinalPage: Bool
+    /// See `ParsersCompactScoreImporter.pieceHasPickup`.
+    let pieceHasPickup: Bool?
     private var issues: [ParsersCompactScoreIssue] = []
     private var diagnostics: [ScoreDiagnostic] = []
 
-    init(root: [String: Any], fileName: String, firstMeasureNumber: Int) {
+    init(root: [String: Any], fileName: String, firstMeasureNumber: Int, isFinalPage: Bool = true, pieceHasPickup: Bool? = nil) {
         self.root = root
         self.fileName = fileName
         self.firstMeasureNumber = firstMeasureNumber
+        self.isFinalPage = isFinalPage
+        self.pieceHasPickup = pieceHasPickup
     }
 
     /// Records an issue (and its Core diagnostic twin).
@@ -222,6 +241,8 @@ struct ParsersCompactScoreReader {
         var built: [(number: Int, time: TimeSignature?, key: KeySignature?, tempo: Double?, measureUnits: Int, voices: [String: [LPCEvent]])] = []
         var confidence: [Double?] = []
         let lastIndex = rawMeasures.count - 1
+        // Rule 3 exceptions: the pickup itself, and the final measure of the piece when it completes a pickup.
+        let shortFinalAllowed = isFinalPage && (pieceHasPickup ?? pickup)
 
         for (i, rawMeasure) in rawMeasures.enumerated() {
             let expected = firstMeasureNumber + i
@@ -315,7 +336,7 @@ struct ParsersCompactScoreReader {
                 voices[spec.key] = events
                 voiceLengths[spec.key] = total
                 // Rule 3: voice length.
-                let allowShort = (i == 0 && pickup) || i == lastIndex
+                let allowShort = (i == 0 && pickup) || (i == lastIndex && shortFinalAllowed)
                 if total > measureUnits {
                     report(.error, measureIndex: i, voice: spec.key, "Voice \"\(spec.key)\" lasts \(total) divisions but a \(effectiveTime) measure holds \(measureUnits) (divisions = \(divisions)).")
                 } else if total < measureUnits, !allowShort {
@@ -326,6 +347,14 @@ struct ParsersCompactScoreReader {
                 report(.warning, measureIndex: i, "The pickup's voices have different lengths (\(voiceLengths.sorted { $0.key < $1.key }.map { "\($0.key) \($0.value)" }.joined(separator: ", "))).")
             }
             built.append((number, measureTime, measureKey, measureTempo, measureUnits, voices))
+        }
+
+        // A change written on the first measure is the document's starting value: fold it into the initial values so
+        // the score does not carry a measure-0 override (Core would give it precedence over the initial values anyway).
+        if !built.isEmpty {
+            if let t = built[0].time { time = t; built[0].time = nil }
+            if let k = built[0].key { key = k; built[0].key = nil }
+            if let b = built[0].tempo { tempo = b; built[0].tempo = nil }
         }
 
         // Rule 5: ties pair up with the next event of the same voice (across barlines).

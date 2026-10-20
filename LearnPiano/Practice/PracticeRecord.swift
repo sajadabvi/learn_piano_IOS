@@ -24,7 +24,8 @@ struct PracticeSessionRecord: Hashable, Codable, Sendable {
 ///   while it was expected (`PracticeStatistics.cleanSteps`). So `accuracy` = share of steps played cleanly.
 /// * Just Play: correct, early and late steps all count as correct (the learner played the right notes inside
 ///   the timing window); missed steps do not.
-/// * Listen: nothing is expected; the summary only carries the time practiced.
+/// * Listen: nothing is expected; the summary only carries the time practiced and never `reachedEnd`
+///   (listening to the end must not mark a song completed in `SongProgress`).
 enum PracticeSummaryBuilder {
     /// The Core summary for one session.
     static func summary(arrangementID: String, startedAt: Date, durationSeconds: Double, settings: PracticeSettings, statistics: PracticeStatistics, reachedEnd: Bool) -> PracticeSummary {
@@ -47,7 +48,7 @@ enum PracticeSummaryBuilder {
             wrongNotes: settings.mode == .listen ? 0 : statistics.wrongNotes,
             mistakesByMeasure: settings.mode == .listen ? [:] : statistics.mistakesByMeasure,
             measuresCompleted: settings.mode == .listen ? [] : statistics.measuresCompleted,
-            reachedEnd: reachedEnd
+            reachedEnd: settings.mode == .listen ? false : reachedEnd
         )
     }
 

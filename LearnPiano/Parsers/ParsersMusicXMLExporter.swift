@@ -88,8 +88,10 @@ struct ParsersMusicXMLExporter: Sendable {
             w.close("barline")
         }
 
-        let key = i == 0 ? score.initialKey : m.keySignature
-        let time = i == 0 ? score.initialTime : m.timeSignature
+        // The first measure writes the values in force there, which fold a change stored on measures[0] into the
+        // score's initial values (Core gives such a change precedence from tick 0).
+        let key = i == 0 ? score.keySignature(atMeasure: 0) : m.keySignature
+        let time = i == 0 ? score.timeSignature(atMeasure: 0) : m.timeSignature
         if i == 0 || key != nil || time != nil {
             w.open("attributes")
             if i == 0 { w.leaf("divisions", "\(divisions)") }
@@ -113,7 +115,7 @@ struct ParsersMusicXMLExporter: Sendable {
             w.close("attributes")
         }
 
-        if let bpm = i == 0 ? score.initialTempoBPM : m.tempoBPM {
+        if let bpm = i == 0 ? score.tempoBPM(atMeasure: 0) : m.tempoBPM {
             let text = ParsersMusicXMLExporter.format(bpm)
             w.open("direction", attributes: [("placement", "above")])
             w.open("direction-type")
@@ -173,7 +175,9 @@ struct ParsersMusicXMLExporter: Sendable {
                 } else if e.onset < cursor {
                     w.open("backup"); w.leaf("duration", "\((cursor - e.onset) / unit)"); w.close("backup")
                 }
-                let voiceText = "\(key.hand == .right ? e.voice : e.voice + 4)"
+                // Voices 1–4 per staff by convention; a fifth or later voice shares voice 4 so it never changes hands on re-import.
+                let staffVoice = min(4, max(1, e.voice))
+                let voiceText = "\(key.hand == .right ? staffVoice : staffVoice + 4)"
                 let staffText = "\(e.drawnStaff.staffNumber)"
                 if e.notes.isEmpty {
                     writeNote(nil, displayed: nil, chord: false, event: e, voice: voiceText, staff: staffText, bracket: brackets[ei], unit: unit, into: &w)

@@ -154,13 +154,25 @@ enum KeyboardLaneLayout {
 
 // MARK: - View
 
-/// Falling-note lanes drawn above `KeyboardView`, aligned to the same visible range. Give it the playback
-/// timeline and the current (fractional) tick every frame; it draws descending rectangles per hand.
+/// Falling-note lanes drawn above `KeyboardView`, aligned to the same visible range; it draws descending
+/// rectangles per hand.
+///
+/// Two ways to drive the position:
+/// - `tickProvider` + `isPlaying`: while `isPlaying` is true the lanes run their own display-rate
+///   `TimelineView(.animation)` loop (120 Hz on ProMotion) and sample `tickProvider()` once per frame, e.g.
+///   `{ player.positionTick }`, which the player already interpolates. Only the lanes redraw per frame; the
+///   surrounding views are not re-evaluated. When not playing, the provider is still sampled on every redraw.
+/// - `currentTick` alone (no provider): a static position, redrawn only when the caller passes a new value,
+///   which suits Wait Mode while the cursor stands still, previews and thumbnails.
 struct KeyboardLanesView: View {
     /// Timeline whose notes are shown; nil draws an empty lane area.
     var timeline: PlaybackTimeline?
-    /// Current playback tick (fractional, from the player or the practice cursor).
+    /// Position used when `tickProvider` is nil (fractional playback tick).
     var currentTick: Double
+    /// Per-frame source of the playback tick; overrides `currentTick` when set.
+    var tickProvider: (@MainActor () -> Double)? = nil
+    /// Keeps the per-frame loop running so `tickProvider` is sampled at the display rate.
+    var isPlaying: Bool = false
     /// How far ahead notes become visible, in ticks (default: eight quarters).
     var lookaheadTicks: Ticks = Ticks.perQuarter * 8
     /// Vertical scale; nil fits `lookaheadTicks` into the view height.
@@ -183,7 +195,9 @@ struct KeyboardLanesView: View {
     @State private var isAnimating = false
 
     init(timeline: PlaybackTimeline?,
-         currentTick: Double,
+         currentTick: Double = 0,
+         tickProvider: (@MainActor () -> Double)? = nil,
+         isPlaying: Bool = false,
          lookaheadTicks: Ticks = Ticks.perQuarter * 8,
          pixelsPerTick: CGFloat? = nil,
          visibleRange: ClosedRange<Int> = KeyboardRangeFitter.defaultRange,
@@ -194,6 +208,8 @@ struct KeyboardLanesView: View {
          palette: KeyboardPalette = .standard) {
         self.timeline = timeline
         self.currentTick = currentTick
+        self.tickProvider = tickProvider
+        self.isPlaying = isPlaying
         self.lookaheadTicks = lookaheadTicks
         self.pixelsPerTick = pixelsPerTick
         self.visibleRange = visibleRange
@@ -206,17 +222,22 @@ struct KeyboardLanesView: View {
     }
 
     var body: some View {
-        GeometryReader { proxy in
-            TimelineView(.animation(paused: !isAnimating)) { frame in
+        GeometryReader { _ in
+            // Runs per display frame while playing (sampling the tick) or while the range is animating.
+            TimelineView(.animation(paused: KeyboardLaneClock.isFrameLoopPaused(isPlaying: isPlaying,
+                                                                               hasTickProvider: tickProvider != nil,
+                                                                               isRangeAnimating: isAnimating))) { frame in
                 let now = frame.date.timeIntervalSinceReferenceDate
                 let viewport = animatedViewport.viewport(at: now)
+                // Sampled here, on the main actor, once per frame; the canvas captures the value.
+                let tick = KeyboardLaneClock.tick(provider: tickProvider, fallback: currentTick)
                 Canvas(rendersAsynchronously: false) { context, size in
                     let geometry = KeyboardGeometry(size: size, viewport: viewport)
                     KeyboardLaneRenderer.draw(in: &context,
                                               size: size,
                                               geometry: geometry,
                                               timeline: timeline,
-                                              currentTick: currentTick,
+                                              currentTick: tick,
                                               lookaheadTicks: lookaheadTicks,
                                               pixelsPerTick: pixelsPerTick ?? KeyboardLaneLayout.pixelsPerTick(fitting: lookaheadTicks, in: size.height),
                                               hands: hands,
@@ -240,6 +261,23 @@ struct KeyboardLanesView: View {
         }
         .accessibilityLabel("Upcoming notes")
         .accessibilityHidden(true)
+    }
+}
+
+/// Decides when the lanes redraw per display frame and which tick they draw.
+enum KeyboardLaneClock {
+    /// The frame loop runs while playing with a provider to sample, or while the visible range animates;
+    /// otherwise it is paused and the lanes redraw only when their inputs change.
+    static func isFrameLoopPaused(isPlaying: Bool, hasTickProvider: Bool, isRangeAnimating: Bool) -> Bool {
+        !((isPlaying && hasTickProvider) || isRangeAnimating)
+    }
+
+    /// The provider's sample when there is a provider (non-finite samples fall back), else `fallback`.
+    @MainActor
+    static func tick(provider: (@MainActor () -> Double)?, fallback: Double) -> Double {
+        guard let provider else { return fallback }
+        let value = provider()
+        return value.isFinite ? value : fallback
     }
 }
 

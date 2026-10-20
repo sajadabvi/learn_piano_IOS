@@ -397,6 +397,102 @@ final class KeyboardTests: XCTestCase {
         XCTAssertEqual(overridden[64], .expected(.left))
     }
 
+    /// Measure 1: right hand holds C5 (whole note) over a left-hand eighth-note figure C3 G3 E3 G3 C3 G3 E3 G3.
+    /// Measure 2: right hand G3 (whole note, so G3 is played by both hands in the piece) over left-hand D3.
+    private func waitGapTimeline() -> PlaybackTimeline {
+        let figure = ["C3", "G3", "E3", "G3", "C3", "G3", "E3", "G3"].map { (pitches: [$0], ticks: Ticks(480)) }
+        return ScoreBuilder.make(title: "alberti",
+                                 right: [[(pitches: ["C5"], ticks: 3840)], [(pitches: ["G3"], ticks: 3840)]],
+                                 left: [figure, [(pitches: ["D3"], ticks: 3840)]]).makeTimeline()
+    }
+
+    func testDemoInAWaitGapTakesTheHandFromTheEventStates() {
+        let timeline = waitGapTimeline()
+        // Wait Mode practising the right hand: the cursor already points at the next right-hand step (tick 3840)
+        // while the left-hand G3 at tick 2400 is being demoed in the gap.
+        guard let next = timeline.steps.firstIndex(where: { $0.tick == 3840 }),
+              let demoed = timeline.events.first(where: { $0.hand == .left && $0.tick == 2400 }) else {
+            return XCTFail("timeline is missing the expected step/event")
+        }
+        XCTAssertEqual(demoed.pitches, [55])
+        let rightG3 = timeline.steps[next].events.first { $0.hand == .right }
+        XCTAssertEqual(rightG3?.pitches, [55])   // the step window alone would attribute G3 to the right hand
+
+        let snapshot = FeedbackSnapshot(keyStates: [55: .demo, 79: .upcoming],
+                                        eventStates: [demoed.id: .demo, rightG3?.id ?? "": .upcoming],
+                                        currentStepIndex: next)
+        let states = KeyboardKeyStateMapper.states(from: snapshot, timeline: timeline)
+        XCTAssertEqual(states[55], .demo(.left))
+        // An explicit prebuilt index gives the same answer.
+        let index = KeyboardKeyStateMapper.EventIndex(timeline: timeline)
+        XCTAssertEqual(KeyboardKeyStateMapper.states(from: snapshot, timeline: timeline, eventIndex: index)[55], .demo(.left))
+        // 79 (G5) is in no event: it stays unattributed.
+        XCTAssertEqual(states[79], .upcoming(nil))
+    }
+
+    func testStepWindowFallbackLooksBackIntoTheGap() {
+        let timeline = waitGapTimeline()
+        guard let next = timeline.steps.firstIndex(where: { $0.tick == 3840 }) else { return XCTFail("missing step") }
+        // No event states: E3 (52) is only played inside the gap, before the current step.
+        let window = KeyboardKeyStateMapper.handByPitch(timeline: timeline, currentStepIndex: next)
+        XCTAssertEqual(window[52], .left)
+        XCTAssertEqual(window[55], .right)       // nearest event to the current step wins
+        XCTAssertEqual(window[50], .left)        // D3 at the current step
+        let states = KeyboardKeyStateMapper.states(from: FeedbackSnapshot(keyStates: [52: .demo], currentStepIndex: next),
+                                                   timeline: timeline)
+        XCTAssertEqual(states[52], .demo(.left))
+    }
+
+    func testNilStepIndexUsesEventStatesThenTheSoleHandOfAPitch() {
+        let timeline = waitGapTimeline()
+        guard let demoed = timeline.events.first(where: { $0.hand == .left && $0.tick == 2400 }) else {
+            return XCTFail("missing event")
+        }
+        let snapshot = FeedbackSnapshot(keyStates: [55: .demo, 48: .expected, 72: .upcoming],
+                                        eventStates: [demoed.id: .demo],
+                                        currentStepIndex: nil)
+        let states = KeyboardKeyStateMapper.states(from: snapshot, timeline: timeline)
+        XCTAssertEqual(states[55], .demo(.left))      // from the event states
+        XCTAssertEqual(states[48], .expected(.left))  // C3 is only ever played by the left hand
+        XCTAssertEqual(states[72], .upcoming(.right)) // C5 is only ever played by the right hand
+        XCTAssertEqual(KeyboardKeyStateMapper.handByPitch(timeline: timeline, currentStepIndex: nil), [:])
+    }
+
+    func testEventIndexCacheFollowsTheTimeline() {
+        let first = waitGapTimeline()
+        let second = twoNoteTimeline()
+        let a = KeyboardKeyStateMapper.eventIndex(for: first)
+        XCTAssertTrue(a.matches(first))
+        XCTAssertFalse(a.matches(second))
+        XCTAssertEqual(a.eventsByID.count, first.events.count)
+        let b = KeyboardKeyStateMapper.eventIndex(for: second)
+        XCTAssertTrue(b.matches(second))
+        XCTAssertEqual(b.eventsByID.count, second.events.count)
+        XCTAssertNil(a.soleHandByPitch[55])           // G3 is played by both hands
+        XCTAssertEqual(a.soleHandByPitch[50], .left)
+    }
+
+    // MARK: - Lane clock
+
+    func testLaneFrameLoopRunsOnlyWhilePlayingWithAProviderOrAnimating() {
+        XCTAssertFalse(KeyboardLaneClock.isFrameLoopPaused(isPlaying: true, hasTickProvider: true, isRangeAnimating: false))
+        XCTAssertTrue(KeyboardLaneClock.isFrameLoopPaused(isPlaying: true, hasTickProvider: false, isRangeAnimating: false))
+        XCTAssertTrue(KeyboardLaneClock.isFrameLoopPaused(isPlaying: false, hasTickProvider: true, isRangeAnimating: false))
+        XCTAssertFalse(KeyboardLaneClock.isFrameLoopPaused(isPlaying: false, hasTickProvider: false, isRangeAnimating: true))
+    }
+
+    @MainActor
+    func testLaneClockSamplesTheProviderEachCall() {
+        var position = 100.0
+        let provider: @MainActor () -> Double = { position }
+        XCTAssertEqual(KeyboardLaneClock.tick(provider: provider, fallback: 5), 100)
+        position = 160.5
+        XCTAssertEqual(KeyboardLaneClock.tick(provider: provider, fallback: 5), 160.5)
+        XCTAssertEqual(KeyboardLaneClock.tick(provider: nil, fallback: 5), 5)
+        position = .nan
+        XCTAssertEqual(KeyboardLaneClock.tick(provider: provider, fallback: 5), 5)
+    }
+
     func testMergingHeldKeysNeverOverridesCallerStates() {
         let merged = KeyboardKeyStateMapper.merging([60: .correct], heldByTouch: [60, 62])
         XCTAssertEqual(merged[60], .correct)

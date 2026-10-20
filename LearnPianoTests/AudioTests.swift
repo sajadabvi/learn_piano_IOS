@@ -32,6 +32,47 @@ private func render(_ state: AudioSynthRenderState, frames: Int = 256, hostTime:
     return buffer
 }
 
+/// Runs `body` with an idle voice backed by a temporary partial bank.
+private func withVoice(_ body: (inout AudioSynthVoice) -> Void) {
+    let bank = UnsafeMutablePointer<Float>.allocate(capacity: AudioSynthVoice.bankFloats)
+    bank.initialize(repeating: 0, count: AudioSynthVoice.bankFloats)
+    defer {
+        bank.deinitialize(count: AudioSynthVoice.bankFloats)
+        bank.deallocate()
+    }
+    var voice = AudioSynthVoice(bank: bank)
+    body(&voice)
+}
+
+/// Renders `frames` samples of one voice in irregular chunks (to cross sub-block boundaries mid-call).
+private func renderVoice(_ voice: inout AudioSynthVoice, frames: Int) -> [Float] {
+    var out = [Float](repeating: 0, count: frames)
+    let scratch = UnsafeMutablePointer<Float>.allocate(capacity: AudioSynthVoice.subBlockLength)
+    defer { scratch.deallocate() }
+    out.withUnsafeMutableBufferPointer { buffer in
+        guard let base = buffer.baseAddress else { return }
+        var done = 0
+        var chunk = 37
+        while done < frames {
+            let n = min(chunk, frames - done)
+            voice.render(into: base, start: done, count: n, scratch: scratch)
+            done += n
+            chunk = chunk == 37 ? 256 : 37
+        }
+    }
+    return out
+}
+
+/// Host time `seconds` after `base` (host seconds).
+private func hostTime(_ base: Double, _ seconds: Double) -> UInt64 {
+    AudioHostClock.hostTime(forSeconds: base + seconds)
+}
+
+/// Collects the MIDI bytes a render state sends to a (fake) sampler.
+private final class MIDIRecorder: @unchecked Sendable {
+    var messages: [[UInt8]] = []
+}
+
 private func pitch(_ name: String) -> Pitch {
     guard let p = Pitch(name: name) else {
         XCTFail("bad pitch \(name)")
@@ -167,20 +208,235 @@ final class AudioSynthTests: XCTestCase {
     }
 
     func testVelocityDrivesLoudness() {
-        var soft = AudioSynthVoice()
-        var loud = AudioSynthVoice()
-        soft.start(midi: 60, velocity: 0.2, sampleRate: 48_000, a4: 440, age: 1)
-        loud.start(midi: 60, velocity: 1.0, sampleRate: 48_000, a4: 440, age: 2)
-        XCTAssertGreaterThan(loud.level, soft.level)
+        var softLevel: Float = 0
+        var loudLevel: Float = 0
+        withVoice { soft in
+            soft.start(midi: 60, velocity: 0.2, sampleRate: 48_000, a4: 440, age: 1)
+            softLevel = soft.level
+        }
+        withVoice { loud in
+            loud.start(midi: 60, velocity: 1.0, sampleRate: 48_000, a4: 440, age: 2)
+            loudLevel = loud.level
+        }
+        XCTAssertGreaterThan(loudLevel, softLevel)
     }
 
     func testUndampedTrebleIgnoresNormalReleaseButNotRestrike() {
-        var voice = AudioSynthVoice()
-        voice.start(midi: 100, velocity: 0.8, sampleRate: 48_000, a4: 440, age: 1)
-        voice.release(sampleRate: 48_000)
-        XCTAssertFalse(voice.isReleasing)
-        voice.release(sampleRate: 48_000, force: true)
-        XCTAssertTrue(voice.isReleasing)
+        withVoice { voice in
+            voice.start(midi: 100, velocity: 0.8, sampleRate: 48_000, a4: 440, age: 1)
+            voice.release(sampleRate: 48_000)
+            XCTAssertFalse(voice.isReleasing)
+            voice.release(sampleRate: 48_000, force: true)
+            XCTAssertTrue(voice.isReleasing)
+        }
+    }
+
+    /// The block-based renderer (rotators, per-sub-block envelopes with linear ramps) must match an exact
+    /// double-precision additive model built from the same partial parameters.
+    func testVoiceMatchesExactAdditiveReference() {
+        withVoice { voice in
+            voice.start(midi: 45, velocity: 0.78, sampleRate: 48_000, a4: 440, age: 1)
+            let p = AudioSynthVoice.partialCount
+            func row(_ field: AudioSynthVoice.BankField) -> [Double] { (0..<p).map { Double(voice.bank[field.rawValue * p + $0]) } }
+            let cosine = row(.cosine), sine = row(.sine)
+            let fast = row(.envelopeFast), slow = row(.envelopeSlow)
+            let decayFast = row(.blockDecayFast), decaySlow = row(.blockDecaySlow)
+            let frames = 48_000 * 2
+            let out = renderVoice(&voice, frames: frames)
+            var errorEnergy = 0.0
+            var referenceEnergy = 0.0
+            // Skip the attack ramp and the hammer burst (first 12 ms), which the reference does not model.
+            for i in 1_000..<frames {
+                let t = Double(i + 1)
+                var reference = 0.0
+                for k in 0..<p where fast[k] + slow[k] > 0 {
+                    let omega = atan2(sine[k], cosine[k])
+                    let envelope = fast[k] * pow(decayFast[k], t / Double(AudioSynthVoice.subBlockLength))
+                        + slow[k] * pow(decaySlow[k], t / Double(AudioSynthVoice.subBlockLength))
+                    reference += envelope * sin(omega * t)
+                }
+                let difference = Double(out[i]) - reference
+                errorEnergy += difference * difference
+                referenceEnergy += reference * reference
+            }
+            XCTAssertGreaterThan(referenceEnergy, 0)
+            XCTAssertLessThan((errorEnergy / referenceEnergy).squareRoot(), 1e-3, "relative RMS error")
+            XCTAssertTrue(out.allSatisfy { $0.isFinite })
+        }
+    }
+
+    func testPartialsAboveTheNyquistGuardAreNotGenerated() {
+        withVoice { voice in
+            voice.start(midi: 108, velocity: 1, sampleRate: 48_000, a4: 440, age: 1)
+            let count = voice.activePartialCount
+            XCTAssertGreaterThan(count, 0)
+            XCTAssertLessThan(count, AudioSynthVoice.partialCount, "C8 has only a few partials below 21.6 kHz")
+            let p = AudioSynthVoice.partialCount
+            for k in 0..<p {
+                let omega = atan2(Double(voice.bank[AudioSynthVoice.BankField.sine.rawValue * p + k]),
+                                  Double(voice.bank[AudioSynthVoice.BankField.cosine.rawValue * p + k]))
+                let amplitude = voice.bank[AudioSynthVoice.BankField.amplitude.rawValue * p + k]
+                if k < count {
+                    XCTAssertLessThan(omega * 48_000 / (2 * .pi), 0.45 * 48_000 + 1)
+                    XCTAssertGreaterThan(amplitude, 0)
+                } else {
+                    XCTAssertEqual(amplitude, 0, "partial \(k) above the guard is silent")
+                }
+            }
+        }
+        withVoice { voice in
+            voice.start(midi: 21, velocity: 1, sampleRate: 48_000, a4: 440, age: 1)
+            XCTAssertEqual(voice.activePartialCount, AudioSynthVoice.partialCount, "the bass uses the whole bank")
+        }
+    }
+
+    func testHeldBassNoteDecaysAndFreesItself() {
+        withVoice { voice in
+            voice.start(midi: 21, velocity: 1, sampleRate: 48_000, a4: 440, age: 1)
+            let early = renderVoice(&voice, frames: 48_000).dropFirst(24_000).map { abs($0) }.max() ?? 0
+            var late: Float = 0
+            for _ in 0..<8 { late = renderVoice(&voice, frames: 48_000).map { abs($0) }.max() ?? 0 }
+            XCTAssertGreaterThan(early, 0.001)
+            XCTAssertLessThan(late, early, "a held note decays")
+            XCTAssertTrue(late.isFinite)
+            for _ in 0..<60 where voice.isActive { _ = renderVoice(&voice, frames: 48_000) }
+            XCTAssertFalse(voice.isActive, "a silent voice frees itself")
+        }
+    }
+
+    /// Render-cost guard: 48 sounding voices for 1 s of audio. Budgets: 0.15 s in optimized builds; in
+    /// unoptimized (Debug) builds the loop must still run well under real time.
+    func testRenderCostOf48VoicesStaysWithinBudget() {
+        #if DEBUG
+        let budget = 0.75
+        #else
+        let budget = 0.15
+        #endif
+        var best = Double.infinity
+        for _ in 0..<3 {
+            let queue = AudioCommandQueue()
+            let state = AudioSynthRenderState(voiceCount: 48, sampleRate: 48_000, a4Hertz: 440, queue: queue)
+            for k in 0..<48 { queue.push(.noteOn(24 + (k * 61) % 72, velocity: 0.9)) }
+            render(state, frames: 256)
+            XCTAssertEqual(state.activeVoiceCount, 48)
+            var ts = makeTimestamp()
+            var buffer = [Float](repeating: 0, count: 256)
+            let started = DispatchTime.now().uptimeNanoseconds
+            for _ in 0..<(48_000 / 256) {
+                buffer.withUnsafeMutableBufferPointer { out in
+                    guard let base = out.baseAddress else { return }
+                    withUnsafePointer(to: &ts) { state.render(timestamp: $0, frameCount: 256, into: base) }
+                }
+            }
+            best = min(best, Double(DispatchTime.now().uptimeNanoseconds - started) / 1e9)
+        }
+        XCTAssertLessThan(best, budget, "1 s of 48-voice audio took \(best) s")
+    }
+
+    func testSoftClipIsContinuousMonotonicAndBounded() {
+        let step: Float = 0.0001
+        var previous = AudioSynthRenderState.softClip(0)
+        var x: Float = 0
+        var steps = 0
+        while steps < 40_000 {
+            x += step
+            steps += 1
+            let y = AudioSynthRenderState.softClip(x)
+            XCTAssertLessThanOrEqual(y - previous, step * 1.01 + 1e-6, "no jump at \(x)")
+            XCTAssertGreaterThanOrEqual(y, previous, "monotonic at \(x)")
+            XCTAssertLessThan(y, 1.0 + 1e-6)
+            previous = y
+        }
+        XCTAssertEqual(AudioSynthRenderState.softClip(0.5), 0.5, "identity below the knee")
+        XCTAssertEqual(AudioSynthRenderState.softClip(-0.9), -AudioSynthRenderState.softClip(0.9), "odd symmetry")
+        XCTAssertEqual(AudioSynthRenderState.softClip(.nan), 0)
+        let knee = AudioSynthRenderState.softClipKnee
+        XCTAssertEqual(AudioSynthRenderState.softClip(knee + 1e-4), knee + 1e-4, accuracy: 1e-6, "slope 1 at the knee")
+    }
+
+    /// Wait Mode re-strikes the other hand's C3 before the first strike's notated length is over: the first
+    /// chord's scheduled release must not cut the second strike.
+    func testEarlierChordReleaseDoesNotCutANewerStrikeOfTheSameKey() {
+        let queue = AudioCommandQueue()
+        let sink = AudioRenderCommandSink(queue: queue)
+        let state = AudioSynthRenderState(voiceCount: 32, sampleRate: 48_000, a4Hertz: 440, queue: queue)
+        let base = AudioHostClock.nowSeconds + 100
+        let first = sink.playChord([60], velocity: 0.8, durationSeconds: 1.0, hostTime: hostTime(base, 0))
+        let second = sink.playChord([60], velocity: 0.8, durationSeconds: 1.0, hostTime: hostTime(base, 0.5))
+        XCTAssertEqual(first.count, 1)
+        XCTAssertNotEqual(first, second, "every strike has its own identity")
+        XCTAssertFalse(first.contains(0))
+        for (t, held) in [(0.0, [60]), (0.6, [60]), (1.1, [60]), (1.2, [60]), (1.6, [Int]())] {
+            render(state, hostTime: hostTime(base, t))
+            XCTAssertEqual(state.heldMIDINotes, held, "held keys at \(t) s")
+        }
+    }
+
+    func testAnonymousReleasesOnlyAffectTheirOwnProducer() {
+        let queue = AudioCommandQueue()
+        let state = AudioSynthRenderState(voiceCount: 32, sampleRate: 48_000, a4Hertz: 440, queue: queue)
+        queue.push(.noteOn(60, velocity: 0.8, tag: AudioPianoSynth.Tag.immediate, strikeID: 42))
+        render(state)
+        queue.push(.noteOff(60, tag: AudioPianoSynth.Tag.player))
+        render(state)
+        XCTAssertEqual(state.heldMIDINotes, [60], "a player release does not cut an immediate note")
+        queue.push(.noteOff(60, tag: AudioPianoSynth.Tag.immediate, strikeID: 41))
+        render(state)
+        XCTAssertEqual(state.heldMIDINotes, [60], "a release naming another strike does nothing")
+        queue.push(.noteOff(60, tag: AudioPianoSynth.Tag.immediate))
+        render(state)
+        XCTAssertEqual(state.heldMIDINotes, [], "an anonymous release of the same producer releases the key")
+        queue.push(.noteOn(64, velocity: 0.8, tag: AudioPianoSynth.Tag.player))
+        queue.push(.noteOn(67, velocity: 0.8, tag: AudioPianoSynth.Tag.immediate, strikeID: 7))
+        render(state)
+        queue.push(.allNotesOff())
+        render(state)
+        XCTAssertEqual(state.heldMIDINotes, [], "all-notes-off releases every producer")
+    }
+
+    /// With a SoundFont the sampler only knows keys: the key is released when its last strike ends.
+    func testSamplerKeyIsReleasedOnlyWhenItsLastStrikeEnds() {
+        let queue = AudioCommandQueue()
+        let sink = AudioRenderCommandSink(queue: queue)
+        let state = AudioSynthRenderState(voiceCount: 32, sampleRate: 48_000, a4Hertz: 440, queue: queue)
+        let recorder = MIDIRecorder()
+        state.enableSampler { _, _, length, bytes in
+            recorder.messages.append(Array(UnsafeBufferPointer(start: bytes, count: length)))
+        }
+        let base = AudioHostClock.nowSeconds + 100
+        sink.playChord([48], velocity: 0.8, durationSeconds: 1.0, hostTime: hostTime(base, 0))
+        sink.playChord([48], velocity: 0.8, durationSeconds: 1.0, hostTime: hostTime(base, 0.5))
+        for t in [0.0, 0.6, 1.1] { render(state, hostTime: hostTime(base, t)) }
+        XCTAssertEqual(recorder.messages.map { $0[0] }, [0x90, 0x90], "the first chord's release keeps the key down")
+        render(state, hostTime: hostTime(base, 1.6))
+        XCTAssertEqual(recorder.messages.map { $0[0] }, [0x90, 0x90, 0x80])
+        XCTAssertEqual(recorder.messages.last?[1], 48)
+        XCTAssertEqual(state.activeVoiceCount, 0, "notes went to the sampler, not the synth")
+        // Moving notes back to the synth silences whatever still rings on the sampler.
+        queue.push(.noteOn(50, velocity: 0.8))
+        render(state)
+        state.disableSampler()
+        queue.push(.noteOn(52, velocity: 0.8))
+        render(state)
+        XCTAssertEqual(recorder.messages.last, [0xB0, 123, 0])
+        XCTAssertEqual(state.heldMIDINotes, [52])
+    }
+
+    func testDiscardStaleKeepsOnlyFutureAndControlCommandsInOrder() {
+        let queue = AudioCommandQueue()
+        let now = AudioHostClock.now()
+        let past = AudioHostClock.hostTime(forSeconds: AudioHostClock.seconds(forHostTime: now) - 1)
+        let future = AudioHostClock.hostTime(forSeconds: AudioHostClock.seconds(forHostTime: now) + 1)
+        queue.push(.noteOn(60, velocity: 0.8))                          // "now" when pushed: stale
+        queue.push(.noteOn(62, velocity: 0.8, hostTime: future, tag: 1)) // still ahead: kept
+        queue.push(.noteOff(60, hostTime: past))                         // past: stale
+        queue.push(.cancelPending(tag: 1, cutoffHostTime: past))         // control: kept
+        queue.push(.click(accented: true, hostTime: future, tag: 2))     // kept
+        queue.push(.allNotesOff())                                       // stale
+        XCTAssertEqual(queue.discardStale(atHostTime: now), 3)
+        let kept = drainCommands(queue)
+        XCTAssertEqual(kept.map(\.kind), [.noteOn, .cancelPending, .click])
+        XCTAssertEqual(kept.first?.midi, 62)
     }
 
     func testCommandQueueIsFIFOAndBounded() {
@@ -321,6 +577,11 @@ final class AudioTransportMapperTests: XCTestCase {
         XCTAssertEqual(items[1].hand, .left)
         XCTAssertEqual(items[1].notes.first?.velocity ?? 0, AudioPlaybackPlan.defaultLeftVelocity, accuracy: 1e-9)
         XCTAssertTrue(items[2].notes.isEmpty, "continuation is not re-struck")
+        XCTAssertEqual(items[2].continuations.map(\.note.midi), [60])
+        XCTAssertEqual(items[2].continuations.first?.note.endTick, 5760, "a continuation ends with its chain")
+        XCTAssertEqual(items[2].continuations.first?.attackTick, 0)
+        XCTAssertEqual(items[2].continuationsToStrike(lapStartTick: 0), [], "already sounding from the attack")
+        XCTAssertEqual(items[2].continuationsToStrike(lapStartTick: 3840).map(\.midi), [60], "a lap starting on it strikes it")
         XCTAssertEqual(items[3].notes.map(\.midi), [64])
         XCTAssertEqual(timeline.events[items[3].eventIndex].tick, 5760)
     }
@@ -398,6 +659,92 @@ final class AudioTransportMapperTests: XCTestCase {
         let queue = AudioCommandQueue()
         XCTAssertTrue(job.pump(untilHostSeconds: 5, sink: AudioRenderCommandSink(queue: queue)))
         XCTAssertNil(queue.pop())
+    }
+
+    /// Measure 1: whole-note C4 tied into measure 2 (tempo 120: one measure = 2 s).
+    private func tiedWholeNotes(measures: Int) -> PlaybackTimeline {
+        let c4 = pitch("C4")
+        let list = (0..<measures).map { index in
+            Measure(number: index + 1, events: [
+                MeasureEvent(onset: 0, duration: 3840,
+                             notes: [ChordNote(pitch: c4, tieStart: index < measures - 1, tieStop: index > 0)], hand: .right),
+            ])
+        }
+        return Score(metadata: ScoreMetadata(title: "Ties"), initialTempoBPM: 120, measures: list).makeTimeline()
+    }
+
+    /// Seconds after `anchor` of the commands of one kind, rounded to 0.1 ms.
+    private func times(_ commands: [AudioRenderCommand], _ kind: AudioRenderCommand.Kind, anchor: Double) -> [Double] {
+        commands.filter { $0.kind == kind }.map { ((AudioHostClock.seconds(forHostTime: $0.hostTime) - anchor) * 10_000).rounded() / 10_000 }
+    }
+
+    func testLoopLapStartingInsideATieStrikesTheTiedNote() {
+        let timeline = tiedWholeNotes(measures: 2)
+        let items = AudioPlaybackPlan.items(from: timeline)
+        let mapper = AudioTransportMapper(tempoMap: timeline.tempoMap, speed: 1, startTick: 0, endTick: timeline.totalTicks, loop: 3840..<7680)
+        let anchor = AudioHostClock.nowSeconds + 100
+        let job = AudioPlaybackJob(mapper: mapper, anchorHostSeconds: anchor, items: items, audibleHands: .both, tag: 1) { _, _ in }
+        let queue = AudioCommandQueue()
+        XCTAssertFalse(job.pump(untilHostSeconds: anchor + 6.5, sink: AudioRenderCommandSink(queue: queue)))
+        let commands = drainCommands(queue)
+        XCTAssertTrue(commands.allSatisfy { $0.midi == 60 })
+        XCTAssertEqual(times(commands, .noteOn, anchor: anchor), [0, 4, 6], "struck at the attack and at every lap onset")
+        XCTAssertEqual(times(commands, .noteOff, anchor: anchor), [4, 6], "each strike is cut at its lap end")
+        // At a lap wrap the release is queued before the new strike.
+        let wrap = commands.filter { abs(AudioHostClock.seconds(forHostTime: $0.hostTime) - anchor - 4) < 1e-6 }
+        XCTAssertEqual(wrap.map(\.kind), [.noteOff, .noteOn])
+    }
+
+    func testRunStartedOnATieContinuationStrikesItAtOnce() {
+        let timeline = tiedWholeNotes(measures: 2)
+        let mapper = AudioTransportMapper(tempoMap: timeline.tempoMap, speed: 1, startTick: 3840, endTick: timeline.totalTicks, loop: nil)
+        let anchor = AudioHostClock.nowSeconds + 100
+        let job = AudioPlaybackJob(mapper: mapper, anchorHostSeconds: anchor, items: AudioPlaybackPlan.items(from: timeline),
+                                   audibleHands: .both, tag: 1) { _, _ in }
+        let queue = AudioCommandQueue()
+        XCTAssertTrue(job.pump(untilHostSeconds: anchor + 10, sink: AudioRenderCommandSink(queue: queue)))
+        let commands = drainCommands(queue)
+        XCTAssertEqual(commands.map(\.midi), [60, 60])
+        XCTAssertEqual(times(commands, .noteOn, anchor: anchor), [0])
+        XCTAssertEqual(times(commands, .noteOff, anchor: anchor), [2])
+    }
+
+    func testChainedTieIsStruckOnlyAtTheFirstLinkInsideTheLap() {
+        let timeline = tiedWholeNotes(measures: 3)
+        let items = AudioPlaybackPlan.items(from: timeline)
+        XCTAssertEqual(items.map(\.tick), [0, 3840, 7680])
+        XCTAssertEqual(items[0].notes.first?.endTick, 11_520, "the attack lasts the whole chain")
+        XCTAssertEqual(items[2].continuations.first?.tiedFromTick, 3840)
+        XCTAssertEqual(items[2].continuations.first?.note.endTick, 11_520)
+        // Loop over measures 2-3: only measure 2 strikes; measure 3 continues that strike.
+        XCTAssertEqual(items[1].continuationsToStrike(lapStartTick: 3840).map(\.midi), [60])
+        XCTAssertEqual(items[2].continuationsToStrike(lapStartTick: 3840), [])
+        // Loop over measure 3 only: it strikes.
+        XCTAssertEqual(items[2].continuationsToStrike(lapStartTick: 7680).map(\.midi), [60])
+
+        let mapper = AudioTransportMapper(tempoMap: timeline.tempoMap, speed: 1, startTick: 3840, endTick: timeline.totalTicks, loop: nil)
+        let anchor = AudioHostClock.nowSeconds + 100
+        let job = AudioPlaybackJob(mapper: mapper, anchorHostSeconds: anchor, items: items, audibleHands: .both, tag: 1) { _, _ in }
+        let queue = AudioCommandQueue()
+        XCTAssertTrue(job.pump(untilHostSeconds: anchor + 10, sink: AudioRenderCommandSink(queue: queue)))
+        let commands = drainCommands(queue)
+        XCTAssertEqual(times(commands, .noteOn, anchor: anchor), [0], "struck once, not again at measure 3")
+        XCTAssertEqual(times(commands, .noteOff, anchor: anchor), [4], "and held through the end of the chain")
+    }
+
+    func testTieContinuationIsNotRestruckWhileTheKeyIsAdopted() {
+        let timeline = tiedWholeNotes(measures: 2)
+        let mapper = AudioTransportMapper(tempoMap: timeline.tempoMap, speed: 1, startTick: 3840, endTick: timeline.totalTicks, loop: nil)
+        let anchor = AudioHostClock.nowSeconds + 100
+        let job = AudioPlaybackJob(mapper: mapper, anchorHostSeconds: anchor, items: AudioPlaybackPlan.items(from: timeline),
+                                   audibleHands: .both, tag: 1) { _, _ in }
+        // A re-time hand-over on the continuation: the old run's C4 keeps sounding until 1.5 s.
+        XCTAssertTrue(job.adopt([AudioOwedNoteOff(midi: 60, onsetHostSeconds: anchor - 2, hostSeconds: anchor + 1.5, tag: 1)]))
+        let queue = AudioCommandQueue()
+        XCTAssertTrue(job.pump(untilHostSeconds: anchor + 10, sink: AudioRenderCommandSink(queue: queue)))
+        let commands = drainCommands(queue)
+        XCTAssertEqual(times(commands, .noteOn, anchor: anchor), [], "no re-attack of a sounding tie")
+        XCTAssertEqual(times(commands, .noteOff, anchor: anchor), [1.5])
     }
 
     @MainActor
@@ -529,6 +876,21 @@ private func effectiveTimedCommands(_ stream: [AudioRenderCommand]) -> [AudioRen
 }
 
 final class AudioHandOverTests: XCTestCase {
+    @MainActor
+    func testEngineStopPausesThePlayerAndReportsIt() {
+        let synth = AudioPianoSynth()
+        let player = AudioScorePlayer(synth: synth)
+        var interruptions = 0
+        player.onInterrupted = { interruptions += 1 }
+        player.load(timeline: ScoreBuilder.make(title: "Stop", tempo: 120, right: [[(["C4"], 3840)]]).makeTimeline())
+        player.seek(toTick: 960)
+        synth.stop()
+        XCTAssertEqual(interruptions, 1, "engine-stop handlers run on stop()")
+        XCTAssertFalse(player.isPlaying)
+        XCTAssertEqual(player.positionTick, 960, "the position is kept")
+        XCTAssertFalse(synth.isRunning)
+    }
+
     @MainActor
     func testMasterVolumeClampsWithoutRecursing() {
         let synth = AudioPianoSynth()

@@ -143,14 +143,16 @@ struct ParsersMIDIImporter: ScoreImporter, Sendable {
 
     /// Assigns each note to a hand.
     ///
-    /// - `streamHands` (from track names such as "Left hand" or "RH") decides when it names a hand for every stream.
+    /// - `streamHands` (from track names such as "Left hand" or "RH") decides only when at least two streams are used,
+    ///   every used stream is named, and the names cover both hands. A single stream is always split by pitch, because
+    ///   one track name cannot describe a two-hand part.
     /// - With exactly two streams, the stream with the lower average pitch is the left hand (on a tie, the second).
     /// - Otherwise notes at or above `splitPoint` are right-hand notes; a lower note is still given to the right hand
     ///   when nothing in the right hand is sounding or starting at its onset and it lies within a major sixth
     ///   (9 semitones) below the right hand's recent centroid.
     static func assignHands(_ notes: [ParsersMIDINote], streamCount: Int, splitPoint: Int = 60, streamHands: [Int: Hand] = [:]) -> [Hand] {
         let used = Set(notes.map { $0.stream })
-        if !used.isEmpty, used.allSatisfy({ streamHands[$0] != nil }) {
+        if used.count >= 2, used.allSatisfy({ streamHands[$0] != nil }), Set(used.compactMap { streamHands[$0] }).count == 2 {
             return notes.map { streamHands[$0.stream] ?? .right }
         }
         if streamCount == 2 {
@@ -185,13 +187,27 @@ struct ParsersMIDIImporter: ScoreImporter, Sendable {
         return hands
     }
 
-    /// The hand a track name refers to ("Left hand", "LH", "Bass", "Piano RH", "Treble"…), or nil.
+    /// Whole-word track-name markers for each hand. Matching is by token, so "Bright Acoustic Piano", "Copyright",
+    /// "Bassoon" or "Contrabass" do not count.
+    private static let leftHandWords: Set<String> = ["left", "links", "linke", "lefthand", "lh", "bass", "gauche", "sinistra"]
+    private static let rightHandWords: Set<String> = ["right", "rechts", "rechte", "righthand", "rh", "treble", "droite", "destra"]
+
+    /// The hand a track name refers to ("Left hand", "LH", "L.H.", "Bass", "Piano RH", "Treble"…), or nil.
+    ///
+    /// The name is split into letter tokens (dots inside abbreviations such as "l.h." are removed first); a hand is
+    /// returned only when a token is one of the hand words and the name does not also name the other hand.
     static func hand(forTrackName name: String) -> Hand? {
-        let lower = name.lowercased()
-        let words = Set(lower.split(whereSeparator: { !$0.isLetter && $0 != "." }).map(String.init))
-        if lower.contains("left") || lower.contains("links") || lower.contains("bass") || words.contains("lh") || words.contains("l.h.") || words.contains("l.h") { return .left }
-        if lower.contains("right") || lower.contains("rechts") || lower.contains("treble") || words.contains("rh") || words.contains("r.h.") || words.contains("r.h") { return .right }
-        return nil
+        let tokens = name.lowercased()
+            .split(whereSeparator: { !$0.isLetter && $0 != "." })
+            .map { $0.replacingOccurrences(of: ".", with: "") }
+            .filter { !$0.isEmpty }
+        let left = tokens.contains { leftHandWords.contains($0) }
+        let right = tokens.contains { rightHandWords.contains($0) }
+        switch (left, right) {
+        case (true, false): return .left
+        case (false, true): return .right
+        default: return nil
+        }
     }
 
     /// Estimates the key from a duration-weighted pitch-class histogram (index 0 = C) using the Krumhansl–Kessler

@@ -41,12 +41,14 @@ final class InputPitchPipeline {
         set { detector.configuration = newValue }
     }
 
-    /// Tracker parameters (confirmation frames, release frames…). `framePeriod` always follows the hop.
+    /// Tracker parameters (confirmation frames, release frames…). `framePeriod` and `binWidth` always follow
+    /// the hop and FFT size.
     var trackerConfiguration: InputNoteTrackerConfiguration {
         get { tracker.configuration }
         set {
             var configuration = newValue
             configuration.framePeriod = Double(hop) / sampleRate
+            configuration.binWidth = analyzer.binWidth
             tracker.configuration = configuration
         }
     }
@@ -66,21 +68,41 @@ final class InputPitchPipeline {
         detector = InputPitchDetector(binWidth: analyzer.binWidth, binCount: analyzer.binCount, configuration: detectorConfiguration)
         var trackerConfiguration = trackerConfiguration
         trackerConfiguration.framePeriod = Double(hop) / sampleRate
+        trackerConfiguration.binWidth = analyzer.binWidth
         tracker = InputNoteTracker(configuration: trackerConfiguration)
         spectrum = [Float](repeating: 0, count: analyzer.binCount)
         buffer.reserveCapacity(fftSize * 4)
     }
 
+    /// Timestamp disagreement (seconds) below which the caller's `startTime` is treated as jitter and ignored.
+    static let reanchorTolerance: TimeInterval = 0.002
+
     /// Appends samples whose first sample occurred at `startTime` and analyses every completed hop.
     ///
-    /// `startTime` is only used to (re)anchor the clock when the internal buffer is empty, so small jitter
-    /// in the caller's timestamps does not disturb frame times; a gap after a dropout re-anchors naturally.
+    /// Frame times follow the sample clock, re-anchored to the caller's clock on every call: the time the
+    /// new chunk should start at (the buffered samples' start plus their duration) is compared with
+    /// `startTime`. A disagreement within `reanchorTolerance` is jitter and ignored; a larger one (sample
+    /// clock drift against the host clock) shifts the buffered samples' time. A disagreement of more than one
+    /// hop is a discontinuity (dropout, interruption): the stale samples are discarded and the tracker's onset
+    /// history is cleared so the jump is not mistaken for an attack.
     func process(samples: UnsafeBufferPointer<Float>, startTime: TimeInterval) -> [FrameResult] {
         guard let base = samples.baseAddress, !samples.isEmpty else { return [] }
-        if readIndex >= buffer.count {
+        let pending = buffer.count - readIndex
+        if pending <= 0 {
             buffer.removeAll(keepingCapacity: true)
             readIndex = 0
             bufferStartTime = startTime
+        } else {
+            let expectedStart = bufferStartTime + Double(pending) / sampleRate
+            let disagreement = startTime - expectedStart
+            if abs(disagreement) > Double(hop) / sampleRate {
+                buffer.removeAll(keepingCapacity: true)
+                readIndex = 0
+                bufferStartTime = startTime
+                tracker.resetOnsetHistory()
+            } else if abs(disagreement) > Self.reanchorTolerance {
+                bufferStartTime += disagreement
+            }
         }
         buffer.append(contentsOf: UnsafeBufferPointer(start: base, count: samples.count))
         var results: [FrameResult] = []
@@ -90,7 +112,8 @@ final class InputPitchPipeline {
                 guard let wholeBase = whole.baseAddress else { return }
                 let frame = UnsafeBufferPointer(start: wholeBase + readIndex, count: fftSize)
                 analyzer.magnitudes(of: frame, into: &spectrum)
-                let pitches = detector.detect(spectrum: spectrum)
+                let pitches = detector.detect(spectrum: spectrum, sounding: Set(tracker.activeNotes.keys),
+                                              reference: tracker.onsetReferenceSpectrum)
                 let events = tracker.process(spectrum: spectrum, noiseFloor: detector.lastFloor, pitches: pitches, time: frameEndTime)
                 results.append(FrameResult(time: frameEndTime, events: events, pitches: pitches,
                                            rms: InputSpectrumAnalyzer.rms(frame), flux: tracker.lastFlux))
@@ -115,6 +138,7 @@ final class InputPitchPipeline {
         let offs = tracker.releaseAll(at: time)
         buffer.removeAll(keepingCapacity: true)
         readIndex = 0
+        tracker.resetOnsetHistory()
         return offs
     }
 

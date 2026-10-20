@@ -497,6 +497,97 @@ final class NotationTests: XCTestCase {
         XCTAssertFalse(NotationScrollTransition.isJump(fromTick: 0, toTick: 100, fromMeasure: 0, toMeasure: 0, pulseTicks: Ticks.perQuarter / 4))
     }
 
+    func testStreamedLargeStepsAreMotionNotJumps() {
+        let pulse = TimeSignature.common.pulseTicks
+        // 130 ticks in one update is a jump when isolated (seek, Wait-Mode step after waiting) ...
+        XCTAssertTrue(NotationScrollTransition.isJump(fromTick: 1000, toTick: 1130, fromMeasure: 0, toMeasure: 0, pulseTicks: pulse,
+                                                      offsetChange: 6.5, viewportWidth: 1000, sinceLastUpdate: nil))
+        XCTAssertTrue(NotationScrollTransition.isJump(fromTick: 1000, toTick: 1130, fromMeasure: 0, toMeasure: 0, pulseTicks: pulse,
+                                                      offsetChange: 6.5, viewportWidth: 1000, sinceLastUpdate: 2))
+        // ... but motion when it is one frame of a stream (fast tempo, compressed rests, dropped frames).
+        XCTAssertFalse(NotationScrollTransition.isJump(fromTick: 1000, toTick: 1130, fromMeasure: 0, toMeasure: 0, pulseTicks: pulse,
+                                                       offsetChange: 6.5, viewportWidth: 1000, sinceLastUpdate: 1.0 / 60))
+        // A seek during playback that moves the score by more than a quarter of the viewport is still eased.
+        XCTAssertTrue(NotationScrollTransition.isJump(fromTick: 1000, toTick: 9000, fromMeasure: 0, toMeasure: 2, pulseTicks: pulse,
+                                                      offsetChange: 400, viewportWidth: 1000, sinceLastUpdate: 1.0 / 60))
+        // Backward moves and repeat jumps stay jumps inside a stream.
+        XCTAssertTrue(NotationScrollTransition.isJump(fromTick: 5000, toTick: 1000, fromMeasure: 1, toMeasure: 0, pulseTicks: pulse,
+                                                      offsetChange: -10, viewportWidth: 1000, sinceLastUpdate: 1.0 / 60))
+        XCTAssertTrue(NotationScrollTransition.isJump(fromTick: 7660, toTick: 7690, fromMeasure: 1, toMeasure: 0, pulseTicks: pulse,
+                                                      offsetChange: 1, viewportWidth: 1000, sinceLastUpdate: 1.0 / 60))
+    }
+
+    /// Feeds `frames` updates at 60 Hz, each advancing `ticksPerFrame` ticks and `pointsPerTick` points, through the
+    /// same decision the scroll stage makes, and returns (largest |displayed - target|, final |displayed - target|).
+    private func simulateScroll(frames: Int, ticksPerFrame: Double, pointsPerTick: CGFloat, viewport: CGFloat) -> (maxLag: CGFloat, finalLag: CGFloat) {
+        let measureTicks = Double(TimeSignature.common.measureTicks)
+        var transition = NotationScrollTransition()
+        var lastUpdate: TimeInterval?
+        var maxLag: CGFloat = 0
+        var finalLag: CGFloat = 0
+        func sample(_ k: Int) -> NotationScrollSample {
+            let tick = 1000 + ticksPerFrame * Double(k)
+            return NotationScrollSample(tick: tick, measureIndex: Int(tick / measureTicks), offset: CGFloat(tick - 1000) * pointsPerTick)
+        }
+        for k in 1...frames {
+            let t = 100 + TimeInterval(k) / 60
+            let old = sample(k - 1), new = sample(k)
+            let since = lastUpdate.map { t - $0 }
+            lastUpdate = t
+            if let next = transition.next(from: old, to: new, displayedOld: transition.offset(target: old.offset, at: t), viewportWidth: viewport,
+                                          pulseTicks: TimeSignature.common.pulseTicks, sinceLastUpdate: since, at: t) {
+                transition = next
+            }
+            let lag = abs(transition.offset(target: new.offset, at: t) - new.offset)
+            maxLag = max(maxLag, lag)
+            finalLag = lag
+        }
+        return (maxLag, finalLag)
+    }
+
+    func testScrollTracksFastContinuousUpdates() {
+        // 130 ticks per 60 Hz frame (each one over the isolated-jump threshold): the target reaches 390 pt after 60 frames.
+        let result = simulateScroll(frames: 60, ticksPerFrame: 130, pointsPerTick: 0.05, viewport: 1000)
+        let velocity: CGFloat = 130 * 0.05 * 60   // points per second
+        XCTAssertLessThanOrEqual(result.maxLag, velocity * 0.35)
+        XCTAssertEqual(result.finalLag, 0, accuracy: 1e-9)
+    }
+
+    func testScrollKeepsMovingThroughAStreamOfLargeJumps() {
+        // Every frame moves 300 pt of a 1000 pt viewport, so each one is a jump; the offset must still keep up.
+        let result = simulateScroll(frames: 60, ticksPerFrame: 3000, pointsPerTick: 0.1, viewport: 1000)
+        let velocity: CGFloat = 300 * 60
+        XCTAssertLessThanOrEqual(result.maxLag, velocity * 0.35)
+    }
+
+    func testActiveTransitionIsNotRestartedByOrdinaryJumps() {
+        let pulse = TimeSignature.common.pulseTicks
+        let running = NotationScrollTransition.starting(from: 0, at: 10)
+        let old = NotationScrollSample(tick: 1000, measureIndex: 0, offset: 100)
+        let small = NotationScrollSample(tick: 1300, measureIndex: 0, offset: 115)
+        let large = NotationScrollSample(tick: 9000, measureIndex: 2, offset: 500)
+        // Isolated jump while the ease runs: keep the running transition (it follows the live target).
+        XCTAssertNil(running.next(from: old, to: small, displayedOld: 20, viewportWidth: 1000, pulseTicks: pulse, sinceLastUpdate: nil, at: 10.05))
+        // A large jump restarts it only after half the duration.
+        XCTAssertNil(running.next(from: old, to: large, displayedOld: 20, viewportWidth: 1000, pulseTicks: pulse, sinceLastUpdate: nil, at: 10.1))
+        let restarted = running.next(from: old, to: large, displayedOld: 80, viewportWidth: 1000, pulseTicks: pulse, sinceLastUpdate: nil, at: 10.2)
+        XCTAssertEqual(restarted?.from, 80)
+        XCTAssertEqual(restarted?.startTime, 10.2)
+        // A finished transition starts a new one for an isolated jump; layout-only changes never do.
+        let idle = NotationScrollTransition()
+        XCTAssertNotNil(idle.next(from: old, to: small, displayedOld: 100, viewportWidth: 1000, pulseTicks: pulse, sinceLastUpdate: nil, at: 20))
+        XCTAssertNil(idle.next(from: old, to: NotationScrollSample(tick: 1000, measureIndex: 0, offset: 300), displayedOld: 100,
+                               viewportWidth: 1000, pulseTicks: pulse, sinceLastUpdate: nil, at: 20))
+    }
+
+    @MainActor
+    func testScrollClockReportsIntervals() {
+        let clock = NotationScrollClock()
+        XCTAssertNil(clock.tick(at: 5))
+        XCTAssertEqual(clock.tick(at: 5.25) ?? -1, 0.25, accuracy: 1e-12)
+        XCTAssertEqual(clock.lastUpdate, 5.25)
+    }
+
     func testOutOfRangeFingeringIsSkippedWithoutCrashing() {
         var six = note("E4")
         six.fingering = 6

@@ -39,41 +39,171 @@ enum KeyboardKeyState: Hashable, Sendable {
     }
 }
 
-/// Converts the practice engine's `FeedbackSnapshot` into keyboard key states, attaching hands where the
-/// timeline makes them known (the current and upcoming steps, and events sounding at the current step).
+/// Converts the practice engine's `FeedbackSnapshot` into keyboard key states, attaching the hand of the
+/// timeline event behind each expected, upcoming or demo key.
+///
+/// Attribution, in order of precedence:
+/// 1. `snapshot.eventStates`: an event in the same state as the key (e.g. a `.demo` event for a `.demo` key),
+///    then an event in any of the expected/upcoming/demo states that sounds the pitch.
+/// 2. A step window around `snapshot.currentStepIndex` that reaches `lookbehindSteps` back and
+///    `lookaheadSteps` forward (so the accompaniment demoed in a Wait-Mode gap, which lies before the step
+///    being approached, is found); the step nearest the current one wins where hands collide.
+/// 3. Pitches only one hand ever plays in the whole timeline (this also covers a nil step index before the
+///    start or after the end).
+/// Keys none of these attribute keep a nil hand and draw with the neutral accent.
 enum KeyboardKeyStateMapper {
-    /// How many steps after the current one are consulted to attribute a hand to upcoming/demo pitches.
+    /// How many steps after the current one are consulted by the step-window fallback.
     static let lookaheadSteps = 3
+    /// How many steps before the current one are consulted by the step-window fallback.
+    static let lookbehindSteps = 4
 
-    /// Builds the hand lookup used by `states(from:timeline:)`.
-    static func handByPitch(timeline: PlaybackTimeline?, currentStepIndex: Int?) -> [Int: Hand] {
-        guard let timeline else { return [:] }
-        var result: [Int: Hand] = [:]
-        let start = currentStepIndex ?? 0
-        guard timeline.steps.indices.contains(start) else { return result }
-        // Later steps first so the current step's attribution wins where pitches collide.
-        for i in stride(from: min(timeline.steps.count - 1, start + lookaheadSteps), through: start, by: -1) {
-            for e in timeline.steps[i].events {
-                for p in e.pitches { result[p] = e.hand }
+    /// Per-timeline lookup tables, built once and reused for every snapshot of that timeline.
+    struct EventIndex: Sendable {
+        /// Cheap identity of the timeline the index was built from (see `matches(_:)`).
+        struct Fingerprint: Hashable, Sendable {
+            var scoreID: UUID
+            var eventCount: Int
+            var stepCount: Int
+            var totalTicks: Ticks
+            var firstEventID: String?
+            var middleEventID: String?
+            var lastEventID: String?
+
+            init(_ timeline: PlaybackTimeline) {
+                let events = timeline.events
+                scoreID = timeline.scoreID
+                eventCount = events.count
+                stepCount = timeline.steps.count
+                totalTicks = timeline.totalTicks
+                firstEventID = events.first?.id
+                middleEventID = events.isEmpty ? nil : events[events.count / 2].id
+                lastEventID = events.last?.id
             }
         }
-        for e in timeline.events(soundingAt: timeline.steps[start].tick) {
-            for p in e.pitches where result[p] == nil { result[p] = e.hand }
+
+        let fingerprint: Fingerprint
+        /// Every timeline event by `TimelineEvent.id`.
+        let eventsByID: [String: TimelineEvent]
+        /// Hand of each pitch that only one hand plays anywhere in the timeline.
+        let soleHandByPitch: [Int: Hand]
+
+        /// Builds the tables in one pass over `timeline.events`.
+        init(timeline: PlaybackTimeline) {
+            fingerprint = Fingerprint(timeline)
+            var byID: [String: TimelineEvent] = [:]
+            byID.reserveCapacity(timeline.events.count)
+            var handsByPitch: [Int: Set<Hand>] = [:]
+            for e in timeline.events {
+                byID[e.id] = e
+                for p in e.pitches { handsByPitch[p, default: []].insert(e.hand) }
+            }
+            eventsByID = byID
+            soleHandByPitch = handsByPitch.compactMapValues { $0.count == 1 ? $0.first : nil }
         }
-        return result
+
+        /// Whether this index was (very likely) built from `timeline`. Compares score id, counts, length and a
+        /// few event ids, which change whenever the timeline is rebuilt from edited or re-filtered material.
+        func matches(_ timeline: PlaybackTimeline) -> Bool { fingerprint == Fingerprint(timeline) }
     }
 
-    /// Maps a snapshot to keyboard states. `handOfPitch` overrides the timeline-derived attribution.
-    static func states(from snapshot: FeedbackSnapshot, timeline: PlaybackTimeline? = nil, handOfPitch: ((Int) -> Hand?)? = nil) -> [Int: KeyboardKeyState] {
-        let lookup = handByPitch(timeline: timeline, currentStepIndex: snapshot.currentStepIndex)
-        func hand(_ midi: Int) -> Hand? { handOfPitch?(midi) ?? lookup[midi] }
+    /// Thread-safe one-entry cache so callers that pass only a timeline do not rebuild the index per snapshot.
+    private final class IndexCache: @unchecked Sendable {
+        private let lock = NSLock()
+        private var cached: EventIndex?
+
+        /// Returns the cached index for `timeline`, building and storing a new one when it does not match.
+        func index(for timeline: PlaybackTimeline) -> EventIndex {
+            lock.lock()
+            defer { lock.unlock() }
+            if let cached, cached.matches(timeline) { return cached }
+            let built = EventIndex(timeline: timeline)
+            cached = built
+            return built
+        }
+    }
+
+    private static let cache = IndexCache()
+
+    /// The shared cached index for `timeline` (built on first use, rebuilt when the timeline changes).
+    static func eventIndex(for timeline: PlaybackTimeline) -> EventIndex { cache.index(for: timeline) }
+
+    /// Hands attributed from the snapshot's event states: `exact[state][pitch]` for events in that state and
+    /// `any[pitch]` across the expected/upcoming/demo states (expected first, then demo, then upcoming).
+    static func handsFromEventStates(_ eventStates: [String: NoteFeedbackState], index: EventIndex) -> (exact: [NoteFeedbackState: [Int: Hand]], any: [Int: Hand]) {
+        var exact: [NoteFeedbackState: [Int: Hand]] = [:]
+        // Sorted ids keep the result deterministic where two events of different hands share a pitch and state.
+        for id in eventStates.keys.sorted() {
+            guard let state = eventStates[id], state == .expected || state == .upcoming || state == .demo,
+                  let event = index.eventsByID[id] else { continue }
+            for p in event.pitches where exact[state]?[p] == nil { exact[state, default: [:]][p] = event.hand }
+        }
+        var any: [Int: Hand] = [:]
+        for state in [NoteFeedbackState.expected, .demo, .upcoming] {
+            for (p, h) in exact[state] ?? [:] where any[p] == nil { any[p] = h }
+        }
+        return (exact, any)
+    }
+
+    /// Step-window fallback: hands of the pitches sounded by events whose onset lies between
+    /// `steps[k - lookbehindSteps]` and `steps[k + lookaheadSteps]` (inclusive), plus events still sounding at
+    /// `steps[k]`. Where hands collide, the event whose onset is nearest the current step wins.
+    static func handByPitch(timeline: PlaybackTimeline?, currentStepIndex: Int?) -> [Int: Hand] {
+        guard let timeline, let k = currentStepIndex, timeline.steps.indices.contains(k) else { return [:] }
+        let steps = timeline.steps
+        let events = timeline.events
+        let pivot = steps[k].tick
+        let lowTick = steps[max(0, k - lookbehindSteps)].tick
+        let highTick = steps[min(steps.count - 1, k + lookaheadSteps)].tick
+        var best: [Int: (hand: Hand, distance: Ticks)] = [:]
+        func consider(_ e: TimelineEvent, distance: Ticks) {
+            for p in e.pitches where best[p].map({ distance < $0.distance }) ?? true { best[p] = (e.hand, distance) }
+        }
+        var j = KeyboardLaneLayout.firstEventIndex(atOrAfter: lowTick, in: events)
+        while j < events.count, events[j].tick <= highTick {
+            let e = events[j]
+            if !e.isRest { consider(e, distance: abs(e.tick - pivot)) }
+            j += 1
+        }
+        // Long notes struck before the window that still sound at the current step.
+        for e in timeline.events(soundingAt: pivot) where e.tick < lowTick { consider(e, distance: pivot - e.tick) }
+        return best.mapValues { $0.hand }
+    }
+
+    /// Maps a snapshot to keyboard states.
+    ///
+    /// - Parameters:
+    ///   - timeline: the timeline the snapshot refers to; enables hand attribution.
+    ///   - eventIndex: a prebuilt `EventIndex` for `timeline`; when nil the shared cached index is used.
+    ///   - handOfPitch: overrides every other attribution where it returns a hand.
+    static func states(from snapshot: FeedbackSnapshot,
+                       timeline: PlaybackTimeline? = nil,
+                       eventIndex: EventIndex? = nil,
+                       handOfPitch: ((Int) -> Hand?)? = nil) -> [Int: KeyboardKeyState] {
+        let needsHands = snapshot.keyStates.values.contains { $0 == .expected || $0 == .upcoming || $0 == .demo }
+        var exact: [NoteFeedbackState: [Int: Hand]] = [:]
+        var anyEventHand: [Int: Hand] = [:]
+        var window: [Int: Hand] = [:]
+        var sole: [Int: Hand] = [:]
+        if needsHands, let timeline {
+            let index = eventIndex.flatMap { $0.matches(timeline) ? $0 : nil } ?? Self.eventIndex(for: timeline)
+            (exact, anyEventHand) = handsFromEventStates(snapshot.eventStates, index: index)
+            sole = index.soleHandByPitch
+            // The window is only needed for keys the event states leave unattributed.
+            let unattributed = snapshot.keyStates.contains { midi, s in
+                (s == .expected || s == .upcoming || s == .demo) && exact[s]?[midi] == nil && anyEventHand[midi] == nil
+            }
+            if unattributed { window = handByPitch(timeline: timeline, currentStepIndex: snapshot.currentStepIndex) }
+        }
+        func hand(_ midi: Int, _ state: NoteFeedbackState) -> Hand? {
+            handOfPitch?(midi) ?? exact[state]?[midi] ?? anyEventHand[midi] ?? window[midi] ?? sole[midi]
+        }
         var out: [Int: KeyboardKeyState] = [:]
         out.reserveCapacity(snapshot.keyStates.count)
         for (midi, s) in snapshot.keyStates {
             switch s {
-            case .expected: out[midi] = .expected(hand(midi))
-            case .upcoming: out[midi] = .upcoming(hand(midi))
-            case .demo: out[midi] = .demo(hand(midi))
+            case .expected: out[midi] = .expected(hand(midi, s))
+            case .upcoming: out[midi] = .upcoming(hand(midi, s))
+            case .demo: out[midi] = .demo(hand(midi, s))
             case .pressed: out[midi] = .pressed
             case .correct: out[midi] = .correct
             case .wrong: out[midi] = .wrong

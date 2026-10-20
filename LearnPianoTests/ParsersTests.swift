@@ -189,6 +189,107 @@ final class ParsersTests: XCTestCase {
         XCTAssertEqual(rh[1].drawnStaff, .left)
     }
 
+    func testMusicXMLVoiceTwoOnLowerStaffWithSparseLeftHand() throws {
+        // Four right-hand quarters in voice 1 and one left-hand whole note in voice 2 per measure: most notes agree with
+        // the 1–4 / 5–8 convention, but the lower staff does not use it, so the staff must decide the hand.
+        let quarters = ["C", "D", "E", "F"].map { note($0, 5, duration: 1, type: "quarter") }.joined()
+        let xml = pianoPart("""
+        <measure number="1">{ATTR}\(quarters)<backup><duration>4</duration></backup>\(note("C", 3, duration: 4, type: "whole", voice: 2, staff: 2))</measure>
+        <measure number="2">\(quarters)<backup><duration>4</duration></backup>\(note("G", 2, duration: 4, type: "whole", voice: 2, staff: 2))</measure>
+        """)
+        let result = try importXML(xml)
+        let score = result.score
+        for (i, low) in [48, 43].enumerated() {
+            let lh = score.measures[i].events(for: .left)
+            XCTAssertEqual(lh.map { $0.midiPitches }, [[low]], "measure \(i + 1): the lower staff is the left hand")
+            XCTAssertEqual(lh.first?.voice, 1)
+            XCTAssertEqual(lh.first?.drawnOnOtherStaff, false)
+            let rh = score.measures[i].events(for: .right)
+            XCTAssertEqual(rh.map { $0.midiPitches }, [[72], [74], [76], [77]])
+            XCTAssertTrue(rh.allSatisfy { !$0.drawnOnOtherStaff })
+        }
+        XCTAssertFalse(result.hasErrors)
+        XCTAssertFalse(ScoreValidator.validate(score).contains { $0.severity == .error })
+        // The rule itself: per-staff agreement, at least one lower-staff note in voices 5–8.
+        func raw(_ voice: String, staff: Int) -> ParsersMusicXMLRawNote {
+            var n = ParsersMusicXMLRawNote()
+            n.step = "C"; n.octave = 4; n.duration = 1; n.voice = voice; n.staff = staff
+            return n
+        }
+        let rhHeavy = Array(repeating: raw("1", staff: 1), count: 8)
+        XCTAssertFalse(ParsersMusicXMLScoreBuilder.usesConventionalVoices(rhHeavy + [raw("2", staff: 2)]))
+        XCTAssertTrue(ParsersMusicXMLScoreBuilder.usesConventionalVoices(rhHeavy + [raw("5", staff: 2)]))
+        XCTAssertTrue(ParsersMusicXMLScoreBuilder.usesConventionalVoices([raw("1", staff: 1), raw("1", staff: 2), raw("5", staff: 2)]), "half the lower staff is enough")
+        XCTAssertFalse(ParsersMusicXMLScoreBuilder.usesConventionalVoices([raw("1", staff: 1), raw("1", staff: 2), raw("1", staff: 2), raw("5", staff: 2)]))
+        XCTAssertFalse(ParsersMusicXMLScoreBuilder.usesConventionalVoices(rhHeavy), "no lower-staff note in voices 5–8")
+    }
+
+    /// A score-partwise document with the given (id, name, measures) parts.
+    private func parts(_ list: [(id: String, name: String, measures: String)]) -> String {
+        let partList = list.map { "<score-part id=\"\($0.id)\"><part-name>\($0.name)</part-name></score-part>" }.joined()
+        let bodies = list.map { "<part id=\"\($0.id)\">\($0.measures)</part>" }.joined(separator: "\n")
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><score-partwise version=\"4.0\"><part-list>\(partList)</part-list>\(bodies)</score-partwise>"
+    }
+
+    private func singleStaffAttributes(clef: String) -> String {
+        let sign = clef == "bass" ? "<sign>F</sign><line>4</line>" : "<sign>G</sign><line>2</line>"
+        return "<attributes><divisions>1</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><clef>\(sign)</clef></attributes>"
+    }
+
+    private func singleStaffNote(_ step: String, _ octave: Int, duration: Int, type: String) -> String {
+        "<note><pitch><step>\(step)</step><octave>\(octave)</octave></pitch><duration>\(duration)</duration><voice>1</voice><type>\(type)</type></note>"
+    }
+
+    func testMusicXMLMelodyPlusGrandStaffGetsSeparateVoices() throws {
+        let attr = "<attributes><divisions>1</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><staves>2</staves><clef number=\"1\"><sign>G</sign><line>2</line></clef><clef number=\"2\"><sign>F</sign><line>4</line></clef></attributes>"
+        let melody = "<measure number=\"1\">\(singleStaffAttributes(clef: "treble"))\(singleStaffNote("E", 5, duration: 2, type: "half"))\(singleStaffNote("D", 5, duration: 2, type: "half"))</measure>"
+        let piano = "<measure number=\"1\">\(attr)\(note("C", 5, duration: 4, type: "whole"))<backup><duration>4</duration></backup>\(note("C", 3, duration: 4, type: "whole", voice: 5, staff: 2))</measure>"
+        // The piano part listed first is the usual "piano + melody" order too; both orders must keep the parts apart.
+        for order in [[("P1", "Voice", melody), ("P2", "Piano", piano)], [("P2", "Piano", piano), ("P1", "Voice", melody)]] {
+            let result = try importXML(parts(order.map { (id: $0.0, name: $0.1, measures: $0.2) }))
+            let score = result.score
+            let rh = score.measures[0].events(for: .right)
+            XCTAssertEqual(rh.map { $0.midiPitches }.sorted { $0[0] < $1[0] }, [[72], [74], [76]], "the treble melody joins the right hand")
+            let melodyVoices = Set(rh.filter { $0.midiPitches != [72] }.map { $0.voice })
+            let pianoVoices = Set(rh.filter { $0.midiPitches == [72] }.map { $0.voice })
+            XCTAssertEqual(melodyVoices.count, 1)
+            XCTAssertTrue(melodyVoices.isDisjoint(with: pianoVoices), "the two parts never share a right-hand voice")
+            XCTAssertEqual(score.measures[0].events(for: .left).map { $0.midiPitches }, [[48]])
+            XCTAssertEqual(score.measures[0].events(for: .left).first?.voice, 1)
+            XCTAssertFalse(ScoreValidator.validate(score).contains { $0.message.contains("Overlapping") })
+            XCTAssertTrue(result.diagnostics.contains { $0.severity == .warning && $0.message.contains("Voice") && $0.message.contains("Piano") })
+        }
+    }
+
+    func testMusicXMLThreePartsGetDisjointVoices() throws {
+        let m = { (clef: String, a: (String, Int), b: (String, Int)) in
+            "<measure number=\"1\">\(self.singleStaffAttributes(clef: clef))\(self.singleStaffNote(a.0, a.1, duration: 2, type: "half"))\(self.singleStaffNote(b.0, b.1, duration: 2, type: "half"))</measure>"
+        }
+        let xml = parts([
+            (id: "P1", name: "Flute", measures: m("treble", ("E", 5), ("D", 5))),
+            (id: "P2", name: "Cello", measures: m("bass", ("C", 3), ("G", 2))),
+            (id: "P3", name: "Bassoon", measures: m("bass", ("E", 3), ("B", 2))),
+        ])
+        let result = try importXML(xml)
+        let score = result.score
+        XCTAssertEqual(score.measures[0].events(for: .right).map { $0.voice }, [1, 1])
+        let lh = score.measures[0].events(for: .left)
+        XCTAssertEqual(lh.filter { $0.voice == 1 }.map { $0.midiPitches }, [[48], [43]], "second part = left hand voice 1")
+        XCTAssertEqual(lh.filter { $0.voice == 2 }.map { $0.midiPitches }, [[52], [47]], "third part = left hand voice 2")
+        XCTAssertFalse(ScoreValidator.validate(score).contains { $0.severity == .error })
+        XCTAssertTrue(result.diagnostics.contains { $0.severity == .warning && $0.message.contains("Cello") && $0.message.contains("Bassoon") })
+    }
+
+    func testMusicXMLClefChangeIsReported() throws {
+        let xml = pianoPart("""
+        <measure number="1">{ATTR}\(note("C", 5, duration: 4, type: "whole"))<backup><duration>4</duration></backup>\(note("C", 3, duration: 4, type: "whole", voice: 5, staff: 2))</measure>
+        <measure number="2"><attributes><clef number="2"><sign>G</sign><line>2</line></clef></attributes>\(note("D", 5, duration: 4, type: "whole"))<backup><duration>4</duration></backup>\(note("G", 4, duration: 4, type: "whole", voice: 5, staff: 2))</measure>
+        """)
+        let result = try importXML(xml)
+        XCTAssertTrue(result.diagnostics.contains { $0.severity == .info && $0.measureIndex == 1 && $0.message.contains("clef") })
+        XCTAssertEqual(result.score.measures[1].events(for: .left).map { $0.midiPitches }, [[67]], "the notes keep their hand")
+    }
+
     func testMusicXMLTempoFromDottedMetronome() throws {
         let xml = pianoPart("""
         <measure number="1">{ATTR}<direction><direction-type><metronome><beat-unit>quarter</beat-unit><beat-unit-dot/><per-minute>60</per-minute></metronome></direction-type></direction>
@@ -292,6 +393,39 @@ final class ParsersTests: XCTestCase {
             XCTAssertEqual(error as? ParsersZipError, .checksumMismatch(entry: "a.xml"))
         }
         XCTAssertThrowsError(try ParsersZipArchive(data: Data("not a zip at all, sorry".utf8)))
+    }
+
+    func testInflateIsCappedAndChecksDeclaredSize() throws {
+        let big = Data(repeating: 0x41, count: 3 * 1024 * 1024)
+        let zip = ParsersZipArchive.build(entries: [("a.xml", big)], deflate: true)
+        let entry = try XCTUnwrap(try ParsersZipArchive(data: zip).entries.first)
+        XCTAssertEqual(entry.method, 8)
+        let start = 30 + 5 // local header + name
+        let payload = Array([UInt8](zip)[start ..< start + entry.compressedSize])
+        XCTAssertThrowsError(try ParsersZipArchive.inflate(payload, expectedSize: nil, entryName: "a.xml", limit: 1024 * 1024)) { error in
+            XCTAssertEqual(error as? ParsersZipError, .tooLarge(entry: "a.xml", limit: 1024 * 1024), "a zip bomb stops at the cap")
+        }
+        XCTAssertThrowsError(try ParsersZipArchive.inflate(payload, expectedSize: 1000, entryName: "a.xml")) { error in
+            XCTAssertEqual(error as? ParsersZipError, .inflateFailed(entry: "a.xml"), "output beyond the declared size stops early")
+        }
+        XCTAssertThrowsError(try ParsersZipArchive.inflate(payload, expectedSize: Int(UInt32.max), entryName: "a.xml")) { error in
+            XCTAssertEqual(error as? ParsersZipError, .tooLarge(entry: "a.xml", limit: ParsersZipArchive.maxEntrySize), "a huge declared size is refused, not allocated")
+        }
+        XCTAssertEqual(try ParsersZipArchive.inflate(payload, expectedSize: big.count, entryName: "a.xml").count, big.count)
+    }
+
+    func testZip64MarkersAreRejected() throws {
+        let xml = pianoPart("<measure number=\"1\">{ATTR}\(note("E", 4, duration: 4, type: "whole"))</measure>")
+        var bytes = [UInt8](storedZip([("music/song.xml", Data(xml.utf8))]))
+        // Central directory header: signature PK\u{01}\u{02}; the uncompressed size is at offset 24.
+        let central = try XCTUnwrap((0 ..< bytes.count - 4).first { bytes[$0] == 0x50 && bytes[$0 + 1] == 0x4B && bytes[$0 + 2] == 0x01 && bytes[$0 + 3] == 0x02 })
+        for k in 0..<4 { bytes[central + 24 + k] = 0xFF }
+        XCTAssertThrowsError(try ParsersZipArchive(data: Data(bytes))) { error in
+            XCTAssertEqual(error as? ParsersZipError, .zip64Unsupported)
+        }
+        XCTAssertThrowsError(try ParsersMusicXMLImporter().importScore(data: Data(bytes), fileName: "song.mxl")) { error in
+            guard case ImportError.malformed = error else { return XCTFail("expected malformed, got \(error)") }
+        }
     }
 
     func testCRC32KnownValue() {
@@ -468,6 +602,29 @@ final class ParsersTests: XCTestCase {
         XCTAssertEqual(ParsersMIDIImporter.hand(forTrackName: "Piano LH"), .left)
         XCTAssertEqual(ParsersMIDIImporter.hand(forTrackName: "Right Hand"), .right)
         XCTAssertNil(ParsersMIDIImporter.hand(forTrackName: "Acoustic Grand"))
+        XCTAssertEqual(ParsersMIDIImporter.hand(forTrackName: "Piano L.H."), .left)
+        XCTAssertEqual(ParsersMIDIImporter.hand(forTrackName: "Bass"), .left)
+        XCTAssertEqual(ParsersMIDIImporter.hand(forTrackName: "Treble staff"), .right)
+        XCTAssertEqual(ParsersMIDIImporter.hand(forTrackName: "Rechte Hand"), .right)
+        // Names are matched by whole word only.
+        XCTAssertNil(ParsersMIDIImporter.hand(forTrackName: "Bright Acoustic Piano"))
+        XCTAssertNil(ParsersMIDIImporter.hand(forTrackName: "Copyright 2021"))
+        XCTAssertNil(ParsersMIDIImporter.hand(forTrackName: "Bassoon"))
+        XCTAssertNil(ParsersMIDIImporter.hand(forTrackName: "Contrabass"))
+        XCTAssertEqual(ParsersMIDIImporter.hand(forTrackName: "cleft"), nil)
+        XCTAssertNil(ParsersMIDIImporter.hand(forTrackName: "Left + Right"), "a name naming both hands decides nothing")
+    }
+
+    func testSingleNamedStreamIsStillSplitByPitch() {
+        // One track called "Bright Acoustic Piano" (or even "Right Hand") holding both hands.
+        let pitches = [48, 72, 43, 74, 45, 76, 41, 77]
+        let notes = pitches.enumerated().map { i, midi in ParsersMIDINote(onset: (i / 2) * 960, end: (i / 2) * 960 + 960, midi: midi, stream: 0) }
+        let expected: [Hand] = [.left, .right, .left, .right, .left, .right, .left, .right]
+        XCTAssertEqual(ParsersMIDIImporter.assignHands(notes, streamCount: 1, streamHands: [0: .right]), expected)
+        XCTAssertEqual(ParsersMIDIImporter.assignHands(notes, streamCount: 1), expected)
+        // Two streams named for the same hand do not decide either: the average-pitch rule applies.
+        let two = [ParsersMIDINote(onset: 0, end: 960, midi: 50, stream: 0), ParsersMIDINote(onset: 0, end: 960, midi: 72, stream: 1)]
+        XCTAssertEqual(ParsersMIDIImporter.assignHands(two, streamCount: 2, streamHands: [0: .right, 1: .right]), [.left, .right])
     }
 
     func testKeyEstimation() {
@@ -652,11 +809,12 @@ final class ParsersTests: XCTestCase {
     }
 
     func testLPCShortMeasuresAndWrappers() throws {
-        // The final measure may be short; a middle one may not. Text around the JSON (a code fence) is tolerated.
+        // With a pickup, the final measure may be short (it completes the pickup); a middle one may not.
+        // Text around the JSON (a code fence) is tolerated.
         let json = """
         ```json
-        {"format":"lpc-1","title":"T","composer":"","divisions":1,"time":"3/4","key":0,"tempo":80,"pickup":false,"measures":[
-          {"n":1,"rh":[{"p":["E4"],"d":3}],"lh":[{"p":[],"d":3}]},
+        {"format":"lpc-1","title":"T","composer":"","divisions":1,"time":"3/4","key":0,"tempo":80,"pickup":true,"measures":[
+          {"n":1,"rh":[{"p":["E4"],"d":1}],"lh":[{"p":[],"d":1}]},
           {"n":2,"rh":[{"p":["F4"],"d":2}],"lh":[{"p":[],"d":3}]},
           {"n":3,"rh":[{"p":["G4"],"d":2}],"lh":[{"p":[],"d":2}]}
         ]}
@@ -665,8 +823,54 @@ final class ParsersTests: XCTestCase {
         let parsed = try ParsersCompactScoreImporter().parse(json: json)
         XCTAssertEqual(parsed.errors.map { $0.measure }, [2])
         XCTAssertEqual(parsed.errors.first?.voice, "rh")
+        // Without a pickup the final measure must be complete too.
+        let noPickup = json.replacingOccurrences(of: "\"pickup\":true", with: "\"pickup\":false")
+            .replacingOccurrences(of: "\"d\":1}]", with: "\"d\":3}]")
+        let strict = try ParsersCompactScoreImporter().parse(json: noPickup)
+        XCTAssertEqual(Set(strict.errors.compactMap { $0.measure }), [2, 3])
         XCTAssertThrowsError(try ParsersCompactScoreImporter().parse(json: "[1, 2, 3]"))
         XCTAssertThrowsError(try ParsersCompactScoreImporter().parse(json: "not json"))
+    }
+
+    func testLPCPageFlowShortLastMeasure() throws {
+        // A later page (measures 5–6) whose last measure is short.
+        let page = """
+        {"format":"lpc-1","title":"T","composer":"","divisions":4,"time":"4/4","key":0,"tempo":100,"pickup":false,"measures":[
+          {"n":5,"rh":[{"p":["C4"],"d":16}],"lh":[{"p":[],"d":16}]},
+          {"n":6,"rh":[{"p":["C4"],"d":4}],"lh":[{"p":[],"d":16}]}
+        ]}
+        """
+        let middle = try ParsersCompactScoreImporter(firstMeasureNumber: 5, isFinalPage: false, pieceHasPickup: true).parse(json: page)
+        XCTAssertFalse(middle.isValid, "the end of a page is not the end of the piece")
+        XCTAssertEqual(middle.errors.map { $0.measure }, [6])
+        XCTAssertEqual(middle.errors.first?.voice, "rh")
+        XCTAssertNotEqual(middle.errorsJSON, "[]")
+
+        let lastWithoutPickup = try ParsersCompactScoreImporter(firstMeasureNumber: 5, isFinalPage: true, pieceHasPickup: false).parse(json: page)
+        XCTAssertEqual(lastWithoutPickup.errors.map { $0.measure }, [6], "only a pickup lets the final measure be short")
+
+        let lastWithPickup = try ParsersCompactScoreImporter(firstMeasureNumber: 5, isFinalPage: true, pieceHasPickup: true).parse(json: page)
+        XCTAssertTrue(lastWithPickup.isValid, lastWithPickup.issues.map { $0.description }.joined(separator: "\n"))
+        XCTAssertFalse(lastWithPickup.importResult.score.measures[0].isPickup, "page 1 holds the pickup, not this page")
+    }
+
+    func testLPCFirstMeasureChangesBecomeInitialValues() throws {
+        let json = """
+        {"format":"lpc-1","title":"T","composer":"","divisions":1,"time":"4/4","key":0,"tempo":100,"pickup":false,"measures":[
+          {"n":1,"time":"3/4","key":2,"tempo":60,"rh":[{"p":["D4"],"d":3}],"lh":[{"p":[],"d":3}]},
+          {"n":2,"time":"3/4","key":2,"tempo":60,"rh":[{"p":["E4"],"d":3}],"lh":[{"p":[],"d":3}]}
+        ]}
+        """
+        let parsed = try ParsersCompactScoreImporter().parse(json: json)
+        XCTAssertTrue(parsed.isValid, parsed.issues.map { $0.description }.joined(separator: "\n"))
+        let score = parsed.importResult.score
+        XCTAssertEqual(score.initialTime, TimeSignature(beats: 3, beatType: 4))
+        XCTAssertEqual(score.initialKey, KeySignature(fifths: 2))
+        XCTAssertEqual(score.initialTempoBPM, 60)
+        XCTAssertNil(score.measures[0].timeSignature)
+        XCTAssertNil(score.measures[0].keySignature)
+        XCTAssertNil(score.measures[0].tempoBPM)
+        XCTAssertNil(score.measures[1].timeSignature, "repeating the value in force is not a change")
     }
 
     func testLPCIssueConversionFromValidator() {
@@ -747,6 +951,26 @@ final class ParsersTests: XCTestCase {
         XCTAssertEqual(crossStaff?.drawnOnOtherStaff, true)
         let triplet = again.measures[1].events.first { $0.hand == .right }
         XCTAssertEqual(triplet?.notated, NoteDuration(value: .eighth, tuplet: .triplet))
+    }
+
+    func testExportKeepsMeasureZeroOverrides() throws {
+        // Score-level 4/4 at 100 BPM, but the first measure itself says 3/4 at 60 BPM in D major (Core honours the
+        // measure's values from tick 0).
+        let score = Score(metadata: ScoreMetadata(title: "Override"), initialTime: .common, initialKey: .cMajor, initialTempoBPM: 100, measures: [
+            Measure(number: 1, timeSignature: TimeSignature(beats: 3, beatType: 4), keySignature: KeySignature(fifths: 2), tempoBPM: 60, events: [
+                MeasureEvent(onset: 0, duration: 2880, notes: [ChordNote(pitch: Pitch(step: .D, octave: 4))], hand: .right),
+            ]),
+            Measure(number: 2, events: [
+                MeasureEvent(onset: 0, duration: 2880, notes: [ChordNote(pitch: Pitch(step: .F, alter: 1, octave: 4))], hand: .right),
+            ]),
+        ])
+        let again = try ParsersMusicXMLImporter().importScore(data: ParsersMusicXMLExporter().exportData(score), fileName: "x.musicxml").score
+        XCTAssertEqual(again.timeSignature(atMeasure: 1), TimeSignature(beats: 3, beatType: 4))
+        XCTAssertEqual(again.keySignature(atMeasure: 1), KeySignature(fifths: 2))
+        XCTAssertEqual(again.tempoBPM(atMeasure: 1), 60)
+        XCTAssertEqual(again.makeTimeline().totalSeconds(), score.makeTimeline().totalSeconds(), accuracy: 1e-9)
+        XCTAssertEqual(score.makeTimeline().totalSeconds(), 6.0, accuracy: 1e-9)
+        XCTAssertEqual(again.notatedMeasureStarts, score.notatedMeasureStarts)
     }
 
     func testExportIsDeterministicAndWritesAccidentals() {

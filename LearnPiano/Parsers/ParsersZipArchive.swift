@@ -9,6 +9,10 @@ enum ParsersZipError: Error, LocalizedError, Hashable {
     case inflateFailed(entry: String)
     case checksumMismatch(entry: String)
     case entryNotFound(String)
+    /// The entry would decompress to more than `limit` bytes (a damaged size field or a "zip bomb").
+    case tooLarge(entry: String, limit: Int)
+    /// The archive uses ZIP64 extensions (sizes, offsets or entry counts that do not fit the classic 32/16-bit fields).
+    case zip64Unsupported
 
     var errorDescription: String? {
         switch self {
@@ -18,6 +22,8 @@ enum ParsersZipError: Error, LocalizedError, Hashable {
         case .inflateFailed(let e): return "Entry \(e) could not be decompressed."
         case .checksumMismatch(let e): return "Entry \(e) failed its CRC-32 check."
         case .entryNotFound(let e): return "The archive has no entry named \(e)."
+        case .tooLarge(let e, let limit): return "Entry \(e) is larger than the \(limit / (1024 * 1024)) MB this app reads."
+        case .zip64Unsupported: return "The archive uses the ZIP64 format, which is not supported."
         }
     }
 }
@@ -27,7 +33,18 @@ enum ParsersZipError: Error, LocalizedError, Hashable {
 /// It reads the central directory when present (reliable sizes even for entries written with a data descriptor)
 /// and falls back to walking the local file headers otherwise. Stored (0) and deflate (8) entries are supported;
 /// deflate is inflated with the Compression framework (`COMPRESSION_ZLIB` = raw deflate).
+///
+/// Size fields are never trusted for allocation: decompression works in fixed 64 KiB chunks and stops with
+/// `ParsersZipError.tooLarge` once an entry exceeds `maxEntrySize` (or its declared size), so a damaged or hostile
+/// archive cannot exhaust memory. ZIP64 archives are rejected with `ParsersZipError.zip64Unsupported`.
 struct ParsersZipArchive {
+    /// Largest decompressed entry the reader produces (64 MiB; a MusicXML score is rarely above a few MB).
+    static let maxEntrySize = 64 * 1024 * 1024
+    /// Fixed decompression chunk size.
+    private static let chunkSize = 64 * 1024
+    /// The 32-bit "value is in the ZIP64 extra field" marker.
+    private static let zip64Marker32: UInt32 = 0xFFFF_FFFF
+
     /// One file inside the archive.
     struct Entry: Hashable {
         var name: String
@@ -86,12 +103,18 @@ struct ParsersZipArchive {
         guard dataStart <= bytes.count else { throw ParsersZipError.truncated("entry data of \(entry.name)") }
         let available = bytes.count - dataStart
         let compressedLength = entry.sizesKnown ? min(entry.compressedSize, available) : available
+        if entry.method == 0, min(compressedLength, entry.sizesKnown ? entry.uncompressedSize : compressedLength) > ParsersZipArchive.maxEntrySize {
+            throw ParsersZipError.tooLarge(entry: entry.name, limit: ParsersZipArchive.maxEntrySize)
+        }
         let slice = Array(bytes[dataStart ..< dataStart + compressedLength])
         let out: [UInt8]
         switch entry.method {
         case 0:
             out = entry.sizesKnown ? Array(slice.prefix(entry.uncompressedSize)) : slice
         case 8:
+            if entry.sizesKnown, entry.uncompressedSize > ParsersZipArchive.maxEntrySize {
+                throw ParsersZipError.tooLarge(entry: entry.name, limit: ParsersZipArchive.maxEntrySize)
+            }
             out = try ParsersZipArchive.inflate(slice, expectedSize: entry.sizesKnown ? entry.uncompressedSize : nil, entryName: entry.name)
         default:
             throw ParsersZipError.unsupportedMethod(entry.method, entry: entry.name)
@@ -120,9 +143,14 @@ struct ParsersZipArchive {
             pos -= 1
         }
         guard let e = eocd else { return nil }
-        let count = Int(le16(b, e + 10))
-        let cdSize = Int(le32(b, e + 12))
-        let cdOffset = Int(le32(b, e + 16))
+        let rawCount = le16(b, e + 10)
+        let rawSize = le32(b, e + 12)
+        let rawOffset = le32(b, e + 16)
+        // ZIP64 archives store these three as 0xFFFF / 0xFFFFFFFF and keep the real values in a ZIP64 record.
+        if rawCount == 0xFFFF || rawSize == zip64Marker32 || rawOffset == zip64Marker32 { throw ParsersZipError.zip64Unsupported }
+        let count = Int(rawCount)
+        let cdSize = Int(rawSize)
+        let cdOffset = Int(rawOffset)
         guard cdOffset + cdSize <= b.count, cdOffset >= 0 else { throw ParsersZipError.truncated("central directory") }
         var entries: [Entry] = []
         var p = cdOffset
@@ -130,12 +158,18 @@ struct ParsersZipArchive {
             guard p + 46 <= b.count, le32(b, p) == centralHeaderSignature else { throw ParsersZipError.truncated("central directory entry") }
             let method = le16(b, p + 10)
             let crc = le32(b, p + 16)
-            let csize = Int(le32(b, p + 20))
-            let usize = Int(le32(b, p + 24))
+            let rawCompressed = le32(b, p + 20)
+            let rawUncompressed = le32(b, p + 24)
+            let rawLocalOffset = le32(b, p + 42)
+            if rawCompressed == zip64Marker32 || rawUncompressed == zip64Marker32 || rawLocalOffset == zip64Marker32 {
+                throw ParsersZipError.zip64Unsupported
+            }
+            let csize = Int(rawCompressed)
+            let usize = Int(rawUncompressed)
             let nameLen = Int(le16(b, p + 28))
             let extraLen = Int(le16(b, p + 30))
             let commentLen = Int(le16(b, p + 32))
-            let localOffset = Int(le32(b, p + 42))
+            let localOffset = Int(rawLocalOffset)
             guard p + 46 + nameLen <= b.count else { throw ParsersZipError.truncated("central directory name") }
             let name = String(decoding: b[(p + 46) ..< (p + 46 + nameLen)], as: UTF8.self)
             entries.append(Entry(name: name, method: method, compressedSize: csize, uncompressedSize: usize, crc32: crc, localHeaderOffset: localOffset, sizesKnown: true))
@@ -151,8 +185,11 @@ struct ParsersZipArchive {
             let flags = le16(b, p + 6)
             let method = le16(b, p + 8)
             let crc = le32(b, p + 14)
-            let csize = Int(le32(b, p + 18))
-            let usize = Int(le32(b, p + 22))
+            let rawCompressed = le32(b, p + 18)
+            let rawUncompressed = le32(b, p + 22)
+            if rawCompressed == zip64Marker32 || rawUncompressed == zip64Marker32 { throw ParsersZipError.zip64Unsupported }
+            let csize = Int(rawCompressed)
+            let usize = Int(rawUncompressed)
             let nameLen = Int(le16(b, p + 26))
             let extraLen = Int(le16(b, p + 28))
             guard p + 30 + nameLen <= b.count else { throw ParsersZipError.truncated("local header name") }
@@ -172,8 +209,12 @@ struct ParsersZipArchive {
     // MARK: Inflate
 
     /// Inflates raw deflate data with the Compression framework's streaming API (so that the output size need not be known).
-    static func inflate(_ input: [UInt8], expectedSize: Int?, entryName: String) throws -> [UInt8] {
+    ///
+    /// Output is produced in fixed 64 KiB chunks. Decompression stops with `ParsersZipError.tooLarge` as soon as the
+    /// output exceeds `limit`, and with `inflateFailed` when it exceeds (or, at the end, differs from) `expectedSize`.
+    static func inflate(_ input: [UInt8], expectedSize: Int?, entryName: String, limit: Int = ParsersZipArchive.maxEntrySize) throws -> [UInt8] {
         guard !input.isEmpty else { return [] }
+        if let expected = expectedSize, expected > limit { throw ParsersZipError.tooLarge(entry: entryName, limit: limit) }
         let streamPointer = UnsafeMutablePointer<compression_stream>.allocate(capacity: 1)
         defer { streamPointer.deallocate() }
         guard compression_stream_init(streamPointer, COMPRESSION_STREAM_DECODE, COMPRESSION_ZLIB) == COMPRESSION_STATUS_OK else {
@@ -182,8 +223,8 @@ struct ParsersZipArchive {
         defer { compression_stream_destroy(streamPointer) }
 
         var output: [UInt8] = []
-        output.reserveCapacity(expectedSize ?? input.count * 4)
-        let chunkSize = max(64 * 1024, expectedSize ?? 0)
+        output.reserveCapacity(min(expectedSize ?? input.count.multipliedReportingOverflow(by: 4).partialValue, limit))
+        let chunkSize = ParsersZipArchive.chunkSize
         var chunk = [UInt8](repeating: 0, count: chunkSize)
         var finished = false
         var lastRemaining = -1
@@ -199,7 +240,12 @@ struct ParsersZipArchive {
                     return compression_stream_process(streamPointer, Int32(COMPRESSION_STREAM_FINALIZE.rawValue))
                 }
                 let produced = chunkSize - streamPointer.pointee.dst_size
-                if produced > 0 { output.append(contentsOf: chunk[0..<produced]) }
+                if produced > 0 {
+                    let total = output.count + produced
+                    if total > limit { throw ParsersZipError.tooLarge(entry: entryName, limit: limit) }
+                    if let expected = expectedSize, total > expected { throw ParsersZipError.inflateFailed(entry: entryName) }
+                    output.append(contentsOf: chunk[0..<produced])
+                }
                 switch status {
                 case COMPRESSION_STATUS_OK:
                     // No progress at all means the stream is truncated or corrupt; stop instead of spinning.
